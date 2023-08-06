@@ -1,0 +1,100 @@
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="./style.css" />
+		<title>Canvas Practice</title>
+	</head>
+	<body>
+		<div style="display: flex; flex-direction: column; height: 100%;">
+			<div>
+				<div>
+					<button
+						id="upload-btn"
+						onclick="document.getElementById('uploadIC').click()"
+					>
+						UPLOAD INITIAL CONDITIONS
+					</button>
+					<input
+						style="display: none"
+						id="uploadIC"
+						type="file"
+						name="myIC"
+						accept=".json"
+						onchange="uploadNewIC(event)"
+					/>
+
+          <button
+						id="upload-btn"
+						onclick="document.getElementById('uploadND').click()"
+					>
+						UPLOAD NEIGHBORS DATA
+					</button>
+					<input
+						style="display: none"
+						id="uploadND"
+						type="file"
+						name="myND"
+						onchange="uploadNewND(event)"
+					/>
+
+          <button
+						id="redraw-btn"
+					>
+						REDRAW
+					</button>
+				</div>
+				<div>
+					<h3>Options</h3>
+				</div>
+				<div>
+					<label>Number of particles</label>
+					<input
+						type="number"
+						min="0"
+						step="1"
+						id="N"
+            value="100"
+					/>
+
+					<label>Size of cells</label>
+					<input
+						type="number"
+						min="0"
+						step="any"
+						id="L"
+            value="2"
+					/>
+
+          <label>Number of cells</label>
+					<input
+						type="number"
+						min="1"
+						step="1"
+						id="M"
+            value="4"
+					/>
+
+          <label>Radius of interaction</label>
+					<input
+						type="number"
+						min="0"
+						step="any"
+						id="RC"
+            value="1"
+					/>
+
+          <label>Choose a particle</label>
+					<select name="particles" id="plist" disabled=true>
+            <option value="">--Please choose an option--</option>
+          </select>
+				</div>
+			</div>
+			<div style="height: 100%;">
+				<canvas id="canvas"></canvas>
+			</div>
+		</div>
+		<script type="module" src="viz.js"></script>
+	</body>
+</html>
