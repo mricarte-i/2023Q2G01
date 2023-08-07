@@ -44,6 +44,11 @@
 					>
 						REDRAW
 					</button>
+
+					<label>Choose a particle</label>
+					<select name="particles" id="plist" disabled=true>
+            <option value="">--Please choose an option--</option>
+          </select>
 				</div>
 				<div>
 					<h3>Options</h3>
@@ -64,7 +69,7 @@
 						min="0"
 						step="any"
 						id="L"
-            value="2"
+            value="4"
 					/>
 
           <label>Number of cells</label>
@@ -73,7 +78,7 @@
 						min="1"
 						step="1"
 						id="M"
-            value="4"
+            value="2"
 					/>
 
           <label>Radius of interaction</label>
@@ -82,13 +87,10 @@
 						min="0"
 						step="any"
 						id="RC"
-            value="1"
+            value="1.25"
 					/>
 
-          <label>Choose a particle</label>
-					<select name="particles" id="plist" disabled=true>
-            <option value="">--Please choose an option--</option>
-          </select>
+
 				</div>
 			</div>
 			<div style="height: 100%;">
