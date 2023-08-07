@@ -1,12 +1,12 @@
+<!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" href="./style.css" />
-		<title>Canvas Practice</title>
-	</head>
-	<body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visualizer</title>
+  </head>
+  <body>
 		<div style="display: flex; flex-direction: column; height: 100%;">
 			<div>
 				<div>
@@ -63,13 +63,13 @@
             value="100"
 					/>
 
-					<label>Size of cells</label>
+					<label>Size of area (space)</label>
 					<input
 						type="number"
 						min="0"
 						step="any"
 						id="L"
-            value="4"
+            value="8"
 					/>
 
           <label>Number of cells</label>
@@ -97,6 +97,6 @@
 				<canvas id="canvas"></canvas>
 			</div>
 		</div>
-		<script type="module" src="viz.js"></script>
+    <script type="module" src="/main.js"></script>
 	</body>
 </html>
