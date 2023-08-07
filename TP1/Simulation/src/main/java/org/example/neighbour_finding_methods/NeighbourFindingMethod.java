@@ -7,5 +7,5 @@ import java.util.Collection;
 import java.util.Map;
 
 public interface NeighbourFindingMethod<P extends Point> {
-    Map<Particle<P>, Collection<Particle<P>>> calculateNeighbours(Collection<Particle<P>> particles);
+    Map<Particle<P>, Collection<Particle<P>>> calculateNeighbours(Collection<Particle<P>> particles, Double neighbourhoodRadius);
 }
