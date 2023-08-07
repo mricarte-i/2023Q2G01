@@ -4,6 +4,10 @@ import './parsing'
 
 /**
  *  SIM VARIABLES & DATA
+ *  @N number of particles
+ *  @L size of area (space)
+ *  @M number of cells
+ *  @RC interaction radius
  */
 var N, L, M, RC, InitCond, NeighborData, Selected = undefined;
 
@@ -84,7 +88,7 @@ export function init() {
       let opt = document.createElement("option");
       opt.value = i;
       opt.innerHTML = `Particle Id:${i}`
-      if (i == 0) {
+      if (i == 0 && (!!!Selected || Number(Selected) >= N)) {
         opt.selected = true;
         Selected = "0";
       }
@@ -126,9 +130,9 @@ function drawGrid() {
   ctx.restore();
 
   console.log('grid')
-  const ogRange = { min: 0, max: L * M };
+  const ogRange = { min: 0, max: L };
   const { sqX, sqY, sqSize, sqRangeX, sqRangeY } = calculateSpace();
-  for (let i = 0; i < L * M; i++) {
+  for (let i = 0; i < L; i++) {
     ctx.beginPath();
     ctx.setLineDash([5, 15]);
     ctx.moveTo(transformRange(i, ogRange, sqRangeX), sqY);
@@ -138,7 +142,7 @@ function drawGrid() {
     ctx.stroke();
   }
 
-  for (let i = 0; i < L * M; i++) {
+  for (let i = 0; i < L; i++) {
     ctx.beginPath();
     ctx.setLineDash([5, 15]);
     ctx.moveTo(sqX, transformRange(i, ogRange, sqRangeY));
@@ -164,13 +168,13 @@ function drawArea(sqX, sqY, sqSize) {
 function drawParticle(p, sqRX, sqRY, size, sof, color) {
   ctx.restore();
 
-  const ogRange = { min: 0, max: L * M };
+  const ogRange = { min: 0, max: L };
   ctx.beginPath();
   ctx.strokeStyle = sof == "stroke" ? color : 'white';
   ctx.fillStyle = sof == "fill" ? color : 'white';
   const newX = transformRange(p.x, ogRange, sqRX);
   const newY = transformRange(p.y, ogRange, sqRY);
-  ctx.arc(newX, newY, (size / (L * M)) * 0.1, 0, 2 * Math.PI);
+  ctx.arc(newX, newY, (size / (L)) * 0.1, 0, 2 * Math.PI);
   if (sof == "stroke") {
     ctx.stroke();
   } else if (sof == "fill") {
@@ -190,7 +194,7 @@ function drawParticle(p, sqRX, sqRY, size, sof, color) {
 function drawInteractionRadius(p, sqRX, sqRY, size, color) {
   ctx.restore();
 
-  const ogRange = { min: 0, max: L * M };
+  const ogRange = { min: 0, max: L };
   ctx.beginPath();
   ctx.strokeStyle = color;
   ctx.fillStyle = 'transparent';
@@ -199,7 +203,7 @@ function drawInteractionRadius(p, sqRX, sqRY, size, color) {
   const newY = transformRange(p.y, ogRange, sqRY);
 
   //show interaction radius
-  ctx.arc(newX, newY, ((size / (L * M)) * RC), 0, 2 * Math.PI);
+  ctx.arc(newX, newY, ((size / (L)) * RC), 0, 2 * Math.PI);
   ctx.stroke();
 
   //trying to figure out how to scale to pixels...
