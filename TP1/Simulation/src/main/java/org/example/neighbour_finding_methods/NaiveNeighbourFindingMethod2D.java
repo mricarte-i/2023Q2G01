@@ -8,7 +8,7 @@ import java.util.*;
 
 public class NaiveNeighbourFindingMethod2D extends NaiveNeighbourFindingMethod<Point2D> {
 
-    public NaiveNeighbourFindingMethod2D(DistanceMethod<Particle<Point2D>> distanceMethod) {
+    public NaiveNeighbourFindingMethod2D(DistanceMethod<Point2D> distanceMethod) {
         super(distanceMethod);
     }
 
