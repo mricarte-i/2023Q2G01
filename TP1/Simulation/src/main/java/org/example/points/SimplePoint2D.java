@@ -12,6 +12,11 @@ public class SimplePoint2D implements Point2D {
         this.positionY = positionY;
     }
 
+    public SimplePoint2D(SimplePoint2D p){
+        this.positionX = p.positionX;
+        this.positionY = p.positionY;
+    }
+
     @Override
     public Double getX() {
         return positionX;
