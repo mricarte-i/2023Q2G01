@@ -25,7 +25,7 @@ public class SimpleParticle<P extends Point> implements Particle<P> {
 
     @Override
     public Double[] getCoordinates() {
-        return position.getCoordinates();
+        return position.getCoordinates().clone();
     }
 
     @Override
