@@ -67,7 +67,7 @@ function transformRange(value, range1, range2) {
 
 function calculateSpace() {
   const minSize = Math.min(canvas.width, canvas.height);
-  const sqSize = minSize - minSize / 5;
+  const sqSize = minSize - minSize / 10;
   const sqX = canvas.width / 2 - (sqSize / 2);
   const sqY = canvas.height / 2 - (sqSize / 2);
 
@@ -140,21 +140,21 @@ function drawGrid() {
   const { sqX, sqY, sqSize, sqRangeX, sqRangeY } = calculateSpace();
   for (let i = 0; i < L; i++) {
     ctx.beginPath();
-    ctx.setLineDash([5, 15]);
+    //ctx.setLineDash([5, 15]);
     ctx.moveTo(transformRange(i, ogRange, sqRangeX), sqY);
     ctx.lineTo(transformRange(i, ogRange, sqRangeX), sqSize + sqY);
-    ctx.strokeStyle = 'red';
-    //ctx.lineWidth = '5';
+    ctx.strokeStyle = 'rgba(245, 0, 0, 0.24)';
+    ctx.lineWidth = '0.5px';
     ctx.stroke();
   }
 
   for (let i = 0; i < L; i++) {
     ctx.beginPath();
-    ctx.setLineDash([5, 15]);
+    //ctx.setLineDash([5, 15]);
     ctx.moveTo(sqX, transformRange(i, ogRange, sqRangeY));
     ctx.lineTo(sqSize + sqX, transformRange(i, ogRange, sqRangeY));
-    ctx.strokeStyle = 'red';
-    //ctx.lineWidth = '5';
+    ctx.strokeStyle = 'rgba(245, 0, 0, 0.24)';
+    ctx.lineWidth = '0.5px';
     ctx.stroke();
   }
   ctx.setLineDash([]);
@@ -165,6 +165,7 @@ function drawArea(sqX, sqY, sqSize) {
 
   ctx.beginPath();
   ctx.strokeStyle = 'red';
+  ctx.lineWidth = '1px'
   ctx.rect(sqX, sqY, sqSize, sqSize);
   ctx.stroke();
 
@@ -240,21 +241,22 @@ function drawBase() {
 }
 
 function drawInfo() {
-  //check initial condifitions
-  if (!!!StaticIN || !!!DynamicIN) return;
-  //check neighbor data
-  if (!!!NeighborData) return;
   //check selected particle
   if (!!!Selected) return;
-
+  //check initial condifitions
+  if (!!!StaticIN || !!!DynamicIN) return;
   console.log("draw info on particles...")
   const { sqSize, sqRangeX, sqRangeY } = calculateSpace();
   const selectedIdx = Number(Selected);
   //draw red cross on position of selected particle
   drawParticle(selectedIdx, sqRangeX, sqRangeY, sqSize, 'fill', 'red');
-  drawInteractionRadius(selectedIdx, sqRangeX, sqRangeY, sqSize, 'magenta')
+  drawInteractionRadius(selectedIdx, sqRangeX, sqRangeY, sqSize, 'magenta');
 
-  console.log("SELECTED", InitCond[selectedIdx], RC)
+  //check neighbor data
+  if (!!!NeighborData) return;
+
+
+  console.log("SELECTED", selectedIdx, StaticIN[selectedIdx], DynamicIN[selectedIdx], RC)
 
   //read necessary info
   const selectedNeighbors = NeighborData[selectedIdx];
@@ -262,14 +264,15 @@ function drawInfo() {
   if (!!!selectedNeighbors) return;
   //draw green corsses on positions of neighbor particles
   for (let i = 0; i < selectedNeighbors.length; i++) {
-    const nId = selectedNeighbors[i].id;
-    drawParticle(InitCond[nId], sqRangeX, sqRangeY, sqSize, 'fill', 'green');
+    const nId = selectedNeighbors[i];
+    drawParticle(nId, sqRangeX, sqRangeY, sqSize, 'fill', 'green');
 
     console.log(
       "IS NEAR!",
-      InitCond[nId],
+      nId,
+      StaticIN[nId], DynamicIN[nId],
       {
-        distance: Math.hypot(InitCond[selectedIdx].x - InitCond[nId].x, InitCond[selectedIdx].y - InitCond[nId].y)
+        distance: Math.hypot(DynamicIN[selectedIdx].x - DynamicIN[nId].x, DynamicIN[selectedIdx].y - DynamicIN[nId].y)
       }
     );
   }

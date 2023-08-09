@@ -12,11 +12,7 @@ function uploadNewSI(event) {
     if (FileReader && file) {
       var fr = new FileReader();
       fr.onload = function (ev) {
-        //console.log(ev.target.result)
-        //InitCond = JSON.parse(ev.target.result);
-        //TODO: read & parse two files
         // - Static100.txt, which gives N, L, and properties on each particle
-        //console.log(ev.target.result);
         var lines = ev.target.result.split('\n');
         var particles = [];
         for (var line = 0; line < lines.length; line++) {
@@ -46,10 +42,6 @@ function uploadNewSI(event) {
 
         console.log(particles);
         setStaticIN(particles);
-        // - Dynamic100.txt, which gives a timestamp followed by the positions and velocities of each particle at that time
-
-        //setInitCond(JSON.parse(ev.target.result));
-        //init();
       };
 
       fr.readAsText(file);
@@ -88,35 +80,31 @@ function uploadNewDI(event) {
           var redLine = lines[line].split(/\s/).filter(x => !!x); //remove whitespaces
           switch (line % (N + 1)) {
             case 0:
-              particles = [];
               //time
+              particles = [];
               var read = redLine[0]; //there should only be one value, this one
               t = Number(read);
               console.log({ t, read });
-              //setN(Number(readN));
               break;
             default:
+              //x_i y_i vx_i vy_i
               var readX = redLine[0];
               var readY = redLine[1];
               //NO VELOCITY IN THIS ONE :)
               //var readVX = redLine[2];
               //var readVY = redLine[3];
-              //console.log({ r_i: Number(readR), pr_i: Number(readPR) });
               particles.push({ x: Number(readX), y: Number(readY) })
 
               if ((line + 1) % (N + 1) == 0) {
                 //on last particle, send data w/timestamp!
                 //setParticlesAtTime(particles, t);
-                //particles = [];
                 setDynamicIN(particles);
               }
-            //r_i pr_i
           }
         }
 
         console.log(particles);
 
-        //setInitCond(JSON.parse(ev.target.result));
         init();
       };
 
@@ -129,26 +117,40 @@ function uploadNewDI(event) {
 const upDI = document.getElementById("uploadDI");
 upDI.addEventListener("change", (ev) => uploadNewDI(ev));
 
-/*
-function uploadNewND(event) {
+
+function uploadNewOUT(event) {
   var file = event.target.files[0];
   var filename = file.name;
   var idxDot = filename.lastIndexOf(".") + 1;
   var extFile = filename.substr(idxDot, filename.length).toLowerCase();
 
   if (
-    extFile == "json"
+    extFile == "txt"
   ) {
     if (FileReader && file) {
       var fr = new FileReader();
       fr.onload = function (ev) {
-        //NeighborData = JSON.parse(ev.target.result);
-        //TODO: read & parse data from AlgunosVecinos_100.txt
+        var N = getN();
+        if (!!!N) {
+          alert("please upload static input first!");
+        }
+        // - Vecinos100.txt
         // - each line is supposed to be like:
         // [0    1    2    3] - for the 0th particle, its neighbors are 1,2,3
-        setNeighborData(JSON.parse(ev.target.result))
+        var lines = ev.target.result.split('\n');
+        var particles = Array(N).fill(null);
+        for (var line = 0; line < lines.length; line++) {
+          //console.log(lines[line]);
+          var redLine = lines[line].split(/\s+|\[|\]/g).filter(x => !!x).map(s => Number(s)); //remove whitespaces, '[' & ']'
+          var readID = redLine.shift(); //first element is the id of the particle that is "selected"
+          var neighbors = redLine;
+          particles[readID] = neighbors;
+        }
+
+        console.log(particles);
+        setNeighborData(particles);
         init();
-      };
+      }
       fr.readAsText(file);
     }
   } else {
@@ -156,6 +158,5 @@ function uploadNewND(event) {
   }
 }
 
-const upND = document.getElementById("uploadND");
-upND.addEventListener("change", (ev) => uploadNewND(ev));
-*/
+const upOUT = document.getElementById("uploadOUT");
+upOUT.addEventListener("change", (ev) => uploadNewOUT(ev));
