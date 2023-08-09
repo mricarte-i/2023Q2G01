@@ -6,6 +6,6 @@ import org.example.points.Point;
 import java.util.Collection;
 import java.util.Map;
 
-public interface NeighbourFindingMethod<P extends Point> {
-    Map<Particle<P>, Collection<Particle<P>>> calculateNeighbours(Collection<Particle<P>> particles, Double neighbourhoodRadius);
+public interface NeighbourFindingMethod<T extends Point, P extends Particle<T>> {
+    Map<P, Collection<P>> calculateNeighbours(Collection<P> particles, Double neighbourhoodRadius);
 }

@@ -6,7 +6,7 @@ import org.example.points.SimplePoint2D;
 
 import java.math.BigInteger;
 
-public class SimpleParticle2D extends SimpleParticle<Point2D> implements Point2D {
+public class SimpleParticle2D extends SimpleParticle<Point2D> implements Particle2D {
 
     public SimpleParticle2D(BigInteger id, Point2D position, Double radius) {
         super(id, position, radius);
@@ -43,11 +43,11 @@ public class SimpleParticle2D extends SimpleParticle<Point2D> implements Point2D
 
     @Override
     public Double distanceTo(Point2D p, DistanceMethod<Point2D> distanceMethod) {
-        return distanceMethod.calculateDistance(this, p);
+        return p.distanceTo(position, distanceMethod) - radius;
     }
 
     @Override
-    public Double distanceTo(Particle<Point2D> p, DistanceMethod<Particle<Point2D>> distanceMethod) {
+    public Double distanceTo(Particle<Point2D> p, DistanceMethod<Point2D> distanceMethod) {
         return super.distanceTo(p, distanceMethod);
     }
 

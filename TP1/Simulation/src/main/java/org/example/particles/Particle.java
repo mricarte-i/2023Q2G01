@@ -9,6 +9,6 @@ public interface Particle<P extends Point> extends Point {
     BigInteger getId();
     Double[] getCoordinates();
     P getPosition();
-    Double distanceTo(Particle<P> p, DistanceMethod<Particle<P>> distanceMethod);
+    Double distanceTo(Particle<P> p, DistanceMethod<P> distanceMethod);
     Double getRadius();
 }

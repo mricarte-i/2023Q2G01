@@ -6,24 +6,29 @@ import org.example.points.Point;
 
 import java.util.*;
 
-public abstract class NaiveNeighbourFindingMethod<P extends Point> implements NeighbourFindingMethod<P> {
-    private final DistanceMethod<Particle<P>> distanceMethod;
+public class NaiveNeighbourFindingMethod<T extends Point, P extends Particle<T>> implements NeighbourFindingMethod<T, P> {
+    private final DistanceMethod<T> distanceMethod;
 
-    public NaiveNeighbourFindingMethod(DistanceMethod<Particle<P>> distanceMethod){
+    public NaiveNeighbourFindingMethod(DistanceMethod<T> distanceMethod){
         this.distanceMethod = distanceMethod;
     }
 
     @Override
-    public Map<Particle<P>, Collection<Particle<P>>> calculateNeighbours(Collection<Particle<P>> particles, Double neighbourhoodRadius) {
-        Map<Particle<P>, Collection<Particle<P>>> neighbourMap = new HashMap<>();
-        for (Particle<P> particle : particles){
-            Set<Particle<P>> particleNeighbours = new HashSet<>(particles.size());
+    public Map<P, Collection<P>> calculateNeighbours(Collection<P> particles, Double neighbourhoodRadius) {
+        Map<P, Collection<P>> neighbourMap = new HashMap<>();
+        Set<P> possibleNeighbours = new HashSet<>(particles);
+        for (P particle : particles) {
+            Set<P> particleNeighbours = new HashSet<>(particles.size());
             neighbourMap.put(particle, particleNeighbours);
-            for (Particle<P> possibleNeighbour : particles){
-                if (!particleNeighbours.contains(possibleNeighbour) && particle.distanceTo(possibleNeighbour, distanceMethod) < neighbourhoodRadius) {
-                    particleNeighbours.add(possibleNeighbour);
+        }
+        for (P particle : particles) {
+            for (P possibleNeighbour : possibleNeighbours){
+                if (!particle.equals(possibleNeighbour) && particle.distanceTo(possibleNeighbour, distanceMethod) < neighbourhoodRadius) {
+                    neighbourMap.get(particle).add(possibleNeighbour);
+                    neighbourMap.get(possibleNeighbour).add(particle);
                 }
             }
+            possibleNeighbours.remove(particle);
         }
         return neighbourMap;
     }

@@ -5,6 +5,7 @@ import org.example.points.Point;
 import org.example.points.SimplePoint2D;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 public class SimpleParticle<P extends Point> implements Particle<P> {
     protected final BigInteger id;
@@ -24,7 +25,7 @@ public class SimpleParticle<P extends Point> implements Particle<P> {
 
     @Override
     public Double[] getCoordinates() {
-        return position.getCoordinates();
+        return position.getCoordinates().clone();
     }
 
     @Override
@@ -38,7 +39,24 @@ public class SimpleParticle<P extends Point> implements Particle<P> {
     }
 
     @Override
-    public Double distanceTo(Particle<P> p, DistanceMethod<Particle<P>> distanceMethod) {
-        return distanceMethod.calculateDistance(this, p) - radius - p.getRadius();
+    public Double distanceTo(Particle<P> p, DistanceMethod<P> distanceMethod) {
+        return distanceMethod.calculateDistance(position, p.getPosition()) - radius - p.getRadius();
+    }
+
+    @Override
+    public String toString() {
+        return "@{id=" + id.toString() + ";r=" + radius.toString() + ";p=" + Arrays.toString(position.getCoordinates()) + "}";
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Particle<?>))
+            return false;
+        return id.equals(((Particle<?>) o).getId());
     }
 }
