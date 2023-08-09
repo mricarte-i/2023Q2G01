@@ -1,34 +1,66 @@
 import { setInitCond, setNeighborData, init } from "./main";
 
-function uploadNewIC(event) {
+function uploadNewSI(event) {
   var file = event.target.files[0];
   var filename = file.name;
   var idxDot = filename.lastIndexOf(".") + 1;
   var extFile = filename.substr(idxDot, filename.length).toLowerCase();
 
   if (
-    extFile == "json"
+    extFile == "txt"
   ) {
     if (FileReader && file) {
       var fr = new FileReader();
       fr.onload = function (ev) {
-        console.log(ev.target.result)
+        //console.log(ev.target.result)
         //InitCond = JSON.parse(ev.target.result);
         //TODO: read & parse two files
         // - Static100.txt, which gives N, L, and properties on each particle
+        //console.log(ev.target.result);
+        var lines = ev.target.result.split('\n');
+        var particles = [];
+        for (var line = 0; line < lines.length; line++) {
+          //console.log(lines[line]);
+          var redLine = lines[line].split(/\s/).filter(x => !!x); //remove whitespaces
+          switch (line) {
+            case 0:
+              //N
+              var readN = redLine[0]; //there should only be one value, this one
+              console.log({ N: Number(readN), readN });
+              //setN(Number(readN));
+              break;
+            case 1:
+              //L
+              var readL = redLine[0];
+              console.log({ L: Number(readL), readL });
+              //setL(Number(readL));
+              break;
+            default:
+              var readR = redLine[0];
+              var readPR = redLine[1];
+              //console.log({ r_i: Number(readR), pr_i: Number(readPR) });
+              particles.push({ r: Number(readR), pr: Number(readPR) })
+            //r_i pr_i
+          }
+        }
+
+        console.log(particles);
         // - Dynamic100.txt, which gives a timestamp followed by the positions and velocities of each particle at that time
-        setInitCond(JSON.parse(ev.target.result));
-        init();
+
+        //setInitCond(JSON.parse(ev.target.result));
+        //init();
       };
       fr.readAsText(file);
     }
   } else {
-    alert("Only .json files, please.");
+    alert("Only .txt files, please.");
   }
 }
-const upIC = document.getElementById("uploadIC");
-upIC.addEventListener("change", (ev) => uploadNewIC(ev));
+const upSI = document.getElementById("uploadSI");
+upSI.addEventListener("change", (ev) => uploadNewSI(ev));
 
+
+/*
 function uploadNewND(event) {
   var file = event.target.files[0];
   var filename = file.name;
@@ -57,3 +89,4 @@ function uploadNewND(event) {
 
 const upND = document.getElementById("uploadND");
 upND.addEventListener("change", (ev) => uploadNewND(ev));
+*/

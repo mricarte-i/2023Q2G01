@@ -11,32 +11,44 @@
 			<div>
 				<div>
 					<button
-						id="upload-btn"
-						onclick="document.getElementById('uploadIC').click()"
+						id="upload-btn-SI"
+						onclick="document.getElementById('uploadSI').click()"
 					>
-						UPLOAD INITIAL CONDITIONS
+						UPLOAD STATIC IN
 					</button>
 					<input
 						style="display: none"
-						id="uploadIC"
+						id="uploadSI"
 						type="file"
-						name="myIC"
-						accept=".json"
-						onchange="uploadNewIC(event)"
+						name="mySI"
+						accept=".txt"
+					/>
+
+					<button
+						id="upload-btn-DI"
+						onclick="document.getElementById('uploadDI').click()"
+					>
+						UPLOAD DYNAMIC IN
+					</button>
+					<input
+						style="display: none"
+						id="uploadDI"
+						type="file"
+						name="myDI"
+						accept=".txt"
 					/>
 
           <button
-						id="upload-btn"
-						onclick="document.getElementById('uploadND').click()"
+						id="upload-btn-OUT"
+						onclick="document.getElementById('uploadOUT').click()"
 					>
-						UPLOAD NEIGHBORS DATA
+						UPLOAD OUTPUT
 					</button>
 					<input
 						style="display: none"
-						id="uploadND"
+						id="uploadOUT"
 						type="file"
-						name="myND"
-						onchange="uploadNewND(event)"
+						name="myOUT"
 					/>
 
           <button
