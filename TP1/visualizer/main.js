@@ -9,14 +9,20 @@ import './parsing'
  *  @M number of cells
  *  @RC interaction radius
  */
-var N, L, M, RC, InitCond, NeighborData, Selected = undefined;
+var N, L, M, RC, StaticIN, DynamicIN, NeighborData, Selected = undefined;
 
 export function setN(val) { N = val; }
 export function setL(val) { L = val; }
 export function setM(val) { M = val; }
 export function setRC(val) { RC = val; }
 
-export function setInitCond(val) { InitCond = val; }
+export function getN() { return N; }
+export function getL() { return L; }
+export function getM() { return M; }
+export function getRC() { return RC; }
+
+export function setStaticIN(val) { StaticIN = val; }
+export function setDynamicIN(val) { DynamicIN = val; }
 export function setNeighborData(val) { NeighborData = val; }
 
 /**
@@ -165,16 +171,16 @@ function drawArea(sqX, sqY, sqSize) {
   drawGrid(sqX, sqY)
 }
 
-function drawParticle(p, sqRX, sqRY, size, sof, color) {
+function drawParticle(id, sqRX, sqRY, size, sof, color) {
   ctx.restore();
 
   const ogRange = { min: 0, max: L };
   ctx.beginPath();
   ctx.strokeStyle = sof == "stroke" ? color : 'white';
   ctx.fillStyle = sof == "fill" ? color : 'white';
-  const newX = transformRange(p.x, ogRange, sqRX);
-  const newY = transformRange(p.y, ogRange, sqRY);
-  ctx.arc(newX, newY, (size / (L)) * 0.1, 0, 2 * Math.PI);
+  const newX = transformRange(DynamicIN[id].x, ogRange, sqRX);
+  const newY = transformRange(DynamicIN[id].y, ogRange, sqRY);
+  ctx.arc(newX, newY, (size / L) * StaticIN[id].r, 0, 2 * Math.PI);
   if (sof == "stroke") {
     ctx.stroke();
   } else if (sof == "fill") {
@@ -187,11 +193,11 @@ function drawParticle(p, sqRX, sqRY, size, sof, color) {
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'center';
   ctx.font = `20px sans-serif`
-  ctx.fillText(`${p.id}`, newX, newY)
+  ctx.fillText(`${id}`, newX, newY)
 
 }
 
-function drawInteractionRadius(p, sqRX, sqRY, size, color) {
+function drawInteractionRadius(id, sqRX, sqRY, size, color) {
   ctx.restore();
 
   const ogRange = { min: 0, max: L };
@@ -199,11 +205,11 @@ function drawInteractionRadius(p, sqRX, sqRY, size, color) {
   ctx.strokeStyle = color;
   ctx.fillStyle = 'transparent';
 
-  const newX = transformRange(p.x, ogRange, sqRX);
-  const newY = transformRange(p.y, ogRange, sqRY);
+  const newX = transformRange(DynamicIN[id].x, ogRange, sqRX);
+  const newY = transformRange(DynamicIN[id].y, ogRange, sqRY);
 
   //show interaction radius
-  ctx.arc(newX, newY, ((size / (L)) * RC), 0, 2 * Math.PI);
+  ctx.arc(newX, newY, ((size / L) * (StaticIN[id].r + StaticIN[id].pr)), 0, 2 * Math.PI);
   ctx.stroke();
 
   //trying to figure out how to scale to pixels...
@@ -224,10 +230,10 @@ function drawBase() {
   drawArea(sqX, sqY, sqSize)
 
   //check & read initial conditions
-  if (!!InitCond) {
+  if (!!StaticIN && !!DynamicIN) {
     console.log("init cond draw...")
-    for (let i = 0; i < InitCond.length; i++) {
-      drawParticle(InitCond[i], sqRangeX, sqRangeY, sqSize, 'stroke', 'blue');
+    for (let i = 0; i < N; i++) {
+      drawParticle(i, sqRangeX, sqRangeY, sqSize, 'stroke', 'blue');
     }
   }
   console.log("drawing!", { minSize, sqSize, sqX, sqY })
@@ -235,7 +241,7 @@ function drawBase() {
 
 function drawInfo() {
   //check initial condifitions
-  if (!!!InitCond) return;
+  if (!!!StaticIN || !!!DynamicIN) return;
   //check neighbor data
   if (!!!NeighborData) return;
   //check selected particle
@@ -245,8 +251,8 @@ function drawInfo() {
   const { sqSize, sqRangeX, sqRangeY } = calculateSpace();
   const selectedIdx = Number(Selected);
   //draw red cross on position of selected particle
-  drawParticle(InitCond[selectedIdx], sqRangeX, sqRangeY, sqSize, 'fill', 'red');
-  drawInteractionRadius(InitCond[selectedIdx], sqRangeX, sqRangeY, sqSize, 'magenta')
+  drawParticle(selectedIdx, sqRangeX, sqRangeY, sqSize, 'fill', 'red');
+  drawInteractionRadius(selectedIdx, sqRangeX, sqRangeY, sqSize, 'magenta')
 
   console.log("SELECTED", InitCond[selectedIdx], RC)
 
