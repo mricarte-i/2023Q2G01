@@ -5,6 +5,7 @@ import org.example.points.Point2D;
 import org.example.points.SimplePoint2D;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 public class VirtualParticle2D implements Particle2D {
 
@@ -59,5 +60,22 @@ public class VirtualParticle2D implements Particle2D {
     @Override
     public Double getRadius() {
         return realParticle.getRadius();
+    }
+
+    @Override
+    public String toString() {
+        return "@{id=" + getId().toString() + ";r=" + getRadius().toString() + ";p=" + Arrays.toString(getPosition().getCoordinates()) + "}";
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Particle<?>))
+            return false;
+        return getId().equals(((Particle<?>) o).getId());
     }
 }
