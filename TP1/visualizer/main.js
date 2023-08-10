@@ -9,14 +9,20 @@ import './parsing'
  *  @M number of cells
  *  @RC interaction radius
  */
-var N, L, M, RC, InitCond, NeighborData, Selected = undefined;
+var N, L, M, RC, StaticIN, DynamicIN, NeighborData, Selected = undefined;
 
 export function setN(val) { N = val; }
 export function setL(val) { L = val; }
 export function setM(val) { M = val; }
 export function setRC(val) { RC = val; }
 
-export function setInitCond(val) { InitCond = val; }
+export function getN() { return N; }
+export function getL() { return L; }
+export function getM() { return M; }
+export function getRC() { return RC; }
+
+export function setStaticIN(val) { StaticIN = val; }
+export function setDynamicIN(val) { DynamicIN = val; }
 export function setNeighborData(val) { NeighborData = val; }
 
 /**
@@ -61,7 +67,7 @@ function transformRange(value, range1, range2) {
 
 function calculateSpace() {
   const minSize = Math.min(canvas.width, canvas.height);
-  const sqSize = minSize - minSize / 5;
+  const sqSize = minSize - minSize / 10;
   const sqX = canvas.width / 2 - (sqSize / 2);
   const sqY = canvas.height / 2 - (sqSize / 2);
 
@@ -134,21 +140,21 @@ function drawGrid() {
   const { sqX, sqY, sqSize, sqRangeX, sqRangeY } = calculateSpace();
   for (let i = 0; i < L; i++) {
     ctx.beginPath();
-    ctx.setLineDash([5, 15]);
+    //ctx.setLineDash([5, 15]);
     ctx.moveTo(transformRange(i, ogRange, sqRangeX), sqY);
     ctx.lineTo(transformRange(i, ogRange, sqRangeX), sqSize + sqY);
-    ctx.strokeStyle = 'red';
-    //ctx.lineWidth = '5';
+    ctx.strokeStyle = 'rgba(245, 0, 0, 0.24)';
+    ctx.lineWidth = '0.5px';
     ctx.stroke();
   }
 
   for (let i = 0; i < L; i++) {
     ctx.beginPath();
-    ctx.setLineDash([5, 15]);
+    //ctx.setLineDash([5, 15]);
     ctx.moveTo(sqX, transformRange(i, ogRange, sqRangeY));
     ctx.lineTo(sqSize + sqX, transformRange(i, ogRange, sqRangeY));
-    ctx.strokeStyle = 'red';
-    //ctx.lineWidth = '5';
+    ctx.strokeStyle = 'rgba(245, 0, 0, 0.24)';
+    ctx.lineWidth = '0.5px';
     ctx.stroke();
   }
   ctx.setLineDash([]);
@@ -159,22 +165,23 @@ function drawArea(sqX, sqY, sqSize) {
 
   ctx.beginPath();
   ctx.strokeStyle = 'red';
+  ctx.lineWidth = '1px'
   ctx.rect(sqX, sqY, sqSize, sqSize);
   ctx.stroke();
 
   drawGrid(sqX, sqY)
 }
 
-function drawParticle(p, sqRX, sqRY, size, sof, color) {
+function drawParticle(id, sqRX, sqRY, size, sof, color) {
   ctx.restore();
 
   const ogRange = { min: 0, max: L };
   ctx.beginPath();
   ctx.strokeStyle = sof == "stroke" ? color : 'white';
   ctx.fillStyle = sof == "fill" ? color : 'white';
-  const newX = transformRange(p.x, ogRange, sqRX);
-  const newY = transformRange(p.y, ogRange, sqRY);
-  ctx.arc(newX, newY, (size / (L)) * 0.1, 0, 2 * Math.PI);
+  const newX = transformRange(DynamicIN[id].x, ogRange, sqRX);
+  const newY = transformRange(DynamicIN[id].y, ogRange, sqRY);
+  ctx.arc(newX, newY, (size / L) * StaticIN[id].r, 0, 2 * Math.PI);
   if (sof == "stroke") {
     ctx.stroke();
   } else if (sof == "fill") {
@@ -187,11 +194,11 @@ function drawParticle(p, sqRX, sqRY, size, sof, color) {
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'center';
   ctx.font = `20px sans-serif`
-  ctx.fillText(`${p.id}`, newX, newY)
+  ctx.fillText(`${id}`, newX, newY)
 
 }
 
-function drawInteractionRadius(p, sqRX, sqRY, size, color) {
+function drawInteractionRadius(id, sqRX, sqRY, size, color) {
   ctx.restore();
 
   const ogRange = { min: 0, max: L };
@@ -199,11 +206,11 @@ function drawInteractionRadius(p, sqRX, sqRY, size, color) {
   ctx.strokeStyle = color;
   ctx.fillStyle = 'transparent';
 
-  const newX = transformRange(p.x, ogRange, sqRX);
-  const newY = transformRange(p.y, ogRange, sqRY);
+  const newX = transformRange(DynamicIN[id].x, ogRange, sqRX);
+  const newY = transformRange(DynamicIN[id].y, ogRange, sqRY);
 
   //show interaction radius
-  ctx.arc(newX, newY, ((size / (L)) * RC), 0, 2 * Math.PI);
+  ctx.arc(newX, newY, ((size / L) * (StaticIN[id].r + StaticIN[id].pr)), 0, 2 * Math.PI);
   ctx.stroke();
 
   //trying to figure out how to scale to pixels...
@@ -224,31 +231,32 @@ function drawBase() {
   drawArea(sqX, sqY, sqSize)
 
   //check & read initial conditions
-  if (!!InitCond) {
+  if (!!StaticIN && !!DynamicIN) {
     console.log("init cond draw...")
-    for (let i = 0; i < InitCond.length; i++) {
-      drawParticle(InitCond[i], sqRangeX, sqRangeY, sqSize, 'stroke', 'blue');
+    for (let i = 0; i < N; i++) {
+      drawParticle(i, sqRangeX, sqRangeY, sqSize, 'stroke', 'blue');
     }
   }
   console.log("drawing!", { minSize, sqSize, sqX, sqY })
 }
 
 function drawInfo() {
-  //check initial condifitions
-  if (!!!InitCond) return;
-  //check neighbor data
-  if (!!!NeighborData) return;
   //check selected particle
   if (!!!Selected) return;
-
+  //check initial condifitions
+  if (!!!StaticIN || !!!DynamicIN) return;
   console.log("draw info on particles...")
   const { sqSize, sqRangeX, sqRangeY } = calculateSpace();
   const selectedIdx = Number(Selected);
   //draw red cross on position of selected particle
-  drawParticle(InitCond[selectedIdx], sqRangeX, sqRangeY, sqSize, 'fill', 'red');
-  drawInteractionRadius(InitCond[selectedIdx], sqRangeX, sqRangeY, sqSize, 'magenta')
+  drawParticle(selectedIdx, sqRangeX, sqRangeY, sqSize, 'fill', 'red');
+  drawInteractionRadius(selectedIdx, sqRangeX, sqRangeY, sqSize, 'magenta');
 
-  console.log("SELECTED", InitCond[selectedIdx], RC)
+  //check neighbor data
+  if (!!!NeighborData) return;
+
+
+  console.log("SELECTED", selectedIdx, StaticIN[selectedIdx], DynamicIN[selectedIdx], RC)
 
   //read necessary info
   const selectedNeighbors = NeighborData[selectedIdx];
@@ -256,14 +264,15 @@ function drawInfo() {
   if (!!!selectedNeighbors) return;
   //draw green corsses on positions of neighbor particles
   for (let i = 0; i < selectedNeighbors.length; i++) {
-    const nId = selectedNeighbors[i].id;
-    drawParticle(InitCond[nId], sqRangeX, sqRangeY, sqSize, 'fill', 'green');
+    const nId = selectedNeighbors[i];
+    drawParticle(nId, sqRangeX, sqRangeY, sqSize, 'fill', 'green');
 
     console.log(
       "IS NEAR!",
-      InitCond[nId],
+      nId,
+      StaticIN[nId], DynamicIN[nId],
       {
-        distance: Math.hypot(InitCond[selectedIdx].x - InitCond[nId].x, InitCond[selectedIdx].y - InitCond[nId].y)
+        distance: Math.hypot(DynamicIN[selectedIdx].x - DynamicIN[nId].x, DynamicIN[selectedIdx].y - DynamicIN[nId].y)
       }
     );
   }

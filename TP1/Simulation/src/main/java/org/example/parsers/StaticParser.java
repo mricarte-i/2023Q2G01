@@ -1,7 +1,6 @@
 package org.example.parsers;
 
-import jdk.internal.net.http.common.Pair;
-
+import org.example.utils.Pair;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -11,9 +10,9 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class StaticParser {
-    public static List<Pair<Double, Double>> parse (String path){
+    public static List<Pair<Double>> parse (String path){
         Scanner input = null;
-        List<Pair<Double, Double>> list = new ArrayList<>();
+        List<Pair<Double>> list = new ArrayList<>();
 
         try {
             System.out.println("Parsing static file...");
@@ -23,12 +22,12 @@ public class StaticParser {
 
             Double N = Arrays.stream(input.nextLine().split("\\s\\s\\s\\s")).filter(s -> !s.isEmpty()).map(Double::valueOf).collect(Collectors.toList()).get(0);
             Double L = Arrays.stream(input.nextLine().split("\\s\\s\\s\\s")).filter(s -> !s.isEmpty()).map(Double::valueOf).collect(Collectors.toList()).get(0);
-            Pair<Double, Double> p = new Pair<>(N,L);
+            Pair<Double> p = new Pair<>(N,L);
             list.add(p);
 
             while(input.hasNext()) {
                 List<Double> numbers = Arrays.stream(input.nextLine().split("\\s\\s\\s\\s")).filter(s -> !s.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
-                Pair<Double, Double> pair = new Pair<>(numbers.get(0), numbers.get(1));
+                Pair<Double> pair = new Pair<>(numbers.get(0), numbers.get(1));
                 list.add(pair);
             }
 
