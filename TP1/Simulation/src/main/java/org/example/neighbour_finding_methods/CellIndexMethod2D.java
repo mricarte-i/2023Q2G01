@@ -20,7 +20,7 @@ public class CellIndexMethod2D implements NeighbourFindingMethod<Point2D, Partic
     }
 
     @Override
-    public Map<Particle2D, Collection<Particle2D>> calculateNeighbours(Collection<Particle2D> particles, Double neighbourhoodRadius) {
+    public Map<Particle2D, Collection<Particle2D>> calculateNeighbours(Collection<Particle2D> particles, double neighbourhoodRadius) {
         int          n              = particles.size();
         double       cellSide       = l / m;
         Integer[][]  heads          = new Integer[m][m];
@@ -43,7 +43,7 @@ public class CellIndexMethod2D implements NeighbourFindingMethod<Point2D, Partic
         }
     }
 
-    private Map<Particle2D, Collection<Particle2D>> calculateNeighboursFromCells(Integer[][] heads, Integer[] list, Particle2D[] particleInfo, Double neighbourhoodRadius) {
+    private Map<Particle2D, Collection<Particle2D>> calculateNeighboursFromCells(Integer[][] heads, Integer[] list, Particle2D[] particleInfo, double neighbourhoodRadius) {
         Map<Particle2D, Collection<Particle2D>> neighbourMap = new HashMap<>();
         for (Particle2D particle : particleInfo) {
             neighbourMap.put(particle, new HashSet<>());
@@ -60,7 +60,7 @@ public class CellIndexMethod2D implements NeighbourFindingMethod<Point2D, Partic
         return neighbourMap;
     }
 
-    private void calculateNeighboursBetween2Cells(int cell1Row, int cell1Col, int cell2Row, int cell2Col, Integer[][] heads, Integer[] list, Particle2D[] particleInfo, Double neighbourhoodRadius, Map<Particle2D, Collection<Particle2D>> neighbourMap) {
+    private void calculateNeighboursBetween2Cells(int cell1Row, int cell1Col, int cell2Row, int cell2Col, Integer[][] heads, Integer[] list, Particle2D[] particleInfo, double neighbourhoodRadius, Map<Particle2D, Collection<Particle2D>> neighbourMap) {
         Integer currCell1ListIndex = heads[cell1Row][cell1Col];
         while (currCell1ListIndex != null) {
             Integer currCell2ListIndex = heads[cell2Row][cell2Col];

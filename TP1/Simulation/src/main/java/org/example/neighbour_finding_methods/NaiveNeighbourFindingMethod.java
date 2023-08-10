@@ -14,7 +14,7 @@ public class NaiveNeighbourFindingMethod<T extends Point, P extends Particle<T>>
     }
 
     @Override
-    public Map<P, Collection<P>> calculateNeighbours(Collection<P> particles, Double neighbourhoodRadius) {
+    public Map<P, Collection<P>> calculateNeighbours(Collection<P> particles, double neighbourhoodRadius) {
         Map<P, Collection<P>> neighbourMap = new HashMap<>();
         Set<P> possibleNeighbours = new HashSet<>(particles);
         for (P particle : particles) {

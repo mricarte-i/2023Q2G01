@@ -14,7 +14,7 @@ public class NaiveNeighbourFindingMethod2D extends NaiveNeighbourFindingMethod<P
     }
 
     @Override
-    public Map<Particle2D, Collection<Particle2D>> calculateNeighbours(Collection<Particle2D> particles, Double neighbourhoodRadius) {
+    public Map<Particle2D, Collection<Particle2D>> calculateNeighbours(Collection<Particle2D> particles, double neighbourhoodRadius) {
         return super.calculateNeighbours(particles, neighbourhoodRadius);
     }
 }

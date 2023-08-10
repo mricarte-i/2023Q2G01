@@ -10,20 +10,20 @@ import java.util.*;
 
 public class NaiveNeighbourFindingMethod2DWithWrapAround implements NeighbourFindingMethod<Point2D, Particle2D> {
     private final NeighbourFindingMethod<Point2D, VirtualParticle2D> neighbourFindingMethod;
-    private final Double l;
+    private final double l;
 
-    public NaiveNeighbourFindingMethod2DWithWrapAround(DistanceMethod<Point2D> distanceMethod, Double l){
+    public NaiveNeighbourFindingMethod2DWithWrapAround(DistanceMethod<Point2D> distanceMethod, double l){
         this.neighbourFindingMethod = new NaiveNeighbourFindingMethod<>(distanceMethod);
         this.l = l;
     }
 
     @Override
-    public Map<Particle2D, Collection<Particle2D>> calculateNeighbours(Collection<Particle2D> particles, Double neighbourhoodRadius) {
+    public Map<Particle2D, Collection<Particle2D>> calculateNeighbours(Collection<Particle2D> particles, double neighbourhoodRadius) {
         Map<VirtualParticle2D, Collection<VirtualParticle2D>> virtualNeighboursMap = calculateNeighboursWithVirtualParticles(particles, neighbourhoodRadius);
         return convertVirtualToRealNeighbourhood(virtualNeighboursMap);
     }
 
-    private Map<VirtualParticle2D, Collection<VirtualParticle2D>> calculateNeighboursWithVirtualParticles(Collection<Particle2D> particles, Double neighbourhoodRadius) {
+    private Map<VirtualParticle2D, Collection<VirtualParticle2D>> calculateNeighboursWithVirtualParticles(Collection<Particle2D> particles, double neighbourhoodRadius) {
         List<VirtualParticle2D> realAndVirtualParticles = new ArrayList<>(particles.size()*3);
         for (Particle2D particle : particles) {
 
