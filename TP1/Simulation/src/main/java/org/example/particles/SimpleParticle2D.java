@@ -42,13 +42,13 @@ public class SimpleParticle2D extends SimpleParticle<Point2D> implements Particl
     }
 
     @Override
-    public Double distanceTo(Point2D p, DistanceMethod<Point2D> distanceMethod) {
-        return p.distanceTo(position, distanceMethod) - radius;
+    public Double distanceTo(Particle<Point2D> p, DistanceMethod<Point2D> distanceMethod) {
+        return super.distanceTo(p, distanceMethod);
     }
 
     @Override
-    public Double distanceTo(Particle<Point2D> p, DistanceMethod<Point2D> distanceMethod) {
-        return super.distanceTo(p, distanceMethod);
+    public Double distanceTo(Particle2D p, DistanceMethod<Point2D> distanceMethod) {
+        return this.distanceTo((Particle<Point2D>) p, distanceMethod);
     }
 
     @Override
