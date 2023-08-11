@@ -7,13 +7,13 @@ import org.example.points.SimplePoint2D;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-public class SimpleVirtualParticle2D implements VirtualParticle2D {
+public class SimpleVirtualParticle2D<P extends Particle2D> implements VirtualParticle2D<P> {
 
-    private final Particle2D realParticle;
+    private final P realParticle;
     private final Double deltaX;
     private final Double deltaY;
 
-    public SimpleVirtualParticle2D(Particle2D p, Double deltaX, Double deltaY){
+    public SimpleVirtualParticle2D(P p, Double deltaX, Double deltaY){
         this.realParticle = p;
         this.deltaX = deltaX;
         this.deltaY = deltaY;
@@ -64,7 +64,7 @@ public class SimpleVirtualParticle2D implements VirtualParticle2D {
     }
 
     @Override
-    public Particle2D getRealParticle() {
+    public P getRealParticle() {
         return realParticle;
     }
 

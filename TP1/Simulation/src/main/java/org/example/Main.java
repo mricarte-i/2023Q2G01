@@ -94,7 +94,7 @@ public class Main {
         long startCalc = System.nanoTime();
         //call that algorithm!
         if(readAlg.equals("cim")){
-            NeighbourFindingMethod<Point2D, Particle2D> cellIndex = new CellIndexMethod2D(distMethod, L, M);
+            NeighbourFindingMethod<Point2D, Particle2D> cellIndex = new CellIndexMethod2D<>(distMethod, L, M);
             rp.parseAndWriteToFile(cellIndex.calculateNeighbours(particles, Rc), outputLocation);
         } else if (readAlg.equals("naive")) {
             if(readMode.equals("wrap")){
