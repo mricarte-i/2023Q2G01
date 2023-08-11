@@ -1,10 +1,12 @@
 package org.example.neighbour_finding_methods;
 
 import org.example.distance_methods.DistanceMethod;
+import org.example.exceptions.InvalidNeighbourhoodRadiusException;
 import org.example.particles.Particle2D;
 import org.example.particles.SimpleVirtualParticle2D;
 import org.example.particles.VirtualParticle2D;
 import org.example.points.Point2D;
+import org.example.utils.Pair;
 
 import java.util.*;
 
@@ -18,6 +20,10 @@ public class CellIndexMethod2DWithWrapAround<P extends Particle2D> extends CellI
     public Map<P, Collection<P>> calculateNeighbours(Collection<P> particles, double neighbourhoodRadius) {
         int           n                = particles.size();
         double        cellSide         = l / m;
+        Pair<Double> top2Radii = biggest2ParticleRadii(particles);
+        if (cellSide <= neighbourhoodRadius + top2Radii.getFirst() + top2Radii.getSecond()) {
+            throw new InvalidNeighbourhoodRadiusException(cellSide, neighbourhoodRadius, top2Radii.getFirst(), top2Radii.getSecond());
+        }
         Integer[][]   heads            = new Integer[m][m];
         Integer[]     list             = new Integer[n];
         P[]           particleInfo     = (P[]) new Particle2D[n];

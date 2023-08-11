@@ -1,6 +1,7 @@
 package org.example.neighbour_finding_methods;
 
 import org.example.distance_methods.DistanceMethod;
+import org.example.exceptions.InvalidNeighbourhoodRadiusException;
 import org.example.particles.Particle2D;
 import org.example.points.Point2D;
 import org.example.utils.Pair;
@@ -13,6 +14,7 @@ public class CellIndexMethod2D<P extends Particle2D> implements NeighbourFinding
     protected final double l;
     protected final int m;
 
+
     public CellIndexMethod2D(DistanceMethod<Point2D> distanceMethod, double l, int m){
         this.distanceMethod = distanceMethod;
         this.l              = l;
@@ -23,6 +25,10 @@ public class CellIndexMethod2D<P extends Particle2D> implements NeighbourFinding
     public Map<P, Collection<P>> calculateNeighbours(Collection<P> particles, double neighbourhoodRadius) {
         int          n              = particles.size();
         double       cellSide       = l / m;
+        Pair<Double> top2Radii = biggest2ParticleRadii(particles);
+        if (cellSide <= neighbourhoodRadius + top2Radii.getFirst() + top2Radii.getSecond()) {
+           throw new InvalidNeighbourhoodRadiusException(cellSide, neighbourhoodRadius, top2Radii.getFirst(), top2Radii.getSecond());
+        }
         Integer[][]  heads          = new Integer[m][m];
         Integer[]    list           = new Integer[n];
         P[]          particleInfo   = (P[]) new Particle2D[n];
@@ -60,6 +66,18 @@ public class CellIndexMethod2D<P extends Particle2D> implements NeighbourFinding
             }
         }
         return neighbourMap;
+    }
+
+    protected Pair<Double> biggest2ParticleRadii(Collection<P> particles) {
+        double maxRadius       = 0d;
+        double secondMaxRadius = 0d;
+        for (P particle : particles) {
+            if(particle.getRadius() > maxRadius) {
+                secondMaxRadius = maxRadius;
+                maxRadius       = particle.getRadius();
+            }
+        }
+        return new Pair<>(maxRadius, secondMaxRadius);
     }
 
     private void calculateNeighboursBetween2Cells(int cell1Row, int cell1Col, int cell2Row, int cell2Col, Integer[][] heads, Integer[] list, P[] particleInfo, double neighbourhoodRadius, Map<P, Collection<P>> neighbourMap) {
