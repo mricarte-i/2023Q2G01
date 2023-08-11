@@ -141,7 +141,7 @@ function uploadNewOUT(event) {
         var particles = Array(N).fill(null);
         for (var line = 0; line < lines.length; line++) {
           //console.log(lines[line]);
-          var redLine = lines[line].split(/\s+|\[|\]/g).filter(x => !!x).map(s => Number(s)); //remove whitespaces, '[' & ']'
+          var redLine = lines[line].split(/\s+|\[|\]/g).filter(x => !!x).map(s => Number(s) - 1); //remove whitespaces, '[' & ']'
           var readID = redLine.shift(); //first element is the id of the particle that is "selected"
           var neighbors = redLine;
           particles[readID] = neighbors;
