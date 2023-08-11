@@ -272,7 +272,7 @@ function drawInfo() {
       nId + 1,
       StaticIN[nId], DynamicIN[nId],
       {
-        distance: Math.hypot(DynamicIN[selectedIdx].x - DynamicIN[nId].x, DynamicIN[selectedIdx].y - DynamicIN[nId].y)
+        distance: Math.hypot(DynamicIN[selectedIdx].x - DynamicIN[nId].x, DynamicIN[selectedIdx].y - DynamicIN[nId].y) - StaticIN[selectedIdx].r - StaticIN[nId].r
       }
     );
   }

@@ -17,8 +17,10 @@ import org.example.utils.Pair;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class Main {
@@ -90,25 +92,32 @@ public class Main {
 
         DistanceMethod<Point2D> distMethod = new EuclideanDistanceMethod2D<>();
         ResultParser rp = new ResultParser();
+        Map<Particle2D, Collection<Particle2D>> neighbourData = null;
 
         long startCalc = System.nanoTime();
         //call that algorithm!
         if(readAlg.equals("cim")){
             //TODO: catch InvalidNeighbourhoodRadiusException
             NeighbourFindingMethod<Point2D, Particle2D> cellIndex = new CellIndexMethod2D<>(distMethod, L, M);
-            rp.parseAndWriteToFile(cellIndex.calculateNeighbours(particles, Rc), outputLocation);
+            neighbourData = cellIndex.calculateNeighbours(particles, Rc);
         } else if (readAlg.equals("naive")) {
             if(readMode.equals("wrap")){
                 NeighbourFindingMethod<Point2D, Particle2D> naiveWrap = new NaiveNeighbourFindingMethod2DWithWrapAround(distMethod, L);
-                rp.parseAndWriteToFile(naiveWrap.calculateNeighbours(particles, Rc), outputLocation);
+                neighbourData = naiveWrap.calculateNeighbours(particles, Rc);
             } else if (readMode.equals("normal")) {
                 NeighbourFindingMethod<Point2D, Particle2D> naiveNormal = new NaiveNeighbourFindingMethod2D(distMethod);
-                rp.parseAndWriteToFile(naiveNormal.calculateNeighbours(particles, Rc), outputLocation);
+                neighbourData = naiveNormal.calculateNeighbours(particles, Rc);
             }
         }
         long endCalc = System.nanoTime();
-
         System.out.println("Time: " + String.valueOf(endCalc - startCalc) + " nanoseconds");
+
+        if(neighbourData != null){
+            rp.parseAndWriteToFile(neighbourData, outputLocation);
+        }else {
+            throw new RuntimeException("Finder has failed to run, check your parameters.");
+        }
+
 
     }
 }
