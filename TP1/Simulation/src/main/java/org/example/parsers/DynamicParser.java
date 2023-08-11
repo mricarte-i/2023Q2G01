@@ -20,7 +20,7 @@ public class DynamicParser {
             File file = new File(path);
             input = new Scanner(file);
 
-            input.nextLine();
+            input.nextLine(); //skips first timestamp
 
             while(input.hasNext()) {
                 List<Double> numbers = Arrays.stream(input.nextLine().split("\\s\\s\\s")).filter(s -> !s.isEmpty()).map(Double::valueOf).collect(Collectors.toList());
