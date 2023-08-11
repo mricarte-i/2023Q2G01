@@ -5,11 +5,12 @@ import org.example.particles.SimpleParticle2D;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
-public class RandomParticle2DSupplier implements Supplier<Iterable<Particle2D>> {
+public class RandomParticle2DSupplier implements Supplier<Collection<Particle2D>> {
 
     protected final int n;
     protected final Random randomGenerator;
@@ -34,7 +35,7 @@ public class RandomParticle2DSupplier implements Supplier<Iterable<Particle2D>> 
     }
 
     @Override
-    public Iterable<Particle2D> get() {
+    public Collection<Particle2D> get() {
         List<Particle2D> generatedParticles = new ArrayList<>(n);
         Supplier<BigInteger> idGenerator = new IncreasingBigIntegersSupplier();
         for (int i = 0; i < n; i++) {
