@@ -26,19 +26,55 @@ import java.util.function.Supplier;
 public class Main {
     public static void main(String[] args) {
         System.out.printf("Hello and welcome!\n");
+
+        //example: [jar] --runmode=parse|random {...specific params}
+
+
+        if(args.length <= 1){
+            throw new RuntimeException("need parameters!");
+        }
+
+        String[] readParam = args[0].split("(?:--(\\w+)=\\s*)");
+        if(readParam.length != 2){
+            throw new RuntimeException("TELL ME A RUN MODE");
+        }
+        String runMode = readParam[1];
+        String[] params = Arrays.copyOfRange(args, 1, args.length);
+        //String[] params = new String[args.length -1];
+        //System.arraycopy(params, 1, args, args.length -1);
+
+        //List<Particle2D> particles = null;
+        if(runMode.equals("parse")){
+            //particles = runParse(params);
+            runParse(params);
+        }else if(runMode.equals("random")){
+            //particles = runRandom(params);
+            runRandom(params);
+        }
+
+
+
+    }
+
+    private static void runRandom(String[] params) {
+        return;
+    }
+
+    private static void runParse(String[] params) {
         //example: [jar] --M=50 --Rc=1.0 --alg=naive|cim --mode=wrap|normal --ST="../Static100.txt" --DY="../Dynamic100.txt" --OUT="../Out100"
 
+
         //TODO: M isn't optional???
-        if(args.length != 7){
-            throw new RuntimeException("need parameters: M, Rc, alg, mode, ST, DY, OUT " + args.length);
+        if(params.length != 7){
+            throw new RuntimeException("need parameters: M, Rc, alg, mode, ST, DY, OUT " + params.length + " " + Arrays.toString(params));
         }
         int M = 0;
         double Rc = 0d;
         String staticFile = null, dynamicFile = null, outputLocation = null, readAlg = null, readMode = null;
 
         // placeholder param parser...
-        for (int i = 0; i < args.length; i++) {
-            String[] line = args[i].split("(?:--(\\w+)=\\s*)");
+        for (int i = 0; i < params.length; i++) {
+            String[] line = params[i].split("(?:--(\\w+)=\\s*)");
             if (line.length < 2) {
                 throw new RuntimeException("all parameters must have key and value." + Arrays.toString(line));
             }
@@ -67,7 +103,7 @@ public class Main {
                     outputLocation = line[1];
                     break;
             }
-            //System.out.println(args[i]);
+            //System.out.println(params[i]);
         }
 
         //get those constants!
@@ -117,7 +153,5 @@ public class Main {
         }else {
             throw new RuntimeException("Finder has failed to run, check your parameters.");
         }
-
-
     }
 }
