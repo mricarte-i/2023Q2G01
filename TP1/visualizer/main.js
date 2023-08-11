@@ -93,7 +93,7 @@ export function init() {
     for (let i = 0; i < N; i++) {
       let opt = document.createElement("option");
       opt.value = i;
-      opt.innerHTML = `Particle Id:${i}`
+      opt.innerHTML = `Particle Id:${i + 1}`
       if (i == 0 && (!!!Selected || Number(Selected) >= N)) {
         opt.selected = true;
         Selected = "0";
@@ -194,7 +194,7 @@ function drawParticle(id, sqRX, sqRY, size, sof, color) {
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'center';
   ctx.font = `20px sans-serif`
-  ctx.fillText(`${id}`, newX, newY)
+  ctx.fillText(`${id + 1}`, newX, newY)
 
 }
 
@@ -256,7 +256,7 @@ function drawInfo() {
   if (!!!NeighborData) return;
 
 
-  console.log("SELECTED", selectedIdx, StaticIN[selectedIdx], DynamicIN[selectedIdx], RC)
+  console.log("SELECTED", selectedIdx + 1, StaticIN[selectedIdx], DynamicIN[selectedIdx], RC)
 
   //read necessary info
   const selectedNeighbors = NeighborData[selectedIdx];
@@ -269,7 +269,7 @@ function drawInfo() {
 
     console.log(
       "IS NEAR!",
-      nId,
+      nId + 1,
       StaticIN[nId], DynamicIN[nId],
       {
         distance: Math.hypot(DynamicIN[selectedIdx].x - DynamicIN[nId].x, DynamicIN[selectedIdx].y - DynamicIN[nId].y)
