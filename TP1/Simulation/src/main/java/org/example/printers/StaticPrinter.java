@@ -11,10 +11,12 @@ public class StaticPrinter {
 
     private final String fileName;
     private final double l;
+    private final double rc;
 
-    public StaticPrinter(String fileName, double l) {
+    public StaticPrinter(String fileName, double l, double rc) {
         this.fileName = fileName;
         this.l = l;
+        this.rc = rc;
     }
 
     public void parseAndWriteToFile(Collection<Particle2D> particles) {
@@ -41,7 +43,7 @@ public class StaticPrinter {
             fileWriter.write(Double.toString(l) + "\n");
 
             for (Particle2D particle : particles) {
-                fileWriter.write( particle.getRadius() + "\n");
+                fileWriter.write( particle.getRadius() + "    " + rc + "\n");
             }
 
             fileWriter.close();
