@@ -37,7 +37,7 @@ public class DynamicPrinter {
 
             FileWriter fileWriter = new FileWriter(fileName + ".txt", false);
 
-            fileWriter.write(0);
+            fileWriter.write(Integer.toString(0) + "\n");
 
             for (Particle2D particle : particles) {
                 fileWriter.write( particle.getX() + " " + particle.getY() + "\n");
