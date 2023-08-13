@@ -72,9 +72,11 @@ public class CellIndexMethod2D<P extends Particle2D> implements NeighbourFinding
         double maxRadius       = 0d;
         double secondMaxRadius = 0d;
         for (P particle : particles) {
-            if(particle.getRadius() > maxRadius) {
+            if (particle.getRadius() >= maxRadius) {
                 secondMaxRadius = maxRadius;
                 maxRadius       = particle.getRadius();
+            } else if (particle.getRadius() >= secondMaxRadius) {
+                secondMaxRadius = particle.getRadius();
             }
         }
         return new Pair<>(maxRadius, secondMaxRadius);
