@@ -121,8 +121,8 @@ public class Main {
         if(rtype.equals("random")) particleSupplier = new RandomParticle2DSupplier(N, L, L, r, seed);
         if(particleSupplier == null) throw new RuntimeException();
         Collection<Particle2D> particles = particleSupplier.get();
-        StaticPrinter staticPrinter = new StaticPrinter("static", L, Rc);
-        DynamicPrinter dynamicPrinter = new DynamicPrinter("dynamic");
+        StaticPrinter staticPrinter = new StaticPrinter(staticFile, L, Rc);
+        DynamicPrinter dynamicPrinter = new DynamicPrinter(dynamicFile);
         staticPrinter.parseAndWriteToFile(particles);
         dynamicPrinter.parseAndWriteToFile(particles);
         DistanceMethod<Point2D> distMethod = new EuclideanDistanceMethod2D<>();
