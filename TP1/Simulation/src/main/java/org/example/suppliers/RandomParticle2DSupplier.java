@@ -34,6 +34,14 @@ public class RandomParticle2DSupplier implements Supplier<Collection<Particle2D>
         this.randomGenerator = new Random(seed);
     }
 
+    public RandomParticle2DSupplier(int n, double maxX, double maxY, double maxRadius, Random randomGenerator) {
+        this.n = n;
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.maxRadius = maxRadius;
+        this.randomGenerator = randomGenerator;
+    }
+
     @Override
     public Collection<Particle2D> get() {
         List<Particle2D> generatedParticles = new ArrayList<>(n);
