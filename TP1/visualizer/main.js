@@ -41,6 +41,17 @@ const ctx = canvas.getContext("2d");
 canvas.width = canvas.getBoundingClientRect().width;
 canvas.height = canvas.getBoundingClientRect().height;
 
+let zoomMult = 1;
+const player = {
+  x: 0,
+  y: 0
+};
+const cam = {
+  x: 0,
+  y: 0
+}
+
+
 window.addEventListener("resize", (ev) => {
   canvas.width = canvas.getBoundingClientRect().width;
   canvas.height = canvas.getBoundingClientRect().height;
@@ -49,7 +60,7 @@ window.addEventListener("resize", (ev) => {
 })
 
 const redraw = document.getElementById("redraw-btn");
-redraw.addEventListener("click", (ev) => drawBase());
+redraw.addEventListener("click", (ev) => drawAll());
 
 /**
  *  HELPER FUNCTIONS
@@ -85,7 +96,7 @@ function calculateSpace() {
  */
 export function init() {
   ctx.save();
-  console.log("init!")
+  //console.log("init!")
 
   removeOptions(select)
   if (!!N && N >= 1) {
@@ -123,19 +134,46 @@ export function init() {
     return;
   }
 
+  player.x = canvas.width / (2 * zoomMult);
+  player.y = canvas.height / (2 * zoomMult);
+
   drawAll();
 }
 
+function runSerial(tasks) {
+  return new Promise((resolve) => {
+    const promised = [];
+    Promise
+      .allSettled(tasks)
+      .then((results) => {
+        results.forEach((result) => {
+          promised.push(result.status);
+        });
+
+        return resolve(promised);
+      });
+
+  })
+
+}
+
+let drawCallState = 0;
+
 function drawAll() {
-  drawBase();
-  drawInfo();
+  if (drawCallState == 0) {
+    drawCallState = 1;
+    runSerial([drawBase(), drawInfo()]).then((val) => {
+      //console.log(val);
+      drawCallState = 0;
+    });
+  }
 }
 
 
 function drawGrid() {
-  ctx.restore();
+  ctx.save();
 
-  console.log('grid')
+  //console.log('grid')
   const ogRange = { min: 0, max: L };
   const { sqX, sqY, sqSize, sqRangeX, sqRangeY } = calculateSpace();
   for (let i = 0; i < L; i++) {
@@ -158,10 +196,12 @@ function drawGrid() {
     ctx.stroke();
   }
   ctx.setLineDash([]);
+
+  ctx.restore();
 }
 
 function drawArea(sqX, sqY, sqSize) {
-  ctx.restore();
+  ctx.save();
 
   ctx.beginPath();
   ctx.strokeStyle = 'red';
@@ -169,11 +209,13 @@ function drawArea(sqX, sqY, sqSize) {
   ctx.rect(sqX, sqY, sqSize, sqSize);
   ctx.stroke();
 
+  ctx.restore();
+
   drawGrid(sqX, sqY)
 }
 
 function drawParticle(id, sqRX, sqRY, size, sof, color) {
-  ctx.restore();
+  ctx.save();
 
   const ogRange = { min: 0, max: L };
   ctx.beginPath();
@@ -194,12 +236,14 @@ function drawParticle(id, sqRX, sqRY, size, sof, color) {
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'center';
   ctx.font = `20px sans-serif`
-  ctx.fillText(`${id + 1}`, newX, newY)
+  ctx.fillText(`${id + 1}`, newX, newY);
+
+  ctx.restore();
 
 }
 
 function drawInteractionRadius(id, sqRX, sqRY, size, color) {
-  ctx.restore();
+  ctx.save();
 
   const ogRange = { min: 0, max: L };
   ctx.beginPath();
@@ -213,6 +257,8 @@ function drawInteractionRadius(id, sqRX, sqRY, size, color) {
   ctx.arc(newX, newY, ((size / L) * (StaticIN[id].r + StaticIN[id].pr)), 0, 2 * Math.PI);
   ctx.stroke();
 
+  ctx.restore();
+
   //trying to figure out how to scale to pixels...
   /*
   console.log(
@@ -223,59 +269,123 @@ function drawInteractionRadius(id, sqRX, sqRY, size, color) {
   */
 }
 
-function drawBase() {
-  //clear canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+function setCtx() {
+  ctx.scale(zoomMult, zoomMult);
+  cam.x = player.x - canvas.width / (2 * zoomMult);
+  cam.y = player.y - canvas.height / (2 * zoomMult);
+  ctx.translate(-cam.x, -cam.y);
 
-  const { minSize, sqX, sqY, sqSize, sqRangeX, sqRangeY } = calculateSpace();
-  drawArea(sqX, sqY, sqSize)
-
-  //check & read initial conditions
-  if (!!StaticIN && !!DynamicIN) {
-    console.log("init cond draw...")
-    for (let i = 0; i < N; i++) {
-      drawParticle(i, sqRangeX, sqRangeY, sqSize, 'stroke', 'blue');
-    }
-  }
-  console.log("drawing!", { minSize, sqSize, sqX, sqY })
+  //console.log({ zoomMult, cam, player });
 }
 
-function drawInfo() {
-  //check selected particle
-  if (!!!Selected) return;
-  //check initial condifitions
-  if (!!!StaticIN || !!!DynamicIN) return;
-  console.log("draw info on particles...")
-  const { sqSize, sqRangeX, sqRangeY } = calculateSpace();
-  const selectedIdx = Number(Selected);
-  //draw red cross on position of selected particle
-  drawParticle(selectedIdx, sqRangeX, sqRangeY, sqSize, 'fill', 'red');
-  drawInteractionRadius(selectedIdx, sqRangeX, sqRangeY, sqSize, 'magenta');
+const drawBase = () => new Promise(
+  (resolve) => {
+    //clear canvas
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setCtx();
 
-  //check neighbor data
-  if (!!!NeighborData) return;
+    const { minSize, sqX, sqY, sqSize, sqRangeX, sqRangeY } = calculateSpace();
+    drawArea(sqX, sqY, sqSize)
 
-
-  console.log("SELECTED", selectedIdx + 1, StaticIN[selectedIdx], DynamicIN[selectedIdx], RC)
-
-  //read necessary info
-  const selectedNeighbors = NeighborData[selectedIdx];
-
-  if (!!!selectedNeighbors) return;
-  //draw green corsses on positions of neighbor particles
-  for (let i = 0; i < selectedNeighbors.length; i++) {
-    const nId = selectedNeighbors[i];
-    drawParticle(nId, sqRangeX, sqRangeY, sqSize, 'fill', 'green');
-
-    console.log(
-      "IS NEAR!",
-      nId + 1,
-      StaticIN[nId], DynamicIN[nId],
-      {
-        distance: Math.hypot(DynamicIN[selectedIdx].x - DynamicIN[nId].x, DynamicIN[selectedIdx].y - DynamicIN[nId].y) - StaticIN[selectedIdx].r - StaticIN[nId].r
+    //check & read initial conditions
+    if (!!StaticIN && !!DynamicIN) {
+      //console.log("init cond draw...")
+      for (let i = 0; i < N; i++) {
+        drawParticle(i, sqRangeX, sqRangeY, sqSize, 'stroke', 'blue');
       }
-    );
+    }
+    //console.log("drawing!", { minSize, sqSize, sqX, sqY })
+    return resolve();
   }
+);
+
+const drawInfo = () => new Promise(
+  (resolve, reject) => {
+    //check selected particle
+    if (!!!Selected) return reject();
+    //check initial condifitions
+    if (!!!StaticIN || !!!DynamicIN) return reject();
+    //console.log("draw info on particles...")
+    const { sqSize, sqRangeX, sqRangeY } = calculateSpace();
+    const selectedIdx = Number(Selected);
+    //draw red cross on position of selected particle
+    drawParticle(selectedIdx, sqRangeX, sqRangeY, sqSize, 'fill', 'red');
+    drawInteractionRadius(selectedIdx, sqRangeX, sqRangeY, sqSize, 'magenta');
+
+    //check neighbor data
+    if (!!!NeighborData) return reject();
+
+
+    console.log("SELECTED", selectedIdx + 1, StaticIN[selectedIdx], DynamicIN[selectedIdx], RC)
+
+    //read necessary info
+    const selectedNeighbors = NeighborData[selectedIdx];
+
+    if (!!!selectedNeighbors) return reject();
+    //draw green corsses on positions of neighbor particles
+    for (let i = 0; i < selectedNeighbors.length; i++) {
+      const nId = selectedNeighbors[i];
+      drawParticle(nId, sqRangeX, sqRangeY, sqSize, 'fill', 'green');
+
+      console.log(
+        "IS NEAR!",
+        nId + 1,
+        StaticIN[nId], DynamicIN[nId],
+        {
+          distance: Math.hypot(DynamicIN[selectedIdx].x - DynamicIN[nId].x, DynamicIN[selectedIdx].y - DynamicIN[nId].y) - StaticIN[selectedIdx].r - StaticIN[nId].r
+        }
+      );
+    }
+    return resolve();
+  }
+)
+
+
+function clamp(value, min, max) {
+  if (value < min) return min;
+  else if (value > max) return max;
+  return value;
 }
 
-drawBase()
+
+var listened = false;
+window.addEventListener("keyup", (ev) => {
+  listened = false;
+  if (ev.key == "i") {
+    zoomMult += 0.1;
+    listened = true;
+  }
+  if (ev.key == "o") {
+    zoomMult -= 0.1;
+    listened = true;
+  }
+  if (ev.key == "ArrowLeft") {
+    player.x -= L / 10;  //Left key
+    listened = true;
+  }
+  if (ev.key == "ArrowUp") {
+    player.y -= L / 10;  //Up key
+    listened = true;
+  }
+  if (ev.key == "ArrowRight") {
+    player.x += L / 10; //Right key
+    listened = true;
+  }
+  if (ev.key == "ArrowDown") {
+    player.y += L / 10; //Down key
+    listened = true;
+  }
+
+
+  clamp(zoomMult, 0.5, 2);
+  clamp(player.x, -10, L + 10);
+  clamp(player.y, -10, L + 10);
+  if (listened) {
+    drawAll();
+  }
+})
+
+
+
+drawAll();
