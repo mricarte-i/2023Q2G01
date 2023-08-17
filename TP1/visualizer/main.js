@@ -11,6 +11,8 @@ import './parsing'
  */
 var N, L, M, RC, StaticIN, DynamicIN, NeighborData, Selected = undefined;
 var Step = 0, Steps = undefined;
+var PlayAnimation = false;
+var MillisPerFrame = 500;
 
 export function setN(val) { N = val; }
 export function setL(val) { L = val; }
@@ -86,13 +88,23 @@ nextStepBtn.addEventListener("click", (ev) => {
   drawAll();
 });
 
-/*
-timeStepSlider.addEventListener("change", (ev) => {
-  Step = transformRange(ev.target.value, {min: 0, max: 100}, {min: 0, max: Steps - 1});
-  console.log(Step);
-  drawAll();
+let animationIntervalId = undefined;
+
+const playBtn = document.getElementById("autoPlay-btn");
+playBtn.addEventListener("click", (ev) => {
+  PlayAnimation = !PlayAnimation;
+  if (!PlayAnimation && animationIntervalId != undefined) {
+    clearInterval(animationIntervalId);
+    animationIntervalId = undefined;
+  } else {
+    animationIntervalId = setInterval(() => {
+      Step = mod(Step + 1, Steps);
+      console.log(Step);
+      timeStepSlider.value = transformRange(Step, { min: 0, max: Steps - 1 }, { min: 0, max: 100 });
+      drawAll();
+    }, MillisPerFrame);
+  }
 })
-*/
 
 /**
  *  HELPER FUNCTIONS
