@@ -10,6 +10,7 @@ import './parsing'
  *  @RC interaction radius
  */
 var N, L, M, RC, StaticIN, DynamicIN, NeighborData, Selected = undefined;
+var Step = 0, Steps = undefined;
 
 export function setN(val) { N = val; }
 export function setL(val) { L = val; }
@@ -24,6 +25,11 @@ export function getRC() { return RC; }
 export function setStaticIN(val) { StaticIN = val; }
 export function setDynamicIN(val) { DynamicIN = val; }
 export function setNeighborData(val) { NeighborData = val; }
+export function setSteps(val) { Steps = val; Step = 0; }
+
+function getCurrentDynamic() {
+  return DynamicIN[Step];
+}
 
 /**
  *  HTML SETUP
@@ -62,10 +68,40 @@ window.addEventListener("resize", (ev) => {
 const redraw = document.getElementById("redraw-btn");
 redraw.addEventListener("click", (ev) => drawAll());
 
+const timeStepSlider = document.getElementById("timeStepSlider");
+
+const prevStepBtn = document.getElementById("prevStep-btn");
+prevStepBtn.addEventListener("click", (ev) => {
+  Step = mod(Step - 1, Steps);
+  console.log(Step);
+  timeStepSlider.value = transformRange(Step, { min: 0, max: Steps - 1 }, { min: 0, max: 100 });
+  drawAll()
+});
+
+const nextStepBtn = document.getElementById("nextStep-btn");
+nextStepBtn.addEventListener("click", (ev) => {
+  Step = mod(Step + 1, Steps);
+  console.log(Step);
+  timeStepSlider.value = transformRange(Step, { min: 0, max: Steps - 1 }, { min: 0, max: 100 });
+  drawAll();
+});
+
+/*
+timeStepSlider.addEventListener("change", (ev) => {
+  Step = transformRange(ev.target.value, {min: 0, max: 100}, {min: 0, max: Steps - 1});
+  console.log(Step);
+  drawAll();
+})
+*/
+
 /**
  *  HELPER FUNCTIONS
  *
  */
+function mod(n, m) {
+  return ((n % m) + m) % m;
+}
+
 function removeOptions(selectElem) {
   for (let i = selectElem.options.length - 1; i >= 0; i--) {
     selectElem.remove(i)
@@ -216,13 +252,14 @@ function drawArea(sqX, sqY, sqSize) {
 
 function drawParticle(id, sqRX, sqRY, size, sof, color) {
   ctx.save();
+  const currentDynamic = getCurrentDynamic();
 
   const ogRange = { min: 0, max: L };
   ctx.beginPath();
   ctx.strokeStyle = sof == "stroke" ? color : 'white';
   ctx.fillStyle = sof == "fill" ? color : 'white';
-  const newX = transformRange(DynamicIN[id].x, ogRange, sqRX);
-  const newY = transformRange(DynamicIN[id].y, ogRange, sqRY);
+  const newX = transformRange(currentDynamic[id].x, ogRange, sqRX);
+  const newY = transformRange(currentDynamic[id].y, ogRange, sqRY);
   ctx.arc(newX, newY, (size / L) * StaticIN[id].r, 0, 2 * Math.PI);
   if (sof == "stroke") {
     ctx.stroke();
@@ -244,14 +281,15 @@ function drawParticle(id, sqRX, sqRY, size, sof, color) {
 
 function drawInteractionRadius(id, sqRX, sqRY, size, color) {
   ctx.save();
+  const currentDynamic = getCurrentDynamic();
 
   const ogRange = { min: 0, max: L };
   ctx.beginPath();
   ctx.strokeStyle = color;
   ctx.fillStyle = 'transparent';
 
-  const newX = transformRange(DynamicIN[id].x, ogRange, sqRX);
-  const newY = transformRange(DynamicIN[id].y, ogRange, sqRY);
+  const newX = transformRange(currentDynamic[id].x, ogRange, sqRX);
+  const newY = transformRange(currentDynamic[id].y, ogRange, sqRY);
 
   //show interaction radius
   ctx.arc(newX, newY, ((size / L) * (StaticIN[id].r + StaticIN[id].pr)), 0, 2 * Math.PI);
@@ -316,8 +354,9 @@ const drawInfo = () => new Promise(
     //check neighbor data
     if (!!!NeighborData) return reject();
 
+    const currentDynamic = getCurrentDynamic();
 
-    console.log("SELECTED", selectedIdx + 1, StaticIN[selectedIdx], DynamicIN[selectedIdx], RC)
+    console.log("SELECTED", selectedIdx + 1, StaticIN[selectedIdx], currentDynamic[selectedIdx], RC)
 
     //read necessary info
     const selectedNeighbors = NeighborData[selectedIdx];
@@ -331,9 +370,9 @@ const drawInfo = () => new Promise(
       console.log(
         "IS NEAR!",
         nId + 1,
-        StaticIN[nId], DynamicIN[nId],
+        StaticIN[nId], currentDynamic[nId],
         {
-          distance: Math.hypot(DynamicIN[selectedIdx].x - DynamicIN[nId].x, DynamicIN[selectedIdx].y - DynamicIN[nId].y) - StaticIN[selectedIdx].r - StaticIN[nId].r
+          distance: Math.hypot(currentDynamic[selectedIdx].x - currentDynamic[nId].x, currentDynamic[selectedIdx].y - currentDynamic[nId].y) - StaticIN[selectedIdx].r - StaticIN[nId].r
         }
       );
     }

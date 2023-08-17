@@ -1,4 +1,4 @@
-import { setStaticIN, setDynamicIN, setNeighborData, init, getN, setN, setL } from "./main";
+import { setStaticIN, setDynamicIN, setNeighborData, init, getN, setN, setL, setSteps } from "./main";
 
 function uploadNewSI(event) {
   var file = event.target.files[0];
@@ -98,12 +98,28 @@ function uploadNewDI(event) {
               if ((line + 1) % (N + 1) == 0) {
                 //on last particle, send data w/timestamp!
                 //setParticlesAtTime(particles, t);
-                setDynamicIN(particles);
+                //setDynamicIN(particles);
               }
           }
         }
 
         console.log(particles);
+        //setParticlesAtTime(particles, t)
+        const steps = [particles];
+
+        let nextParticles = particles;
+        for (let step = 1; step < 20; step++) {
+          nextParticles = nextParticles.map((p) => {
+            return {
+              x: p.x + 1,
+              y: p.y + 1,
+            };
+          });
+          steps.push(nextParticles);
+          //setParticlesAtTime(nextParticles, step);
+        }
+        setDynamicIN(steps);
+        setSteps(steps.length);
 
         init();
       };
