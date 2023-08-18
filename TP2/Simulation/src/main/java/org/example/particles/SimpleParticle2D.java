@@ -12,7 +12,7 @@ public class SimpleParticle2D extends SimpleParticle<Point2D> implements Particl
         super(id, position, radius);
     }
 
-    public SimpleParticle2D(BigInteger id, Double positionX, double positionY, double radius) {
+    public SimpleParticle2D(BigInteger id, double positionX, double positionY, double radius) {
         super(id, new SimplePoint2D(positionX, positionY), radius);
     }
 

@@ -10,10 +10,10 @@ import java.util.Arrays;
 public class SimpleVirtualParticle2D<P extends Particle2D> implements VirtualParticle2D<P> {
 
     private final P realParticle;
-    private final Double deltaX;
-    private final Double deltaY;
+    private final double deltaX;
+    private final double deltaY;
 
-    public SimpleVirtualParticle2D(P p, Double deltaX, Double deltaY){
+    public SimpleVirtualParticle2D(P p, double deltaX, double deltaY){
         this.realParticle = p;
         this.deltaX = deltaX;
         this.deltaY = deltaY;

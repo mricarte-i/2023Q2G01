@@ -12,7 +12,7 @@ public class SimpleParticle<P extends Point> implements Particle<P> {
     protected final P position;
     protected final double radius;
 
-    public SimpleParticle(BigInteger id, P position, Double radius){
+    public SimpleParticle(BigInteger id, P position, double radius){
         this.id = id;
         this.position = position;
         this.radius = radius;
