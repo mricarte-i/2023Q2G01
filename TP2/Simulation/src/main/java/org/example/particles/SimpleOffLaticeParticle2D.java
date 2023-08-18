@@ -6,6 +6,7 @@ import org.example.points.SimpleVector2D;
 import org.example.points.Vector2D;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 public class SimpleOffLaticeParticle2D implements OffLaticeParticle2D {
     private final Particle2D particle;
@@ -99,5 +100,22 @@ public class SimpleOffLaticeParticle2D implements OffLaticeParticle2D {
     @Override
     public double getRadius() {
         return particle.getRadius();
+    }
+
+    @Override
+    public String toString() {
+        return "@{id=" + getId().toString() + ";r=" + Double.toString(getRadius()) + ";p=" + Arrays.toString(getCoordinates()) + ";v={\uD835\uDC5F=" + getVelocityMagnitude() + ",\uD835\uDF03=" + getVelocityAngle() + "}}";
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Particle<?>))
+            return false;
+        return getId().equals(((Particle<?>) o).getId());
     }
 }
