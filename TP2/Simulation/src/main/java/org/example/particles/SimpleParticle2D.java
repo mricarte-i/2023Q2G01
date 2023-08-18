@@ -8,11 +8,11 @@ import java.math.BigInteger;
 
 public class SimpleParticle2D extends SimpleParticle<Point2D> implements Particle2D {
 
-    public SimpleParticle2D(BigInteger id, Point2D position, Double radius) {
+    public SimpleParticle2D(BigInteger id, Point2D position, double radius) {
         super(id, position, radius);
     }
 
-    public SimpleParticle2D(BigInteger id, Double positionX, Double positionY, Double radius) {
+    public SimpleParticle2D(BigInteger id, Double positionX, double positionY, double radius) {
         super(id, new SimplePoint2D(positionX, positionY), radius);
     }
 
@@ -22,17 +22,17 @@ public class SimpleParticle2D extends SimpleParticle<Point2D> implements Particl
     }
 
     @Override
-    public Double getX() {
+    public double getX() {
         return position.getX();
     }
 
     @Override
-    public Double getY() {
+    public double getY() {
         return position.getY();
     }
 
     @Override
-    public Double[] getCoordinates() {
+    public double[] getCoordinates() {
         return super.getCoordinates();
     }
 
@@ -42,17 +42,17 @@ public class SimpleParticle2D extends SimpleParticle<Point2D> implements Particl
     }
 
     @Override
-    public Double distanceTo(Particle<Point2D> p, DistanceMethod<Point2D> distanceMethod) {
+    public double distanceTo(Particle<Point2D> p, DistanceMethod<Point2D> distanceMethod) {
         return super.distanceTo(p, distanceMethod);
     }
 
     @Override
-    public Double distanceTo(Particle2D p, DistanceMethod<Point2D> distanceMethod) {
+    public double distanceTo(Particle2D p, DistanceMethod<Point2D> distanceMethod) {
         return this.distanceTo((Particle<Point2D>) p, distanceMethod);
     }
 
     @Override
-    public Double getRadius() {
+    public double getRadius() {
         return super.getRadius();
     }
 }

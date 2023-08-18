@@ -4,10 +4,10 @@ import org.example.distance_methods.DistanceMethod;
 
 public class SimplePoint2D implements Point2D {
 
-    private final Double positionX;
-    private final Double positionY;
+    private final double positionX;
+    private final double positionY;
 
-    public SimplePoint2D(Double positionX, Double positionY) {
+    public SimplePoint2D(double positionX, double positionY) {
         this.positionX = positionX;
         this.positionY = positionY;
     }
@@ -18,22 +18,22 @@ public class SimplePoint2D implements Point2D {
     }
 
     @Override
-    public Double getX() {
+    public double getX() {
         return positionX;
     }
 
     @Override
-    public Double getY() {
+    public double getY() {
         return positionY;
     }
 
     @Override
-    public Double[] getCoordinates() {
-        return new Double[] { positionX, positionY };
+    public double[] getCoordinates() {
+        return new double[] { positionX, positionY };
     }
 
     @Override
-    public Double distanceTo(Point2D p, DistanceMethod<Point2D> distanceMethod) {
+    public double distanceTo(Point2D p, DistanceMethod<Point2D> distanceMethod) {
         return distanceMethod.calculateDistance(this, p);
     }
 }

@@ -25,18 +25,18 @@ public class SimpleVirtualParticle2D<P extends Particle2D> implements VirtualPar
     }
 
     @Override
-    public Double getX() {
+    public double getX() {
         return realParticle.getX() + deltaX;
     }
 
     @Override
-    public Double getY() {
+    public double getY() {
         return realParticle.getY() + deltaY;
     }
 
     @Override
-    public Double[] getCoordinates() {
-        Double[] virtualCoordinates = realParticle.getCoordinates().clone();
+    public double[] getCoordinates() {
+        double[] virtualCoordinates = realParticle.getCoordinates().clone();
         virtualCoordinates[0] += deltaX;
         virtualCoordinates[1] += deltaY;
         return virtualCoordinates;
@@ -48,18 +48,18 @@ public class SimpleVirtualParticle2D<P extends Particle2D> implements VirtualPar
     }
 
     @Override
-    public Double distanceTo(Particle<Point2D> p, DistanceMethod<Point2D> distanceMethod) {
+    public double distanceTo(Particle<Point2D> p, DistanceMethod<Point2D> distanceMethod) {
         return distanceMethod.calculateDistance(this.getPosition(), p.getPosition()) - this.getRadius() - p.getRadius();
     }
 
 
     @Override
-    public Double distanceTo(Particle2D p, DistanceMethod<Point2D> distanceMethod) {
+    public double distanceTo(Particle2D p, DistanceMethod<Point2D> distanceMethod) {
         return this.distanceTo((Particle<Point2D>) p, distanceMethod);
     }
 
     @Override
-    public Double getRadius() {
+    public double getRadius() {
         return realParticle.getRadius();
     }
 
@@ -70,7 +70,7 @@ public class SimpleVirtualParticle2D<P extends Particle2D> implements VirtualPar
 
     @Override
     public String toString() {
-        return "@{id=" + getId().toString() + ";r=" + getRadius().toString() + ";p=" + Arrays.toString(getPosition().getCoordinates()) + "}";
+        return "@{id=" + getId().toString() + ";r=" + Double.toString(getRadius()) + ";p=" + Arrays.toString(getPosition().getCoordinates()) + "}";
     }
 
     @Override

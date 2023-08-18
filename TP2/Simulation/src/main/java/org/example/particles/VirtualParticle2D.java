@@ -7,12 +7,12 @@ import java.math.BigInteger;
 
 public interface VirtualParticle2D<P extends Particle2D> extends VirtualParticle<Point2D, P>, Particle2D {
     BigInteger getId();
-    Double getX();
-    Double getY();
-    Double[] getCoordinates();
+    double getX();
+    double getY();
+    double[] getCoordinates();
     Point2D getPosition();
-    Double distanceTo(Particle<Point2D> p, DistanceMethod<Point2D> distanceMethod);
-    Double distanceTo(Particle2D p, DistanceMethod<Point2D> distanceMethod);
-    Double getRadius();
+    double distanceTo(Particle<Point2D> p, DistanceMethod<Point2D> distanceMethod);
+    double distanceTo(Particle2D p, DistanceMethod<Point2D> distanceMethod);
+    double getRadius();
     P getRealParticle();
 }

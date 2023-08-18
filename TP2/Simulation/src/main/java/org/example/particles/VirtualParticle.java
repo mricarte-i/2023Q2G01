@@ -7,8 +7,8 @@ import java.math.BigInteger;
 
 public interface VirtualParticle<T extends Point, P extends Particle<T>> extends Particle<T> {
     BigInteger getId();
-    Double[] getCoordinates();
+    double[] getCoordinates();
     T getPosition();
-    Double distanceTo(Particle<T> p, DistanceMethod<T> distanceMethod);
+    double distanceTo(Particle<T> p, DistanceMethod<T> distanceMethod);
     P getRealParticle();
 }

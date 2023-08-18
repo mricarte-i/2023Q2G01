@@ -6,9 +6,9 @@ import java.util.Arrays;
 
 public abstract class EuclideanDistanceMethod<P extends Point> implements DistanceMethod<P> {
     @Override
-    public Double calculateDistance(P a, P b) {
-        Double[] aCoordinates = a.getCoordinates();
-        Double[] bCoordinates = b.getCoordinates();
+    public double calculateDistance(P a, P b) {
+        double[] aCoordinates = a.getCoordinates();
+        double[] bCoordinates = b.getCoordinates();
         int spaceSize         = Math.max(aCoordinates.length, bCoordinates.length);
         double[] difference   = new double[spaceSize];
         for(int i = 0; i < spaceSize; i++) {

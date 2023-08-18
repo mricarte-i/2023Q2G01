@@ -8,8 +8,8 @@ import java.math.BigInteger;
 
 public interface Particle<P extends Point> {
     BigInteger getId();
-    Double[] getCoordinates();
+    double[] getCoordinates();
     P getPosition();
-    Double distanceTo(Particle<P> p, DistanceMethod<P> distanceMethod);
-    Double getRadius();
+    double distanceTo(Particle<P> p, DistanceMethod<P> distanceMethod);
+    double getRadius();
 }

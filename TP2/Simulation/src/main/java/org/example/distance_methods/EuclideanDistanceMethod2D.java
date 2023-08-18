@@ -4,7 +4,7 @@ import org.example.points.Point2D;
 
 public class EuclideanDistanceMethod2D<P extends Point2D> extends EuclideanDistanceMethod<P> {
     @Override
-    public Double calculateDistance(P a, P b) {
+    public double calculateDistance(P a, P b) {
         return super.calculateDistance(a, b);
     }
 }

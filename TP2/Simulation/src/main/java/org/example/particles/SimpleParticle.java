@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class SimpleParticle<P extends Point> implements Particle<P> {
     protected final BigInteger id;
     protected final P position;
-    protected final Double radius;
+    protected final double radius;
 
     public SimpleParticle(BigInteger id, P position, Double radius){
         this.id = id;
@@ -24,7 +24,7 @@ public class SimpleParticle<P extends Point> implements Particle<P> {
     }
 
     @Override
-    public Double[] getCoordinates() {
+    public double[] getCoordinates() {
         return position.getCoordinates().clone();
     }
 
@@ -34,18 +34,18 @@ public class SimpleParticle<P extends Point> implements Particle<P> {
     }
 
     @Override
-    public Double getRadius() {
+    public double getRadius() {
         return radius;
     }
 
     @Override
-    public Double distanceTo(Particle<P> p, DistanceMethod<P> distanceMethod) {
+    public double distanceTo(Particle<P> p, DistanceMethod<P> distanceMethod) {
         return distanceMethod.calculateDistance(position, p.getPosition()) - radius - p.getRadius();
     }
 
     @Override
     public String toString() {
-        return "@{id=" + id.toString() + ";r=" + radius.toString() + ";p=" + Arrays.toString(position.getCoordinates()) + "}";
+        return "@{id=" + id.toString() + ";r=" + Double.toString(radius) + ";p=" + Arrays.toString(position.getCoordinates()) + "}";
     }
 
     @Override
