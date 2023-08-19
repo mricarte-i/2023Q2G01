@@ -12,6 +12,10 @@ import java.util.*;
 
 public class CellIndexMethod2DWithWrapAround<P extends Particle2D> extends CellIndexMethod2D<P> {
 
+    public CellIndexMethod2DWithWrapAround(DistanceMethod<Point2D> distanceMethod, double l) {
+        super(distanceMethod, l);
+    }
+
     public CellIndexMethod2DWithWrapAround(DistanceMethod<Point2D> distanceMethod, double l, int m) {
         super(distanceMethod, l, m);
     }
@@ -21,6 +25,7 @@ public class CellIndexMethod2DWithWrapAround<P extends Particle2D> extends CellI
         int           n                = particles.size();
         double        cellSide         = l / m;
         Pair<Double> top2Radii = biggest2ParticleRadii(particles);
+        if (this.optimalM) setOptimalM(neighbourhoodRadius, top2Radii.getFirst(), top2Radii.getSecond());
         if (cellSide <= neighbourhoodRadius + top2Radii.getFirst() + top2Radii.getSecond()) {
             throw new InvalidNeighbourhoodRadiusException(cellSide, neighbourhoodRadius, top2Radii.getFirst(), top2Radii.getSecond());
         }
