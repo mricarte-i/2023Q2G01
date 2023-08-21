@@ -4,6 +4,7 @@ import org.example.distance_methods.DistanceMethod;
 import org.example.distance_methods.EuclideanDistanceMethod2D;
 import org.example.neighbour_finding_methods.CellIndexMethod2DWithWrapAround;
 import org.example.neighbour_finding_methods.NeighbourFindingMethod;
+import org.example.parsers.InputParams;
 import org.example.particles.OffLaticeParticle2D;
 import org.example.points.Point2D;
 import org.example.suppliers.RandomOffLaticeParticle2DSupplier;
@@ -18,6 +19,8 @@ public class Main {
         // Press Alt+Enter with your caret at the highlighted text to see how
         // IntelliJ IDEA suggests fixing it.
         System.out.printf("Hello and welcome!");
+
+        parseInputParams(args);
 
         // Press Shift+F10 or click the green arrow button in the gutter to run the code.
         for (int i = 1; i <= 5; i++) {
@@ -48,5 +51,18 @@ public class Main {
             System.out.println(neighbourMap.get(particle));
             System.out.println();
         }
+    }
+
+    private static void parseInputParams(String[] args) {
+        if(args.length != 1)
+            throw new RuntimeException("Invalid args count");
+
+        String[] firstArg = args[0].split("--(\\w+)=\\s*");
+        if(firstArg.length != 2 || !Objects.equals(firstArg[0], "noiseAmplitude")){
+            throw new RuntimeException("Invalid noiseAmplitude arg");
+        }
+
+        InputParams inputParams = InputParams.getInstance();
+        inputParams.setNoiseAmplitude(Double.parseDouble(firstArg[1]));
     }
 }
