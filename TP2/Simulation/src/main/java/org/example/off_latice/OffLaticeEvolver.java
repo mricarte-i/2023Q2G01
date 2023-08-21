@@ -3,6 +3,7 @@ package org.example.off_latice;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Random;
 
 import org.example.particles.OffLaticeParticle2D;
 import org.example.particles.SimpleOffLaticeParticle2D;
@@ -13,9 +14,16 @@ import org.example.points.Vector2D;
 public class OffLaticeEvolver<P extends OffLaticeParticle2D> implements Evolver<Point2D, P> {
 
   private double noiseAmplitude;
+  private Random rand;
 
   public OffLaticeEvolver(double noiseAmplitude) {
     this.noiseAmplitude = noiseAmplitude;
+    this.rand = new Random();
+  }
+
+  public OffLaticeEvolver(double noiseAmplitude, long seed) {
+    this.noiseAmplitude = noiseAmplitude;
+    this.rand = new Random(seed);
   }
 
   @Override
@@ -23,12 +31,15 @@ public class OffLaticeEvolver<P extends OffLaticeParticle2D> implements Evolver<
     Collection<P> nextParticles = new ArrayList<>();
 
     for (P particle : particles) {
-      double newPosX = particle.getX() + particle.xVelocity(); // deltaTime is always equal to one?
+      // deltaTime is always equal to one?
+      double newPosX = particle.getX() + particle.xVelocity();
       double newPosY = particle.getY() + particle.yVelocity();
 
       Vector2D averageNeighbourhoodVelocity = calculateAverageVelocityVector2D(neighboursData.get(particle));
-      double newVelX = averageNeighbourhoodVelocity.xAxisProjection() + this.noiseAmplitude;
-      double newVelY = averageNeighbourhoodVelocity.yAxisProjection() + this.noiseAmplitude;
+      // number between [-eta/2; +eta/2]
+      double noise = (this.noiseAmplitude * rand.nextDouble()) - (this.noiseAmplitude / 2);
+      double newVelX = averageNeighbourhoodVelocity.xAxisProjection() + noise;
+      double newVelY = averageNeighbourhoodVelocity.yAxisProjection() + noise;
       Vector2D newVel = new SimpleVector2D(1, newVelX, newVelY);
 
       P newParticle = (P) new SimpleOffLaticeParticle2D(particle.getId(), newPosX, newPosY,
