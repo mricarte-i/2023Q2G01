@@ -11,31 +11,33 @@ import java.util.*;
 public class CellIndexMethod2D<P extends Particle2D> implements NeighbourFindingMethod<Point2D, P> {
 
     protected final DistanceMethod<Point2D> distanceMethod;
-    protected final double l;
+    protected final int l;
     protected int m;
     protected final boolean optimalM;
 
     public CellIndexMethod2D(DistanceMethod<Point2D> distanceMethod, double l){
         this.distanceMethod = distanceMethod;
-        this.l              = l;
+        this.l              = (int) l;
         this.optimalM       = true;
     }
 
 
     public CellIndexMethod2D(DistanceMethod<Point2D> distanceMethod, double l, int m){
         this.distanceMethod = distanceMethod;
-        this.l              = l;
+        this.l              = (int) l;
         this.m              = m;
         this.optimalM       = false;
     }
 
     @Override
     public Map<P, Collection<P>> calculateNeighbours(Collection<P> particles, double neighbourhoodRadius) {
-        int          n              = particles.size();
-        double       cellSide       = l / m;
         Pair<Double> top2Radii = biggest2ParticleRadii(particles);
         if (this.optimalM) setOptimalM(neighbourhoodRadius, top2Radii.getFirst(), top2Radii.getSecond());
-        if (cellSide <= neighbourhoodRadius + top2Radii.getFirst() + top2Radii.getSecond()) {
+
+        int          n              = particles.size();
+        double       cellSide       = l / m;
+
+        if (cellSide < neighbourhoodRadius + top2Radii.getFirst() + top2Radii.getSecond()) {
            throw new InvalidNeighbourhoodRadiusException(cellSide, neighbourhoodRadius, top2Radii.getFirst(), top2Radii.getSecond());
         }
         Integer[][]  heads          = new Integer[m][m];
@@ -56,6 +58,8 @@ public class CellIndexMethod2D<P extends Particle2D> implements NeighbourFinding
                 heads[row][col] = i;
                 particleInfo[i] = particle;
                 i++;
+            }else{
+                throw new RuntimeException("invalid cell " + row + " " + col + " " + particle.toString());
             }
         }
     }
@@ -78,7 +82,7 @@ public class CellIndexMethod2D<P extends Particle2D> implements NeighbourFinding
     }
 
     protected void setOptimalM(double neighbourhoodRadius, double largestRadii, double secondLongestRadii) {
-        this.m = (int) Math.floor(this.l / (neighbourhoodRadius + largestRadii + secondLongestRadii));
+        this.m = (int) Math.ceil(this.l / (neighbourhoodRadius + largestRadii + secondLongestRadii));
     }
 
     protected Pair<Double> biggest2ParticleRadii(Collection<P> particles) {
@@ -100,7 +104,7 @@ public class CellIndexMethod2D<P extends Particle2D> implements NeighbourFinding
         while (currCell1ListIndex != null) {
             Integer currCell2ListIndex = heads[cell2Row][cell2Col];
             while (currCell2ListIndex != null) {
-                if (particleInfo[currCell1ListIndex].distanceTo(particleInfo[currCell2ListIndex], distanceMethod) <= neighbourhoodRadius && !particleInfo[currCell1ListIndex].equals(particleInfo[currCell2ListIndex])) {
+                if (particleInfo[currCell1ListIndex].distanceTo(particleInfo[currCell2ListIndex], distanceMethod) <= neighbourhoodRadius) {
                     ((Set<P>) neighbourMap.get(particleInfo[currCell1ListIndex])).add(particleInfo[currCell2ListIndex]);
                     ((Set<P>) neighbourMap.get(particleInfo[currCell2ListIndex])).add(particleInfo[currCell1ListIndex]);
                 }

@@ -14,15 +14,18 @@ import org.example.points.Vector2D;
 public class OffLaticeEvolver<P extends OffLaticeParticle2D> implements Evolver<Point2D, P> {
 
   private double noiseAmplitude;
+  private double sideLength;
   private Random rand;
 
-  public OffLaticeEvolver(double noiseAmplitude) {
+  public OffLaticeEvolver(double noiseAmplitude, double sideLength) {
     this.noiseAmplitude = noiseAmplitude;
+    this.sideLength = sideLength;
     this.rand = new Random();
   }
 
-  public OffLaticeEvolver(double noiseAmplitude, long seed) {
+  public OffLaticeEvolver(double noiseAmplitude, double sideLength, long seed) {
     this.noiseAmplitude = noiseAmplitude;
+    this.sideLength = sideLength;
     this.rand = new Random(seed);
   }
 
@@ -35,6 +38,13 @@ public class OffLaticeEvolver<P extends OffLaticeParticle2D> implements Evolver<
       double newPosX = particle.getX() + particle.xVelocity();
       double newPosY = particle.getY() + particle.yVelocity();
 
+      newPosX = clampExclusive(newPosX, 0, this.sideLength);
+      newPosY = clampExclusive(newPosY, 0, this.sideLength);
+
+
+      if(neighboursData.get(particle) == null){
+        throw new RuntimeException("no neighbor data for " + particle.getId());
+      }
       Vector2D averageNeighbourhoodVelocity = calculateAverageVelocityVector2D(neighboursData.get(particle));
       // number between [-eta/2; +eta/2]
       double noise = (this.noiseAmplitude * rand.nextDouble()) - (this.noiseAmplitude / 2);
@@ -62,6 +72,10 @@ public class OffLaticeEvolver<P extends OffLaticeParticle2D> implements Evolver<
 
     double averageAngle = Math.atan(averageSin / averageCos);
     return new SimpleVector2D(1, averageAngle);
+  }
+
+  private double clampExclusive(double value, double minInclusive, double maxExclusive) {
+    return Math.max(minInclusive, Math.min(maxExclusive, value)) % maxExclusive;
   }
 
 }

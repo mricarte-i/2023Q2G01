@@ -22,11 +22,12 @@ public class CellIndexMethod2DWithWrapAround<P extends Particle2D> extends CellI
 
     @Override
     public Map<P, Collection<P>> calculateNeighbours(Collection<P> particles, double neighbourhoodRadius) {
-        int           n                = particles.size();
-        double        cellSide         = l / m;
         Pair<Double> top2Radii = biggest2ParticleRadii(particles);
         if (this.optimalM) setOptimalM(neighbourhoodRadius, top2Radii.getFirst(), top2Radii.getSecond());
-        if (cellSide <= neighbourhoodRadius + top2Radii.getFirst() + top2Radii.getSecond()) {
+
+        int           n                = particles.size();
+        double        cellSide         = l / m;
+        if (cellSide < neighbourhoodRadius + top2Radii.getFirst() + top2Radii.getSecond()) {
             throw new InvalidNeighbourhoodRadiusException(cellSide, neighbourhoodRadius, top2Radii.getFirst(), top2Radii.getSecond());
         }
         Integer[][]   heads            = new Integer[m][m];
@@ -43,7 +44,7 @@ public class CellIndexMethod2DWithWrapAround<P extends Particle2D> extends CellI
         while (currRealCellListIndex != null) {
             Integer currVirtualCellListIndex = heads[virtualCellRow][virtualCellCol];
             while (currVirtualCellListIndex != null) {
-                if (particleInfo[currRealCellListIndex].distanceTo(new SimpleVirtualParticle2D<>(particleInfo[currVirtualCellListIndex], deltaX, deltaY), distanceMethod) <= neighbourhoodRadius && !particleInfo[currRealCellListIndex].equals(particleInfo[currVirtualCellListIndex])) {
+                if (particleInfo[currRealCellListIndex].distanceTo(new SimpleVirtualParticle2D<>(particleInfo[currVirtualCellListIndex], deltaX, deltaY), distanceMethod) <= neighbourhoodRadius) {
                     ((Set<P>) neighbourMap.get(particleInfo[currRealCellListIndex])).add(particleInfo[currVirtualCellListIndex]);
                     ((Set<P>) neighbourMap.get(particleInfo[currVirtualCellListIndex])).add(particleInfo[currRealCellListIndex]);
                 }

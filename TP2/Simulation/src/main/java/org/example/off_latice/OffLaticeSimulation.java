@@ -34,7 +34,7 @@ public class OffLaticeSimulation {
         // cim now has its own optimal M function! how cool :)
         NeighbourFindingMethod<Point2D, OffLaticeParticle2D> cim = new CellIndexMethod2DWithWrapAround<>(distMethod,
                 ip.getSideLength());
-        Evolver<Point2D, OffLaticeParticle2D> evolver = new OffLaticeEvolver<>(ip.getNoiseAmplitude());
+        Evolver<Point2D, OffLaticeParticle2D> evolver = new OffLaticeEvolver<>(ip.getNoiseAmplitude(), ip.getSideLength());
 
         long startCalc = System.nanoTime();
         for (int step = 1; step <= ip.getSteps(); step++) {
