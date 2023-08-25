@@ -1,9 +1,12 @@
 package org.example.parsers;
 
+import org.example.particles.OffLaticeParticle2D;
 import org.example.utils.Pair;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,5 +46,33 @@ public class StaticParser {
 
             System.out.println("Static file parsed successfully");
         }
+    }
+
+    public static void writeFile() {
+        InputParams ip = InputParams.getInstance();
+        try {
+            File file = new File(ip.getStaticPath() + ".txt");
+            if (!file.exists())
+                file.createNewFile();
+        } catch (IOException e) {
+            System.out.println("Error creating file " + ip.getStaticPath() + ".txt");
+        }
+
+        try {
+            FileWriter fileWriter = new FileWriter(ip.getStaticPath() + ".txt", false);
+
+            fileWriter.write(ip.getParticleNumber() + "\n");
+            fileWriter.write(ip.getSideLength() + "\n");
+            for(OffLaticeParticle2D p : ip.getParticles()){
+                fileWriter.write(ip.getInteractionRadius() + " " + ip.getInitialParticleVelocity() + "\n");
+            }
+
+            fileWriter.close();
+
+            System.out.println("Wrote to file " + ip.getStaticPath() + ".txt");
+        } catch (IOException e) {
+            System.out.println("Error writing to file " + ip.getStaticPath() + ".txt");
+        }
+
     }
 }

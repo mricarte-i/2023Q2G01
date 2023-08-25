@@ -1,13 +1,18 @@
 package org.example.parsers;
 
-import java.io.*;
+import org.example.particles.OffLaticeParticle2D;
 
-public class OutputWriter {
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Collection;
+
+public class DynamicWriter {
 
     private FileWriter fileWriter;
     private String fileName;
 
-    public OutputWriter(String fileName) {
+    public DynamicWriter(String fileName) {
         this.fileName = fileName;
         try{
             File file = new File(fileName + ".txt");
@@ -21,9 +26,14 @@ public class OutputWriter {
         }
 
     }
-    public void writeFile (double va, int t) {
+    public void writeFile (Collection<OffLaticeParticle2D> particles, int t) {
         try {
-            this.fileWriter.write( t + "\n" + va + "\n");
+            this.fileWriter.write( t + "\n");
+            for(OffLaticeParticle2D p: particles){
+                this.fileWriter.write(p.getX() + " " + p.getY() + " " + p.getVelocityMagnitude() + " "
+                        + p.getVelocity().xAxisProjectionAngle() + " "
+                        + p.getVelocity().yAxisProjectionAngle() + "\n");
+            }
 
             //System.out.println("Wrote to file " + fileName + ".txt");
         } catch (IOException e) {

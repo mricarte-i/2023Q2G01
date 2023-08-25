@@ -47,10 +47,10 @@ public class ParamsParser {
     // N L R(=0 por ser puntuales) Rc eta v_i steps seed OUT POLOUT
     InputParams ip = InputParams.getInstance();
     // example: [jar] --N=420 --L=50 --Rc=1.0 --eta=0.3 --V=0.3
-    // --T=500 --seed=10940 --OUT="../Out420" --POLOUT="../Pol420"
+    // --T=500 --seed=10940 --ST="../Static420" --OUT="../Out420" --POLOUT="../Pol420"
 
-    if (params.length != 9) {
-      throw new RuntimeException("need parameters: N, L, Rc, eta, V, T, seed, OUT, POLOUT");
+    if (params.length != 10) {
+      throw new RuntimeException("need parameters: N, L, Rc, eta, V, T, seed, ST, OUT, POLOUT");
     }
 
     // placeholder param parser...
@@ -82,9 +82,12 @@ public class ParamsParser {
           ip.setSeed(Long.parseLong(line[1]));
           break;
         case 7:
-          ip.setOutputPath(line[1]);
+          ip.setStaticPath(line[1]);
           break;
         case 8:
+          ip.setOutputPath(line[1]);
+          break;
+        case 9:
           ip.setPolarizationOutPath(line[1]);
           break;
       }
@@ -97,6 +100,8 @@ public class ParamsParser {
         r);
 
     ip.setParticles(offLaticeParticlesSupplier.get());
+
+    StaticParser.writeFile();
 
   }
 

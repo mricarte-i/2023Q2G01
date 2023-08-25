@@ -4,10 +4,7 @@ import org.example.distance_methods.DistanceMethod;
 import org.example.distance_methods.EuclideanDistanceMethod2D;
 import org.example.neighbour_finding_methods.CellIndexMethod2DWithWrapAround;
 import org.example.neighbour_finding_methods.NeighbourFindingMethod;
-import org.example.parsers.DynamicParser;
-import org.example.parsers.InputParams;
-import org.example.parsers.OutputWriter;
-import org.example.parsers.ParamsParser;
+import org.example.parsers.*;
 import org.example.particles.OffLaticeParticle2D;
 import org.example.points.Point2D;
 
@@ -24,11 +21,11 @@ public class OffLaticeSimulation {
         Collection<OffLaticeParticle2D> particles = ip.getParticles();
         double va = calculatePolarization(particles);
 
-        OutputWriter oWriter = new OutputWriter();
-        oWriter.writeFile(va, 0, ip.getPolarizationOutPath());
+        OutputWriter oWriter = new OutputWriter(ip.getPolarizationOutPath());
+        oWriter.writeFile(va, 0);
 
-        DynamicParser dWriter = new DynamicParser();
-        dWriter.writeFile(0, particles, ip.getOutputPath());
+        DynamicWriter dWriter = new DynamicWriter(ip.getOutputPath());
+        dWriter.writeFile(particles, 0);
 
         DistanceMethod<Point2D> distMethod = new EuclideanDistanceMethod2D<>();
         // cim now has its own optimal M function! how cool :)
@@ -41,15 +38,15 @@ public class OffLaticeSimulation {
             Map<OffLaticeParticle2D, Collection<OffLaticeParticle2D>> neighboursData = cim
                     .calculateNeighbours(particles, ip.getInteractionRadius());
             particles = evolver.update(particles, neighboursData);
-            dWriter.writeFile(step, particles, ip.getOutputPath());
+            dWriter.writeFile(particles, step);
 
             va = calculatePolarization(particles);
-            oWriter.writeFile(va, step, ip.getPolarizationOutPath());
+            oWriter.writeFile(va, step);
 
         }
 
-        // pWriter.close();
-        // dWriter.close();
+        oWriter.close();
+        dWriter.close();
         // print a done message & paths to written files
         System.out.println("Wrote to file " + ip.getOutputPath() + ".txt");
         System.out.println("Wrote to file " + ip.getPolarizationOutPath() + ".txt");

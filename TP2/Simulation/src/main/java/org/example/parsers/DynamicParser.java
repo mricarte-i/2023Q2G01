@@ -28,14 +28,13 @@ public class DynamicParser {
             File file = new File(fileName);
             input = new Scanner(file);
 
-            // TODO: skip to last timestamp, and then load those particles!
+            // TODO: skip to last timestamp instead of loading and clearing every step!
             input.nextLine(); // skip timestamp
 
-            // reads until particles is full
-            while (input.hasNext() && particles.size() < particleNumber) {
+            // reads until last timestamp of particles data
+            while (input.hasNext()) {
                 String line = input.nextLine();
-                if (Objects.equals(line, "---")) {
-
+                if (particles.size() == particleNumber) {
                     input.nextLine(); // skip timestamp
                     particles.clear();
                 }
@@ -61,39 +60,5 @@ public class DynamicParser {
             System.out.println("Dynamic file parsed successfully");
         }
         // return new ArrayList<>();
-    }
-
-    public void writeFile(int t, Collection<OffLaticeParticle2D> particles, String fileName) {
-        System.out.println("Writing dynamic file...");
-
-        try {
-            File file = new File(fileName + ".txt");
-            if (!file.exists())
-                file.createNewFile();
-        } catch (IOException e) {
-            System.out.println("Error creating file " + fileName + ".txt");
-        }
-
-        try {
-            FileWriter fileWriter = new FileWriter(fileName + ".txt", false);
-
-            if (t != 0)
-                fileWriter.write("---\n");
-
-            fileWriter.write("t" + t + "\n");
-            for (OffLaticeParticle2D particle : particles) {
-                // x y vmag vx vy
-                fileWriter.write(
-                        particle.getX() + " " + particle.getY() + " " + particle.getVelocityMagnitude() + " "
-                                + particle.getVelocity().xAxisProjectionAngle() + " "
-                                + particle.getVelocity().yAxisProjectionAngle());
-            }
-
-            fileWriter.close();
-
-            // System.out.println("Wrote to file " + fileName + ".txt");
-        } catch (IOException e) {
-            System.out.println("Error writing to file " + fileName + ".txt");
-        }
     }
 }
