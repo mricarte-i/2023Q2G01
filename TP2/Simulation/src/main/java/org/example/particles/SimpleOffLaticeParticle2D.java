@@ -17,9 +17,16 @@ public class SimpleOffLaticeParticle2D implements OffLaticeParticle2D {
         this.velocity = velocity;
     }
 
-    public SimpleOffLaticeParticle2D(BigInteger id, double positionX, double positionY, double velocityMagnitude, double velocityAngle, double radius) {
+    public SimpleOffLaticeParticle2D(BigInteger id, double positionX, double positionY, double velocityMagnitude,
+            double velocityAngle, double radius) {
         this.particle = new SimpleParticle2D(id, positionX, positionY, radius);
         this.velocity = new SimpleVector2D(velocityMagnitude, velocityAngle);
+    }
+
+    public SimpleOffLaticeParticle2D(BigInteger id, double positionX, double positionY, double velocityMagnitude,
+            double velocityX, double velocityY, double radius) {
+        this.particle = new SimpleParticle2D(id, positionX, positionY, radius);
+        this.velocity = new SimpleVector2D(velocityMagnitude, velocityX, velocityY);
     }
 
     @Override
@@ -104,7 +111,9 @@ public class SimpleOffLaticeParticle2D implements OffLaticeParticle2D {
 
     @Override
     public String toString() {
-        return "@{id=" + getId().toString() + ";r=" + Double.toString(getRadius()) + ";p=" + Arrays.toString(getCoordinates()) + ";v={\uD835\uDC5F=" + getVelocityMagnitude() + ",\uD835\uDF03=" + getVelocityAngle() + "}}";
+        return "@{id=" + getId().toString() + ";r=" + Double.toString(getRadius()) + ";p="
+                + Arrays.toString(getCoordinates()) + ";v={\uD835\uDC5F=" + getVelocityMagnitude() + ",\uD835\uDF03="
+                + getVelocityAngle() + "}}";
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.example.distance_methods.DistanceMethod;
 import org.example.distance_methods.EuclideanDistanceMethod2D;
 import org.example.neighbour_finding_methods.CellIndexMethod2DWithWrapAround;
 import org.example.neighbour_finding_methods.NeighbourFindingMethod;
+import org.example.off_latice.OffLaticeSimulation;
 import org.example.parsers.InputParams;
 import org.example.particles.OffLaticeParticle2D;
 import org.example.points.Point2D;
@@ -20,9 +21,18 @@ public class Main {
         // IntelliJ IDEA suggests fixing it.
         System.out.printf("Hello and welcome!");
 
+        // sample(args);
+
+        // run the thing!
+        OffLaticeSimulation.main(args);
+
+    }
+
+    private static void sample(String[] args) {
         parseInputParams(args);
 
-        // Press Shift+F10 or click the green arrow button in the gutter to run the code.
+        // Press Shift+F10 or click the green arrow button in the gutter to run the
+        // code.
         for (int i = 1; i <= 5; i++) {
 
             // Press Shift+F9 to start debugging your code. We have set one breakpoint
@@ -34,17 +44,20 @@ public class Main {
         sampleParticleCIMRun(2d, globalRandomGenerator);
     }
 
-    private static void sampleParticleCIMRun(double interactivityRadius, Random globalRandomGenerator){
-        int N       = 2000;
-        double L    = 50d;
+    private static void sampleParticleCIMRun(double interactivityRadius, Random globalRandomGenerator) {
+        int N = 2000;
+        double L = 50d;
         double maxX = L;
         double maxY = L;
-        double v    = 0.03d;
+        double v = 0.03d;
         double particleRadius = 0d;
-        Supplier<Collection<OffLaticeParticle2D>>    offLaticeParticleSupplier = new RandomOffLaticeParticle2DSupplier(N, maxX, maxY, v, particleRadius, globalRandomGenerator);
-        DistanceMethod<Point2D>                              euclideanDistance = new EuclideanDistanceMethod2D<>();
-        NeighbourFindingMethod<Point2D, OffLaticeParticle2D> cellIndexMethod2D = new CellIndexMethod2DWithWrapAround<>(euclideanDistance, L);
-        Map<OffLaticeParticle2D, Collection<OffLaticeParticle2D>> neighbourMap = cellIndexMethod2D.calculateNeighbours(offLaticeParticleSupplier.get(), interactivityRadius);
+        Supplier<Collection<OffLaticeParticle2D>> offLaticeParticleSupplier = new RandomOffLaticeParticle2DSupplier(N,
+                maxX, maxY, v, particleRadius, globalRandomGenerator);
+        DistanceMethod<Point2D> euclideanDistance = new EuclideanDistanceMethod2D<>();
+        NeighbourFindingMethod<Point2D, OffLaticeParticle2D> cellIndexMethod2D = new CellIndexMethod2DWithWrapAround<>(
+                euclideanDistance, L);
+        Map<OffLaticeParticle2D, Collection<OffLaticeParticle2D>> neighbourMap = cellIndexMethod2D
+                .calculateNeighbours(offLaticeParticleSupplier.get(), interactivityRadius);
 
         for (OffLaticeParticle2D particle : neighbourMap.keySet()) {
             System.out.println(particle);
@@ -54,11 +67,11 @@ public class Main {
     }
 
     private static void parseInputParams(String[] args) {
-        if(args.length != 1)
+        if (args.length != 1)
             throw new RuntimeException("Invalid args count");
 
         String[] firstArg = args[0].split("--(\\w+)=\\s*");
-        if(firstArg.length != 2 || !Objects.equals(firstArg[0], "noiseAmplitude")){
+        if (firstArg.length != 2 || !Objects.equals(firstArg[0], "noiseAmplitude")) {
             throw new RuntimeException("Invalid noiseAmplitude arg");
         }
 
