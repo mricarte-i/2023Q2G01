@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Funny fallback Visualizer</title>
+  </head>
+  <body>
+		<div style="display: flex; flex-direction: column; height: 100%;">
+			<div>
+				<div>
+					<button
+						id="upload-btn-SI"
+						onclick="document.getElementById('uploadSI').click()"
+					>
+						UPLOAD STATIC IN
+					</button>
+					<input
+						style="display: none"
+						id="uploadSI"
+						type="file"
+						name="mySI"
+						accept=".txt"
+					/>
+
+					<button
+						id="upload-btn-DI"
+						onclick="document.getElementById('uploadDI').click()"
+					>
+						UPLOAD DYNAMIC IN
+					</button>
+					<input
+						style="display: none"
+						id="uploadDI"
+						type="file"
+						name="myDI"
+						accept=".txt"
+					/>
+
+          <button
+						id="upload-btn-OUT"
+						onclick="document.getElementById('uploadOUT').click()"
+					>
+						UPLOAD OUTPUT
+					</button>
+					<input
+						style="display: none"
+						id="uploadOUT"
+						type="file"
+						name="myOUT"
+						accept=".txt"
+					/>
+
+          <button
+						id="redraw-btn"
+					>
+						REDRAW
+					</button>
+
+					<label>Choose a particle</label>
+					<select name="particles" id="plist" disabled=true>
+            <option value="">--Please choose an option--</option>
+          </select>
+
+					<button
+						id="prevStep-btn"
+					>
+						PREVIOUS STEP
+					</button>
+
+					<input type="range" value="0" min="0" max="100" id="timeStepSlider" disabled=true/>
+
+					<button
+						id="nextStep-btn"
+					>
+						NEXT STEP
+					</button>
+
+					<button
+						id="autoPlay-btn"
+					>
+						AUTO PLAY
+					</button>
+
+				</div>
+				<div>
+					<h3>Options</h3>
+				</div>
+				<div>
+					<label>Number of particles</label>
+					<input
+						type="number"
+						min="0"
+						step="1"
+						id="N"
+            value="100"
+						disabled
+					/>
+
+					<label>Size of area (space)</label>
+					<input
+						type="number"
+						min="0"
+						step="any"
+						id="L"
+            value="8"
+						disabled
+					/>
+
+          <label>Number of cells</label>
+					<input
+						type="number"
+						min="1"
+						step="1"
+						id="M"
+            value="2"
+					/>
+
+          <label>Radius of interaction</label>
+					<input
+						type="number"
+						min="0"
+						step="any"
+						id="RC"
+            value="1.25"
+						disabled
+					/>
+
+
+				</div>
+			</div>
+			<div style="height: 100%;">
+				<canvas id="canvas"></canvas>
+			</div>
+		</div>
+    <script type="module" src="/main.js"></script>
+	</body>
+</html>
