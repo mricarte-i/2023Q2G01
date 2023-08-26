@@ -48,8 +48,8 @@ public class OffLaticeEvolver<P extends OffLaticeParticle2D> implements Evolver<
       Vector2D averageNeighbourhoodVelocity = calculateAverageVelocityVector2D(neighboursData.get(particle));
       // number between [-eta/2; +eta/2]
       double noise = (this.noiseAmplitude * rand.nextDouble()) - (this.noiseAmplitude / 2);
-      double newVelX = averageNeighbourhoodVelocity.xAxisProjection() + noise;
-      double newVelY = averageNeighbourhoodVelocity.yAxisProjection() + noise;
+      double newVelX = averageNeighbourhoodVelocity.xAxisProjectionAngle() + noise;
+      double newVelY = averageNeighbourhoodVelocity.yAxisProjectionAngle() + noise;
       Vector2D newVel = new SimpleVector2D(1, newVelX, newVelY);
 
       P newParticle = (P) new SimpleOffLaticeParticle2D(particle.getId(), newPosX, newPosY,
@@ -70,12 +70,17 @@ public class OffLaticeEvolver<P extends OffLaticeParticle2D> implements Evolver<
     averageSin /= particles.size();
     averageCos /= particles.size();
 
-    double averageAngle = Math.atan(averageSin / averageCos);
+    double averageAngle = Math.atan2(averageSin, averageCos);
     return new SimpleVector2D(1, averageAngle);
   }
 
   private double clampExclusive(double value, double minInclusive, double maxExclusive) {
-    return Math.max(minInclusive, Math.min(maxExclusive, value)) % maxExclusive;
+    //return Math.max(minInclusive, Math.min(maxExclusive, value)) % maxExclusive;
+    double out = value % maxExclusive;
+    if(out < minInclusive){
+      out = out + maxExclusive;
+    }
+    return out;
   }
 
 }
