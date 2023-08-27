@@ -7,6 +7,7 @@ import numpy as np
 from ovito.vis import Viewport, VectorVis, OpenGLRenderer
 import math
 from ovito.modifiers import ColorCodingModifier
+import os
 
 def num_to_rgb(val, max_val=1):
     i = (val * 255 / max_val)
@@ -57,6 +58,10 @@ def generate_visualization(simulation_info : SimulationInfo, xyz_file : str, ovi
     vp.type = Viewport.Type.Top
     vp.zoom_all()
 
+    ovito_file_split = ovito_file.rsplit('/', 1)
+    os.makedirs(ovito_file_split[0], exist_ok=True)
     ovito.scene.save(ovito_file)
 
+    animation_file_split = animation_file.rsplit('/', 1)
+    os.makedirs(animation_file_split[0], exist_ok=True)
     vp.render_anim(animation_file, size=(3840,2160))
