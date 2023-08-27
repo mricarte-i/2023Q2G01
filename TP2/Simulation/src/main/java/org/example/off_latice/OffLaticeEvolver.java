@@ -64,8 +64,8 @@ public class OffLaticeEvolver<P extends OffLaticeParticle2D> implements Evolver<
     double averageSin = 0;
     double averageCos = 0;
     for (P p : particles) {
-      averageSin = p.getVelocity().yAxisProjectionAngle();
-      averageCos = p.getVelocity().xAxisProjectionAngle();
+      averageSin += p.getVelocity().yAxisProjectionAngle();
+      averageCos += p.getVelocity().xAxisProjectionAngle();
     }
     averageSin /= particles.size();
     averageCos /= particles.size();

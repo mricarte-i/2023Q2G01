@@ -1,4 +1,4 @@
-import { setStaticIN, setDynamicIN, setNeighborData, init, getN, setN, setL, setSteps } from "./main";
+import { setStaticIN, setDynamicIN, setNeighborData, init, getN, setN, getL, setL, setSteps } from "./main";
 
 function uploadNewSI(event) {
   var file = event.target.files[0];
@@ -35,7 +35,7 @@ function uploadNewSI(event) {
               var readRc = redLine[0];
               var readVi = redLine[1];
               //console.log({ r_i: Number(readR), pr_i: Number(readPR) });
-              particles.push({ r: 0.5, pr: Number(readRc), vi: Number(readVi) })
+              particles.push({ r: 0.01 * getL(), pr: Number(readRc), vi: Number(readVi) })
             //r_i pr_i
           }
         }
