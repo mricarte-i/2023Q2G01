@@ -1,11 +1,7 @@
 package org.example.parsers;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Supplier;
 
 import org.example.particles.OffLaticeParticle2D;
@@ -24,18 +20,16 @@ public class ParamsParser {
       throw new RuntimeException("need parameters!");
     }
 
-    String[] readParam = args[0].split("(?:--(\\w+)=\\s*)");
-    if (readParam.length != 2) {
-      throw new RuntimeException("TELL ME A RUN MODE");
+    String[] readParam = args[0].split("=");
+    if(readParam.length != 2 || !readParam[0].startsWith("--")) {
+      throw new RuntimeException("Invalid parameter format: " + args[0]);
     }
     String runMode = readParam[1];
     String[] params = Arrays.copyOfRange(args, 1, args.length);
 
     if (runMode.equals("parse")) {
-      // particles = runParse(params);
       parseWithFiles(params);
     } else if (runMode.equals("random")) {
-      // particles = runRandom(params);
       parseWithRandom(params);
     } else {
       throw new RuntimeException("runTime argument value must be 'parse' or 'random'");
@@ -49,52 +43,40 @@ public class ParamsParser {
     // example: [jar] --N=420 --L=50 --Rc=1.0 --eta=0.3 --V=0.3
     // --T=500 --seed=10940 --ST="../Static420" --OUT="../Out420" --POLOUT="../Pol420"
 
-    if (params.length != 10) {
-      throw new RuntimeException("need parameters: N, L, Rc, eta, V, T, seed, ST, OUT, POLOUT");
+    Map<String, String> paramMap = new HashMap<>();
+
+    for(String param: params) {
+      String[] parts = param.split("=");
+      if(parts.length != 2 || !parts[0].startsWith("--")) {
+        throw new RuntimeException("Invalid parameter format: " + param);
+      }
+      paramMap.put(parts[0].substring(2), parts[1]);
     }
 
-    // placeholder param parser...
-    for (int i = 0; i < params.length; i++) {
-      String[] line = params[i].split("(?:--(\\w+)=\\s*)");
-      if (line.length < 2) {
-        throw new RuntimeException("all parameters must have key and value." + Arrays.toString(line));
-      }
-      switch (i) {
-        case 0:
-          ip.setParticleNumber(Integer.parseInt(line[1]));
-          break;
-        case 1:
-          ip.setSideLength(Double.parseDouble(line[1]));
-          break;
-        case 2:
-          ip.setInteractionRadius(Double.parseDouble(line[1]));
-          break;
-        case 3:
-          ip.setNoiseAmplitude(Double.parseDouble(line[1]));
-          break;
-        case 4:
-          ip.setInitialParticleVelocity(Double.parseDouble(line[1]));
-          break;
-        case 5:
-          ip.setSteps(Integer.parseInt(line[1]));
-          break;
-        case 6:
-          ip.setSeed(Long.parseLong(line[1]));
-          break;
-        case 7:
-          ip.setStaticPath(line[1]);
-          break;
-        case 8:
-          ip.setOutputPath(line[1]);
-          break;
-        case 9:
-          ip.setPolarizationOutPath(line[1]);
-          break;
-      }
-      // System.out.println(params[i]);
+    if(paramMap.size() < 9 || paramMap.size() > 10){
+      throw new RuntimeException(
+              "need parameters: N, L, Rc, eta, V, T, ST, OUT, POLOUT ('seed' is an optional parameter) " + params.length + " " + Arrays.toString(params));
     }
 
-    Random r = new Random(ip.getSeed());
+    ip.setParticleNumber(Integer.parseInt(paramMap.get("N")));
+    ip.setSideLength(Double.parseDouble(paramMap.get("L")));
+    ip.setInteractionRadius(Double.parseDouble(paramMap.get("Rc")));
+    ip.setNoiseAmplitude(Double.parseDouble(paramMap.get("eta")));
+    ip.setInitialParticleVelocity(Double.parseDouble(paramMap.get("V")));
+    ip.setSteps(Integer.parseInt(paramMap.get("T")));
+    ip.setStaticPath(paramMap.get("ST"));
+    ip.setOutputPath(paramMap.get("OUT"));
+    ip.setPolarizationOutPath(paramMap.get("POLOUT"));
+    if(paramMap.containsKey("seed")){
+      ip.setSeed(Long.parseLong(paramMap.get("seed")));
+    }
+
+    Random r;
+    if(ip.getSeed() != -1){
+      r = new Random(ip.getSeed());
+    }else{
+      r = new Random();
+    }
     Supplier<Collection<OffLaticeParticle2D>> offLaticeParticlesSupplier = new RandomOffLaticeParticle2DSupplier(
         ip.getParticleNumber(), ip.getSideLength(), ip.getSideLength(), ip.getInitialParticleVelocity(), ip.getRadius(),
         r);
@@ -111,48 +93,28 @@ public class ParamsParser {
     // --ST="../Static100.txt" --DY="../Dynamic100.txt" --OUT="../Out100"
     // --POLOUT="../Pol100"
 
-    // TODO: M isn't optional???
-    if (params.length != 6) {
-      throw new RuntimeException(
-          "need parameters: T, Rc, eta, ST, DY, OUT, POLOUT " + params.length + " " + Arrays.toString(params));
+    Map<String, String> paramMap = new HashMap<>();
+
+    for(String param: params) {
+      String[] parts = param.split("=");
+      if(parts.length != 2 || !parts[0].startsWith("--")) {
+        throw new RuntimeException("Invalid parameter format: " + param);
+      }
+      paramMap.put(parts[0].substring(2), parts[1]);
     }
 
-    // placeholder param parser...
-    for (int i = 0; i < params.length; i++) {
-      String[] line = params[i].split("(?:--(\\w+)=\\s*)");
-      if (line.length < 2) {
-        throw new RuntimeException("all parameters must have key and value." + Arrays.toString(line));
-      }
-      switch (i) {
-        case 0:
-          // M = Integer.parseInt(line[1]);
-          ip.setSteps(Integer.parseInt(line[1]));
-          break;
-        case 1:
-          // Rc = Double.parseDouble(line[1]);
-          ip.setInteractionRadius(Double.parseDouble(line[1]));
-          break;
-        case 2:
-          ip.setNoiseAmplitude(Double.parseDouble(line[1]));
-          break;
-        case 3:
-          // staticFile = line[1];
-          ip.setStaticPath(line[1]);
-          break;
-        case 4:
-          // dynamicFile = line[1];
-          ip.setDynamicPath(line[1]);
-          break;
-        case 5:
-          // outputLocation = line[1];
-          ip.setOutputPath(line[1]);
-          break;
-        case 6:
-          ip.setPolarizationOutPath(line[1]);
-          break;
-      }
-      // System.out.println(params[i]);
+    if(paramMap.size() < 7){
+      throw new RuntimeException(
+              "need parameters: T, Rc, eta, ST, DY, OUT, POLOUT " + params.length + " " + Arrays.toString(params));
     }
+
+    ip.setSteps(Integer.parseInt(paramMap.get("T")));
+    ip.setInteractionRadius(Double.parseDouble(paramMap.get("Rc")));
+    ip.setNoiseAmplitude(Double.parseDouble(paramMap.get("eta")));
+    ip.setStaticPath(paramMap.get("ST"));
+    ip.setDynamicPath(paramMap.get("DY"));
+    ip.setOutputPath(paramMap.get("OUT"));
+    ip.setPolarizationOutPath(paramMap.get("POLOUT"));
 
     // read that static file!
     StaticParser.parse(ip.getStaticPath()); // modifies the ip singleton!

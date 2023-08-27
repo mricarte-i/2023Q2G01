@@ -21,6 +21,7 @@ public class InputParams {
 
     private InputParams() {
         // Initialize default values here
+        seed = -1;
         particleNumber = 0;
         interactionRadius = 0.0;
         sideLength = 0.0;
