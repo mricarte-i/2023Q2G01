@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import math
 
 @dataclass
 class StaticInfo:
@@ -36,6 +37,18 @@ def parse_static_file(static_file : str) -> StaticInfo:
             particle_info = list(filter(lambda x : x != '', particle_info))
             radii.append(float(particle_info[0]))
         return StaticInfo(N, L, radii)
+    
+def angle_from_x_y(x : float, y : float) -> float:
+    mod_x = abs(x)
+    mod_y = abs(y)
+    normal_angle = math.atan(mod_y/mod_x)
+    if y >= 0 and x < 0:
+        normal_angle = math.pi - normal_angle
+    elif y < 0 and x < 0:
+        normal_angle = math.pi + normal_angle
+    elif y < 0 and x >= 0:
+        normal_angle = 2*math.pi - normal_angle
+    return normal_angle
 
 def parse_dynamic_file(static_info : StaticInfo, dynamic_file : str) -> DynamicInfo:
     with open(dynamic_file) as file:
@@ -53,7 +66,7 @@ def parse_dynamic_file(static_info : StaticInfo, dynamic_file : str) -> DynamicI
                 particle_info = particle_info.split(" ")
                 particle_info = list(filter(lambda x : x != '', particle_info))
                 positions[t_index].append((float(particle_info[0]), float(particle_info[1])))
-                angles[t_index].append(float(particle_info[4]))
+                angles[t_index].append(angle_from_x_y(float(particle_info[3]), float(particle_info[4])))
             t_index += 1
         return DynamicInfo(t_index, positions, angles)
     
