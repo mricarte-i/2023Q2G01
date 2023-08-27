@@ -6,5 +6,6 @@ def parse_arguments() -> tuple[str, str, str, str]:
     parser.add_argument("-d", "--dynamic-file", dest="dynamic_file",     action="store", required=True)
     parser.add_argument("--xyz",                dest="xyz_file",         action="store", required=True)
     parser.add_argument("-o", "--ovito-file",   dest="ovito_file",       action="store", required=True)
+    parser.add_argument("-a", "--animation",    dest="animation_file",   action="store", required=True)
     args = parser.parse_args()
-    return (args.static_file, args.dynamic_file, args.xyz_file, args.ovito_file)
+    return (args.static_file, args.dynamic_file, args.xyz_file, args.ovito_file, args.animation_file)
