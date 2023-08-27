@@ -16,7 +16,7 @@ def create_2d_cell(L):
 
 
 
-def generate_visualization(simulation_info : SimulationInfo, lammps_data_file : str, ovito_file : str) -> None:
+def generate_visualization(simulation_info : SimulationInfo, xyz_file : str, ovito_file : str) -> None:
     data = DataCollection()
 
     L = simulation_info.L
@@ -32,7 +32,7 @@ def generate_visualization(simulation_info : SimulationInfo, lammps_data_file : 
     cell_pipeline = Pipeline(source=StaticSource(data=data))
     cell_pipeline.add_to_scene()
 
-    particles_pipeline = import_file(lammps_data_file + ".xyz", columns=["Particle Identifier", "Position.X", "Position.Y", "Position.Z", "Radius", "Dipole Orientation.X", "Dipole Orientation.Y", "Dipole Orientation.Z", "Angle"])
+    particles_pipeline = import_file(xyz_file + ".xyz", columns=["Particle Identifier", "Position.X", "Position.Y", "Position.Z", "Dipole Orientation.X", "Dipole Orientation.Y", "Dipole Orientation.Z", "Angle"])
     data = particles_pipeline.compute()
     data.particles_.vis.enabled = False
     data.particles_['Dipole Orientation'].vis.enabled = True

@@ -26,9 +26,9 @@ def create_particles_from_sim_info(frame, data, simulation_info : SimulationInfo
         angles[i] = simulation_info.particles[i].angle[frame]
     
 
-def generate_frames(simulation_info : SimulationInfo, lammps_data_file : str) -> None:
+def generate_frames(simulation_info : SimulationInfo, xyz_file : str) -> None:
     create_particles = lambda frame, data : create_particles_from_sim_info(frame, data, simulation_info)
     pipeline = Pipeline(source=PythonScriptSource(function=create_particles))
-    export_file(pipeline, lammps_data_file + ".xyz", format="xyz",
-            columns=["Particle Identifier", "Position.X", "Position.Y", "Position.Z", "Radius", "Dipole Orientation.X", "Dipole Orientation.Y", "Dipole Orientation.Z", "Angle"],
+    export_file(pipeline, xyz_file + ".xyz", format="xyz",
+            columns=["Particle Identifier", "Position.X", "Position.Y", "Position.Z", "Dipole Orientation.X", "Dipole Orientation.Y", "Dipole Orientation.Z", "Angle"],
             multiple_frames=True, start_frame=0, end_frame=simulation_info.instant_count-1)
