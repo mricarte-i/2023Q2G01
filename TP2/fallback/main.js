@@ -71,6 +71,13 @@ const redraw = document.getElementById("redraw-btn");
 redraw.addEventListener("click", (ev) => drawAll());
 
 const timeStepSlider = document.getElementById("timeStepSlider");
+timeStepSlider.addEventListener("change", (ev) => {
+  const val = ev.target.value;
+  if (Steps != undefined) {
+    Step = transformRange(val, { min: 0, max: 100 }, { min: 0, max: Steps - 1 });
+  }
+  drawAll();
+});
 
 const prevStepBtn = document.getElementById("prevStep-btn");
 prevStepBtn.addEventListener("click", (ev) => {
@@ -89,14 +96,17 @@ nextStepBtn.addEventListener("click", (ev) => {
 });
 
 let animationIntervalId = undefined;
+timeStepSlider.disabled = false;
 
 const playBtn = document.getElementById("autoPlay-btn");
 playBtn.addEventListener("click", (ev) => {
   PlayAnimation = !PlayAnimation;
   if (!PlayAnimation && animationIntervalId != undefined) {
     clearInterval(animationIntervalId);
+    timeStepSlider.disabled = false;
     animationIntervalId = undefined;
   } else {
+    timeStepSlider.disabled = true;
     animationIntervalId = setInterval(() => {
       Step = mod(Step + 1, Steps);
       console.log(Step);
