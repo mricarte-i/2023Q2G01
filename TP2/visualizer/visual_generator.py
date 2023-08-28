@@ -17,7 +17,7 @@ def num_to_rgb(val, max_val=1):
     return (r,g,b)
 
 def a(v : VectorVis):
-    v.color_mapping_interval
+    v.scaling
 
 color_table = [
     (0.9882352941176471 , 0.7803921568627451 , 0.16470588235294117),
@@ -37,7 +37,7 @@ def generate_visualization(simulation_info : SimulationInfo, xyz_file : str, ovi
                  [0,0,0,0]]
     
     cell = data.create_cell(cell_dims, pbc=(True, True, True))
-    cell.vis.line_width = 0.1
+    cell.vis.line_width = 0.1 / 50 * simulation_info.L
     data.objects.append(cell)
     
     cell_pipeline = Pipeline(source=StaticSource(data=data))
@@ -46,8 +46,9 @@ def generate_visualization(simulation_info : SimulationInfo, xyz_file : str, ovi
     particles_pipeline = import_file(xyz_file + ".xyz", columns=["Particle Identifier", "Position.X", "Position.Y", "Position.Z", "Dipole Orientation.X", "Dipole Orientation.Y", "Dipole Orientation.Z", "Angle"])
     data = particles_pipeline.compute()
     data.particles_.vis.enabled = False
-    data.particles_['Dipole Orientation'].vis.enabled = True
-    data.particles_['Dipole Orientation'].vis.width = 0.1
+    data.particles_['Dipole Orientation'].vis.enabled   = True
+    data.particles_['Dipole Orientation'].vis.width     = 0.1 / 50 * simulation_info.L
+    data.particles_['Dipole Orientation'].vis.scaling   = 1 / 50 * simulation_info.L
     data.particles_['Dipole Orientation'].vis.color_mapping_gradient = ColorCodingModifier.Gradient(color_table)
     data.particles_['Dipole Orientation'].vis.color_mapping_property = 'Angle'
     data.particles_['Dipole Orientation'].vis.color_mapping_interval = (0, 2*math.pi)
