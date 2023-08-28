@@ -47,8 +47,8 @@ def generate_visualization(simulation_info : SimulationInfo, xyz_file : str, ovi
     data = particles_pipeline.compute()
     data.particles_.vis.enabled = False
     data.particles_['Dipole Orientation'].vis.enabled   = True
-    data.particles_['Dipole Orientation'].vis.width     = 0.1 / 50 * simulation_info.L
-    data.particles_['Dipole Orientation'].vis.scaling   = 1 / 50 * simulation_info.L
+    data.particles_['Dipole Orientation'].vis.width     = 0.20 / 50 * simulation_info.L
+    data.particles_['Dipole Orientation'].vis.scaling   = 1.50 / 50 * simulation_info.L
     data.particles_['Dipole Orientation'].vis.color_mapping_gradient = ColorCodingModifier.Gradient(color_table)
     data.particles_['Dipole Orientation'].vis.color_mapping_property = 'Angle'
     data.particles_['Dipole Orientation'].vis.color_mapping_interval = (0, 2*math.pi)
