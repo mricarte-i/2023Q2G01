@@ -25,6 +25,10 @@ class SimulationInfo:
     L             : float
     instant_count : int
     particles     : list[ParticleInfo]
+    polarization  : list[float]
+
+    def density(self) -> float:
+        return self.N / math.pow(self.L, 2)
     
 
 def parse_static_file(static_file : str) -> StaticInfo:
@@ -70,7 +74,19 @@ def parse_dynamic_file(static_info : StaticInfo, dynamic_file : str) -> DynamicI
             t_index += 1
         return DynamicInfo(t_index, positions, angles)
     
-def get_simulation_info(static_info : StaticInfo, dynamic_info : DynamicInfo) -> SimulationInfo:
+def parse_polarization_file(polarization_file : str) -> list[float]:
+    polarization_values = None
+    with open(polarization_file) as file:
+        while(True):
+            t = file.readline()
+            if not t:
+                break
+            if polarization_values is None:
+                polarization_values = []
+            polarization_values.append(float(file.readline()))
+    return polarization_values
+    
+def get_simulation_info(static_info : StaticInfo, dynamic_info : DynamicInfo, polarization_values : list[float]) -> SimulationInfo:
     particles = []
     for i in range(static_info.N):
         particles.append(ParticleInfo(
@@ -78,9 +94,10 @@ def get_simulation_info(static_info : StaticInfo, dynamic_info : DynamicInfo) ->
             [positions_for_t[i] for positions_for_t in dynamic_info.positions],
             [angles_for_t[i] for angles_for_t in dynamic_info.angles]
         ))
-    return SimulationInfo(static_info.N, static_info.L, dynamic_info.instant_count, particles)
+    return SimulationInfo(static_info.N, static_info.L, dynamic_info.instant_count, particles, polarization_values)
 
-def parse_simulation_files(static_file : str, dynamic_file : str) -> SimulationInfo:
-    static_info  = parse_static_file(static_file)
-    dynamic_info = parse_dynamic_file(static_info, dynamic_file)
-    return get_simulation_info(static_info, dynamic_info)
+def parse_simulation_files(static_file : str, dynamic_file : str, polarization_file : str) -> SimulationInfo:
+    static_info         = parse_static_file(static_file)
+    dynamic_info        = parse_dynamic_file(static_info, dynamic_file)
+    polarization_values = parse_polarization_file(polarization_file)
+    return get_simulation_info(static_info, dynamic_info, polarization_values)
