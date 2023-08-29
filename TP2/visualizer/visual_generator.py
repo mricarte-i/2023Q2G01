@@ -1,23 +1,12 @@
 import ovito
 from ovito.io import import_file
 from simulation_parser import SimulationInfo
-from ovito.data import SimulationCell, DataCollection
+from ovito.data import DataCollection
 from ovito.pipeline import Pipeline, StaticSource
-import numpy as np
-from ovito.vis import Viewport, VectorVis, OpenGLRenderer
+from ovito.vis import Viewport
 import math
 from ovito.modifiers import ColorCodingModifier
 import os
-
-def num_to_rgb(val, max_val=1):
-    i = (val * 255 / max_val)
-    r = round(math.sin(0.024 * i + 0) * 127 + 128)
-    g = round(math.sin(0.024 * i + 2) * 127 + 128)
-    b = round(math.sin(0.024 * i + 4) * 127 + 128)
-    return (r,g,b)
-
-def a(v : VectorVis):
-    v.scaling
 
 color_table = [
     (0.9882352941176471 , 0.7803921568627451 , 0.16470588235294117),
