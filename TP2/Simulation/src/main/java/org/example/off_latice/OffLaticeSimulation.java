@@ -34,7 +34,7 @@ public class OffLaticeSimulation {
         Evolver<Point2D, OffLaticeParticle2D> evolver = new OffLaticeEvolver<>(ip.getNoiseAmplitude(), ip.getSideLength());
 
         long startCalc = System.nanoTime();
-        for (int step = 1; step <= ip.getSteps(); step++) {
+        for (int step = 1; step < ip.getSteps(); step++) {
             Map<OffLaticeParticle2D, Collection<OffLaticeParticle2D>> neighboursData = cim
                     .calculateNeighbours(particles, ip.getInteractionRadius());
             particles = evolver.update(particles, neighboursData);
@@ -42,7 +42,6 @@ public class OffLaticeSimulation {
 
             va = calculatePolarization(particles);
             oWriter.writeFile(va, step);
-
         }
 
         oWriter.close();
@@ -58,7 +57,7 @@ public class OffLaticeSimulation {
         System.out.println("Final polarization value: " + String.valueOf(va));
         // print density & noise amplitude to be nice
         System.out.println(
-                "Density: " + String.valueOf(va) + " & Noise Amplitude: " + String.valueOf(ip.getNoiseAmplitude()));
+                "Density: " + String.valueOf(particles.size()/Math.pow(ip.getSideLength(), 2)) + " & Noise Amplitude: " + String.valueOf(ip.getNoiseAmplitude()));
 
     }
 

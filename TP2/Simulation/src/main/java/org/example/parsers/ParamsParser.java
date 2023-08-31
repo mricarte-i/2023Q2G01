@@ -61,7 +61,7 @@ public class ParamsParser {
     ip.setParticleNumber(Integer.parseInt(paramMap.get("N")));
     ip.setSideLength(Double.parseDouble(paramMap.get("L")));
     ip.setInteractionRadius(Double.parseDouble(paramMap.get("Rc")));
-    ip.setNoiseAmplitude(Double.parseDouble(paramMap.get("eta")));
+    ip.setNoiseAmplitude(Double.parseDouble(paramMap.get("eta"))*Math.PI);
     ip.setInitialParticleVelocity(Double.parseDouble(paramMap.get("V")));
     ip.setSteps(Integer.parseInt(paramMap.get("T")));
     ip.setStaticPath(paramMap.get("ST"));

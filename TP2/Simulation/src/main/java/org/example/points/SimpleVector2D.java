@@ -14,7 +14,7 @@ public class SimpleVector2D implements Vector2D {
     }
 
     public SimpleVector2D(double magnitude, double xAxisProjectionAngle, double yAxisProjectionAngle) {
-        this.angle = Math.atan(yAxisProjectionAngle / xAxisProjectionAngle);
+        this.angle = Math.atan2(yAxisProjectionAngle, xAxisProjectionAngle);
         this.magnitude = magnitude;
     }
 

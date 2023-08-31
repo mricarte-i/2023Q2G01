@@ -301,6 +301,39 @@ function drawParticle(id, sqRX, sqRY, size, sof, color) {
 
 }
 
+function drawVelocityVector(id, sqRX, sqRY, size, color) {
+  ctx.save();
+  const currentDynamic = getCurrentDynamic();
+
+  const ogRange = { min: 0, max: L };
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+
+
+  const startX = transformRange(currentDynamic[id].x, ogRange, sqRX);
+  const startY = transformRange(currentDynamic[id].y, ogRange, sqRY);
+
+  const endX = transformRange(currentDynamic[id].x + (currentDynamic[id].vx * 30), ogRange, sqRX);
+  const endY = transformRange(currentDynamic[id].y + (currentDynamic[id].vy * 30), ogRange, sqRY);
+
+  ctx.moveTo(startX, startY);
+  ctx.lineTo(endX, endY);
+  ctx.stroke();
+
+
+  ctx.restore();
+
+  //trying to figure out how to scale to pixels...
+  /*
+  console.log(
+    { px: size, full: L * M },
+    { px: ((size / (L * M)) * RC), full: RC },
+    { px: (size / (L * M)), full: 1 }
+  )
+  */
+}
+
 function drawInteractionRadius(id, sqRX, sqRY, size, color) {
   ctx.save();
   const currentDynamic = getCurrentDynamic();
@@ -372,6 +405,7 @@ const drawInfo = () => new Promise(
     //draw red cross on position of selected particle
     drawParticle(selectedIdx, sqRangeX, sqRangeY, sqSize, 'fill', 'red');
     drawInteractionRadius(selectedIdx, sqRangeX, sqRangeY, sqSize, 'magenta');
+    drawVelocityVector(selectedIdx, sqRangeX, sqRangeY, sqSize, 'green');
 
     //check neighbor data
     if (!!!NeighborData) return reject();

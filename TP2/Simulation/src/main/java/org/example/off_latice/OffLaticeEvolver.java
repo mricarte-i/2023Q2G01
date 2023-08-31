@@ -47,7 +47,7 @@ public class OffLaticeEvolver<P extends OffLaticeParticle2D> implements Evolver<
       }
       Vector2D averageNeighbourhoodVelocity = calculateAverageVelocityVector2D(neighboursData.get(particle));
       // number between [-eta/2; +eta/2]
-      double noise = (this.noiseAmplitude * rand.nextDouble()) - (this.noiseAmplitude / 2);
+      double noise = this.noiseAmplitude * (rand.nextDouble() - 0.5);
       double newVelX = averageNeighbourhoodVelocity.xAxisProjectionAngle() + noise;
       double newVelY = averageNeighbourhoodVelocity.yAxisProjectionAngle() + noise;
       Vector2D newVel = new SimpleVector2D(1, newVelX, newVelY);
@@ -71,6 +71,14 @@ public class OffLaticeEvolver<P extends OffLaticeParticle2D> implements Evolver<
     averageCos /= particles.size();
 
     double averageAngle = Math.atan2(averageSin, averageCos);
+
+    /*
+    if(averageAngle > Math.PI){
+      averageAngle -= 2*Math.PI;
+    }else if(averageAngle < -Math.PI){
+      averageAngle += 2*Math.PI;
+    }
+    */
     return new SimpleVector2D(1, averageAngle);
   }
 
