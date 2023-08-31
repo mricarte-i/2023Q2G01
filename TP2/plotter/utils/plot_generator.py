@@ -27,6 +27,7 @@ def plot_polarization_over_iterations(simulations_info : list[SimulationInfo], p
         polarization_values = np.array(simulation_info.polarization)
         add_polarization_over_iterations_plot(instants, polarization_values, colors[i])
         i += 1
+    plt.ylim((0, 1.05))
     plt.savefig(plot_file, bbox_inches='tight', dpi=1200)
 
 def add_polarization_over_iterations_plot(instants : np.ndarray, polarization_values : np.ndarray, color : str):
