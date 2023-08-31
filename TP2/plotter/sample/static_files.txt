@@ -1,1 +1,1 @@
-../Simulation/Static420.txt
+../runs/static_l-50_eta-0.5pi_iter-50.txt
