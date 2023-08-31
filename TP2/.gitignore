@@ -1,0 +1,4 @@
+runs/
+visualizer/*.png
+visualizer/*.xyz
+visualizer/*.ovito
