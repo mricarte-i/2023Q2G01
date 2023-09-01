@@ -42,3 +42,9 @@ def add_polarization_over_iterations_plot(instants : np.ndarray, polarization_va
         "Coeficiente de orden" : polarization_values
     })
     sns.lineplot(data=df, x="Iteración", y="Coeficiente de orden", color=color, label=label)
+
+def plot_order_over_noise(simulation_df : pd.DataFrame):
+    plt.figure()
+    sns.set_style("darkgrid")
+    sns.lineplot(data=simulation_df, x="eta", y="va", marker="o", err_style="bars", errorbar=("se", 2))
+    plt.savefig("order_over_noise.png", bbox_inches='tight', dpi=1200)

@@ -18,3 +18,12 @@ def parse_order_over_iterations_arguments() -> tuple[str, str, str, str, str, fl
     args.max_iter           = float(args.max_iter)
     args.min_iter           = float(args.min_iter)
     return (args.static_files, args.dynamic_files, args.polarization_files, args.colors_file, args.out_image_file, args.min_iter, args.max_iter)
+
+def parse_order_over_noise_arguments() -> str:
+    parser = ArgumentParser()
+    parser.add_argument("-d", "--directory",  dest="directory",  action="store", required=True)
+    parser.add_argument("-i", "--va-instant", dest="va_instant", action="store", required=True)
+    args = parser.parse_args()
+    args.directory = args.directory.replace("\\", "/")
+    args.va_instant = int(args.va_instant)
+    return args.directory, args.va_instant
