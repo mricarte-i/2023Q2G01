@@ -70,6 +70,8 @@ def plot_order_over_density(simulation_df : pd.DataFrame):
     cm = plt.get_cmap('jet')
     i = 0
     print("Holis")
+    plt.plot([], [], ' ', label="N = {}".format(int(simulation_df["N"].values[0])))
+    plt.plot([], [], ' ', label=" ")
     plt.plot([], [], ' ', label="Ruido")
     for eta in etas:
         order_over_noise_df = simulation_df[simulation_df["eta"] == eta][["density", "va", "iter"]]
