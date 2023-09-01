@@ -21,12 +21,16 @@ def plot_polarization_over_iterations(simulations_info : list[SimulationInfo], p
         os.makedirs(plot_file_split[0], exist_ok=True)
     plt.figure()
     sns.set_style("darkgrid")
+    plt.plot([], [], ' ', label="L = {}".format(int(simulations_info[0].N)))
+    plt.plot([], [], ' ', label="N = {}".format(int(simulations_info[0].L)))
+    plt.plot([], [], ' ', label=" ")
+    plt.plot([], [], ' ', label="Ruido")
     i = 0
     for simulation_info in simulations_info:
         instants            = np.array(list(range(simulation_info.instant_count)))
         polarization_values = np.array(simulation_info.polarization)
         add_polarization_over_iterations_plot(instants, polarization_values, colors[i], str(noises[i]) + "⋅π")
-        i += 1 
+        i += 1     
     plt.ylim((0, 1.05))
     plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
     plt.savefig(plot_file, bbox_inches='tight', dpi=1200)
