@@ -46,5 +46,39 @@ def add_polarization_over_iterations_plot(instants : np.ndarray, polarization_va
 def plot_order_over_noise(simulation_df : pd.DataFrame):
     plt.figure()
     sns.set_style("darkgrid")
-    sns.lineplot(data=simulation_df, x="eta", y="va", marker="o", err_style="bars", errorbar=("se", 2))
+    Ns = simulation_df["N"].unique()
+    cm = plt.get_cmap('jet')
+    i = 0
+    print("Holis")
+    plt.plot([], [], ' ', label="N")
+    for N in Ns:
+        order_over_noise_df = simulation_df[simulation_df["N"] == N][["eta", "va", "iter"]]
+        ax = sns.pointplot(data=order_over_noise_df, x="eta", y="va", errorbar="se", capsize=.1, label=N, join=False, color=cm(1.*i/len(Ns)))
+        #plt.setp(ax.collections, alpha=.3)
+        #plt.setp(ax.lines, alpha=.5)
+        i += 1
+    plt.xlabel('Ruido')
+    plt.ylabel('Coeficiente de orden')
+    plt.ylim((0, 1.05))
+    plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
     plt.savefig("order_over_noise.png", bbox_inches='tight', dpi=1200)
+
+def plot_order_over_density(simulation_df : pd.DataFrame):
+    plt.figure()
+    sns.set_style("darkgrid")
+    etas = simulation_df["eta"].unique()
+    cm = plt.get_cmap('jet')
+    i = 0
+    print("Holis")
+    plt.plot([], [], ' ', label="Ruido")
+    for eta in etas:
+        order_over_noise_df = simulation_df[simulation_df["eta"] == eta][["density", "va", "iter"]]
+        ax = sns.lineplot(data=order_over_noise_df, x="density", y="va", errorbar="se", label=eta, color=cm(1.*i/len(etas)), marker='o', err_style="bars", err_kws={'capsize':0.1})
+        #plt.setp(ax.collections, alpha=.3)
+        #plt.setp(ax.lines, alpha=.5)
+        i += 1
+    plt.xlabel('Densidad')
+    plt.ylabel('Coeficiente de orden')
+    plt.ylim((0, 1.05))
+    plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
+    plt.savefig("order_over_density.png", bbox_inches='tight', dpi=1200)
