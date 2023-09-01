@@ -29,7 +29,7 @@ def plot_polarization_over_iterations(simulations_info : list[SimulationInfo], p
     for simulation_info in simulations_info:
         instants            = np.array(list(range(simulation_info.instant_count)))
         polarization_values = np.array(simulation_info.polarization)
-        add_polarization_over_iterations_plot(instants, polarization_values, colors[i], str(noises[i]) + "⋅π")
+        add_polarization_over_iterations_plot(instants, polarization_values, colors[i], "{:.2g}".format(noises[i]) + "π")
         i += 1     
     plt.ylim((0, 1.05))
     plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
