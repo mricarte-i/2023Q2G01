@@ -5,7 +5,7 @@ import pandas as pd
 import seaborn as sns
 import os
 
-def plot_polarization_over_iterations_from_files(simulations_static_files : list[str], simulations_dynamic_files : list[str], simulations_polarization_files : list[str], plot_file : str, colors : list[str], noises : list[float]):
+def plot_polarization_over_iterations_from_files(simulations_static_files : list[str], simulations_dynamic_files : list[str], simulations_polarization_files : list[str], plot_file : str, colors : list[str], noises : list[float], min_iter : float, max_iter : float):
     static_files_len        = len(simulations_static_files)
     dynamic_files_len       = len(simulations_dynamic_files)
     polarization_files_len  = len(simulations_polarization_files)
@@ -13,9 +13,9 @@ def plot_polarization_over_iterations_from_files(simulations_static_files : list
     simulations_info = []
     for i in range(static_files_len):
         simulations_info.append(parse_simulation_files(simulations_static_files[i], simulations_dynamic_files[i], simulations_polarization_files[i]))
-    plot_polarization_over_iterations(simulations_info, plot_file, colors, noises)
+    plot_polarization_over_iterations(simulations_info, plot_file, colors, noises, min_iter, max_iter)
 
-def plot_polarization_over_iterations(simulations_info : list[SimulationInfo], plot_file : str, colors : list[str], noises : list[float]):
+def plot_polarization_over_iterations(simulations_info : list[SimulationInfo], plot_file : str, colors : list[str], noises : list[float], min_iter : float, max_iter : float):
     plot_file_split = plot_file.rsplit('/', 1)
     if len(plot_file_split) > 1:
         os.makedirs(plot_file_split[0], exist_ok=True)
@@ -32,6 +32,7 @@ def plot_polarization_over_iterations(simulations_info : list[SimulationInfo], p
         add_polarization_over_iterations_plot(instants, polarization_values, colors[i], "{:.2g}".format(noises[i]) + "π")
         i += 1     
     plt.ylim((0, 1.05))
+    plt.xlim((min_iter, max_iter))
     plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
     plt.savefig(plot_file, bbox_inches='tight', dpi=1200)
 
