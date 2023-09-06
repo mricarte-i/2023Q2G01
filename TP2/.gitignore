@@ -1,4 +1,6 @@
 runs/
-visualizer/*.png
-visualizer/*.xyz
-visualizer/*.ovito
+*.png
+*.xyz
+*.ovito
+*.txt
+*.pyc
