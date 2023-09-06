@@ -50,10 +50,12 @@ def plot_order_over_noise(simulation_df : pd.DataFrame):
     cm = plt.get_cmap('jet')
     i = 0
     print("Holis")
+    plt.plot([], [], ' ', label="Densidad = {:.2g}".format(simulation_df["density"].values[0]))
+    plt.plot([], [], ' ', label=" ")
     plt.plot([], [], ' ', label="N")
     for N in Ns:
         order_over_noise_df = simulation_df[simulation_df["N"] == N][["eta", "va", "iter"]]
-        ax = sns.pointplot(data=order_over_noise_df, x="eta", y="va", errorbar="se", capsize=.1, label=N, join=False, color=cm(1.*i/len(Ns)))
+        ax = sns.lineplot(data=order_over_noise_df, x="eta", y="va", errorbar="se",  label=N, color=cm(1.*i/len(Ns)), marker='o', err_style="bars", err_kws={'capsize':0.1})
         #plt.setp(ax.collections, alpha=.3)
         #plt.setp(ax.lines, alpha=.5)
         i += 1
