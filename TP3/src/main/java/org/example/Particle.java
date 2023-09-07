@@ -23,16 +23,16 @@ public class Particle {
 
     // collidesX|Y detects wall collisions
     public double collidesX() {
-        return 0;
+        return Double.POSITIVE_INFINITY;
     }
 
     public double collidesY() {
-        return 0;
+        return Double.POSITIVE_INFINITY;
     }
 
     // detects particle collisions
     public double collides(Particle b) {
-        return 0;
+        return Double.POSITIVE_INFINITY;
     }
 
     // applies velocity changes to this particle (vs walls or vs other particle)
