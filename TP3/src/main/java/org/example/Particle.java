@@ -42,10 +42,12 @@ public class Particle {
     // applies velocity changes to this particle (vs walls or vs other particle)
     public void bounceX() {
         this.vx = -this.vx;
+        this.collisionCount += 1;
     }
 
     public void bounceY() {
         this.vy = -this.vy;
+        this.collisionCount += 1;
     }
 
     public void bounce(Particle b) {
