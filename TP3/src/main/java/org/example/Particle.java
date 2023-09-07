@@ -1,9 +1,12 @@
 package org.example;
 
+import java.math.BigInteger;
+
 public class Particle {
     // TODO: implement
     private int id;
     private double radius, mass, x, y, vx, vy;
+    private int collisionCount = 0;
 
     // NOTE: initial speed is 0.01, random direction, vx vy are the components of v
     // initial positions should be within the first container
@@ -37,16 +40,18 @@ public class Particle {
 
     // applies velocity changes to this particle (vs walls or vs other particle)
     public void bounceX() {
+        this.vx = -this.vx;
     }
 
     public void bounceY() {
+        this.vy = -this.vy;
     }
 
     public void bounce(Particle b) {
     }
 
     public int getCollisionCount() {
-        return 0;
+        return collisionCount;
     }
 
 }
