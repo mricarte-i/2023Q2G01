@@ -72,23 +72,23 @@ public class Particle {
     }
 
     private double getSigma(@Nonnull Particle b) {
-        return this.radius + b.radius;
+        return b.radius + this.radius;
     }
 
     private double getDeltaRx(@Nonnull Particle b) {
-        return this.x - b.x;
+        return b.x - this.x;
     }
 
     private double getDeltaRy(@Nonnull Particle b) {
-        return this.y - b.y;
+        return b.y - this.y;
     }
 
     private double getDeltaVx(@Nonnull Particle b) {
-        return this.vx - b.vx;
+        return b.vx - this.vx;
     }
 
     private double getDeltaVy(@Nonnull Particle b) {
-        return this.vy - b.vy;
+        return b.vy - this.vy;
     }
 
     private double getDeltaRPow2(@Nonnull Particle b) {
@@ -128,7 +128,32 @@ public class Particle {
         this.collisionCount += 1;
     }
 
-    public void bounce(Particle b) {}
+    private double getJ(@Nonnull Particle b, double sigma) {
+        return (2 * this.mass * b.mass * getDotDeltaVR(b)) / (sigma * (this.mass + b.mass));
+    }
+
+    private double getJx(@Nonnull Particle b, double J, double sigma) {
+        return (J * getDeltaRx(b)) / sigma;
+    }
+
+    private double getJy(@Nonnull Particle b, double J, double sigma) {
+        return (J * getDeltaRy(b)) / sigma;
+    }
+
+    public void bounce(Particle b) {
+        double sigma = getSigma(b);
+        double J     = getJ(b, sigma);
+        double Jx    = getJx(b, J, sigma);
+        double Jy    = getJy(b, J, sigma);
+
+        this.vx = this.vx + Jx / this.mass;
+        this.vy = this.vy + Jy / this.mass;
+        this.collisionCount += 1;
+
+        b.vx = b.vx - Jx / b.mass;
+        b.vy = b.vy - Jy / b.mass;
+        b.collisionCount += 1;
+    }
 
     public int getCollisionCount() {
         return collisionCount;
