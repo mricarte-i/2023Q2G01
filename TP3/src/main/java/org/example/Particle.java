@@ -61,7 +61,7 @@ public class Particle {
         Container c = Container.getInstance();
         return collidesWall(c, this.vx, this.x,
                             0, c.getW(),
-                            0, 2*c.getW());
+                            0, c.getR2RightBound());
     }
 
     public double collidesY() {
@@ -177,7 +177,7 @@ public class Particle {
 
 class Container {
     private final double  L, w, h,
-                    r2UpperBound, r2LowerBound;
+                    r2UpperBound, r2LowerBound, r2RightBound;
     private static Container container = null;
 
     private Container(double L, double w, double h) {
@@ -186,6 +186,7 @@ class Container {
         this.h = h;
         this.r2LowerBound = getR2LowerBound(L, h);
         this.r2UpperBound = getR2UpperBound(r2LowerBound, L);
+        this.r2RightBound = w*2;
     }
 
     double getL() {
@@ -206,6 +207,10 @@ class Container {
 
     double getR2UpperBound() {
         return r2UpperBound;
+    }
+
+    public double getR2RightBound() {
+        return r2RightBound;
     }
 
     static Container getInstance() {
