@@ -22,6 +22,11 @@ public class Particle {
         return y;
     }
 
+    public void updatePosition(double t) {
+        this.x += vx * t;
+        this.y += vy * t;
+    }
+
     // NOTE: initial speed is 0.01, random direction, vx vy are the components of v
     // initial positions should be within the first container
     public Particle(double rx, double ry, double vx, double vy, double mass, double radius) {

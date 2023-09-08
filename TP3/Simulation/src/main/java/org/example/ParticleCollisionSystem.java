@@ -21,8 +21,9 @@ public class ParticleCollisionSystem {
                                                     // calculating Z
     }
 
-    private void evolve() {
+    private void evolve(double t) {
         // steps to time t (event @time t)
+        // p.updatePosition(t)
     }
 
     private void applyCollisions() {
@@ -56,8 +57,11 @@ public class ParticleCollisionSystem {
         }
     }
 
-    private void saveState() {
+    private void saveState(double time) {
         // prints current state to output dynamic
+        // time
+        // X Y VX VY MASS RADIUS
+        // ...
     }
 
     private double getPressureFromFirstContainer() {
@@ -70,13 +74,21 @@ public class ParticleCollisionSystem {
         return 0;
     }
 
-    // idea: make a getPressureFromContainer(container bounds)
+    // TODO:
+    // private double getPressureFromContainer(double x0, x1, x2, x3){
+    // particles inside / area;
+    // }
 
     private void writeOutput() {
         // prints pressures and Z over time (used in observables)
     }
 
-    private double getZ(Particle p) {
+    private double getZ() {
+        // returns average getZ_i for each
+        return 0;
+    }
+
+    private double getZ_i(Particle p) {
         // returns square distance to particles origin
         Particle pOriginal = initParticles.stream().filter(pi -> pi.equals(p)).findFirst().orElse(null);
         if (pOriginal == null) {
@@ -88,24 +100,15 @@ public class ParticleCollisionSystem {
     }
 
     public void simulate() {
-        // runs the whole thing:
-        /**
-         * 1. calls updateCollisions
-         * 2. iterates for each event: (check if event is still valid, if not skip)
-         * - a. evolve()
-         * - b. saveState()
-         * - c. applyCollisions()
-         * - d. updateCollisions()
-         * - e. writeOutputs()
-         */
 
         updateCollisions();
         // iterate for a certain time or until some calculation of equilibrium is met
         // - pick the first event in the eventQueue, check for validity (if not, remove
         // from queue and get next event that is valid)
-        // - evolve() moves particles to event's time
-        // - saveState() writes current positions and velocities...
+        // - evolve(event.time) moves particles to event's time
+        // - saveState(event.time) writes current positions and velocities...
         // - applyCollisions() / could also just call p1.bounce(p2)
+        // - writeOutputs()
         // - remove first valid event (this one) from the eventQueue
         // - updateCollsions() gets new events
     }
