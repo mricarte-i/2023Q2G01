@@ -140,7 +140,7 @@ public class Particle {
         return (J * getDeltaRy(b)) / sigma;
     }
 
-    public void bounce(Particle b) {
+    public void bounce(@Nonnull Particle b) {
         double sigma = getSigma(b);
         double J     = getJ(b, sigma);
         double Jx    = getJx(b, J, sigma);
