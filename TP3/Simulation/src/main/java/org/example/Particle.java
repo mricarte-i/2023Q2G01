@@ -117,6 +117,26 @@ public class Particle {
         return - (dotDeltaVR + Math.sqrt(d)) / deltaVPow2;
     }
 
+    private void bounceRigid(double x, double y) {
+        double ct = 1;
+        double cn = -1;
+
+        double ady = Math.abs(this.x - x);
+        double opp = Math.abs(this.y - y);
+        double hip = Math.sqrt(Math.pow(ady, 2) + Math.pow(opp, 2));
+
+        double cos = ady / hip;
+        double sin = opp / hip;
+
+        double cosPow2 = Math.pow(cos, 2);
+        double sinPow2 = Math.pow(sin, 2);
+
+        double fixedV = (-(cn + ct) * sin * cos);
+
+        this.vx = (-cn * cosPow2 + ct * sinPow2) * this.vx +                         fixedV * this.vy;
+        this.vy =                         fixedV * this.vx + (-cn * sinPow2 + ct * cosPow2) * this.vy;
+    }
+
     // applies velocity changes to this particle (vs walls or vs other particle)
     public void bounceX() {
         this.vx = -this.vx;
