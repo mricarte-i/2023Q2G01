@@ -9,6 +9,19 @@ public class Particle {
     private double radius, mass, x, y, vx, vy;
     private int collisionCount = 0;
 
+    public void setPosition(double newX, double newY) {
+        this.x = newX;
+        this.y = newY;
+    }
+
+    public double getPositionX() {
+        return x;
+    }
+
+    public double getPositionY() {
+        return y;
+    }
+
     // NOTE: initial speed is 0.01, random direction, vx vy are the components of v
     // initial positions should be within the first container
     public Particle(double rx, double ry, double vx, double vy, double mass, double radius) {
@@ -26,22 +39,25 @@ public class Particle {
     }
 
     private double getYWhenChangingContainer(@Nonnull Container c) {
-        if (this.x > c.getW() && this.vx > 0) return Double.NaN;
-        if (this.x < c.getW() && this.vx < 0) return Double.NaN;
+        if (this.x > c.getW() && this.vx > 0)
+            return Double.NaN;
+        if (this.x < c.getW() && this.vx < 0)
+            return Double.NaN;
         double tL = Math.abs((c.getW() - this.x) / this.vx);
         return this.y + this.vy * tL;
     }
 
     private boolean willChangeContainer(@Nonnull Container c) {
         double yL = getYWhenChangingContainer(c);
-        if (Double.isNaN(yL)) return false;
+        if (Double.isNaN(yL))
+            return false;
         return yL - this.radius > c.getR2LowerBound() &&
                 yL + this.radius < c.getR2UpperBound();
     }
 
     private double collidesWall(@Nonnull Container c, double v, double pos,
-                                double leftLowerBound, double leftUpperBound,
-                                double rightLowerBound, double rightUpperBound) {
+            double leftLowerBound, double leftUpperBound,
+            double rightLowerBound, double rightUpperBound) {
         double upperBound = leftUpperBound;
         double lowerBound = leftLowerBound;
         if (willChangeContainer(c)) {
@@ -60,15 +76,15 @@ public class Particle {
     public double collidesX() {
         Container c = Container.getInstance();
         return collidesWall(c, this.vx, this.x,
-                            0, c.getW(),
-                            0, c.getR2RightBound());
+                0, c.getW(),
+                0, c.getR2RightBound());
     }
 
     public double collidesY() {
         Container c = Container.getInstance();
         return collidesWall(c, this.vy, this.y,
-                            0, c.getH(),
-                            c.getR2LowerBound(), c.getR2UpperBound());
+                0, c.getH(),
+                c.getR2LowerBound(), c.getR2UpperBound());
     }
 
     private double getSigma(@Nonnull Particle b) {
@@ -100,21 +116,23 @@ public class Particle {
     }
 
     private double getDotDeltaVR(@Nonnull Particle b) {
-        return getDeltaVx(b)*getDeltaRx(b) + getDeltaVy(b)*getDeltaRy(b);
+        return getDeltaVx(b) * getDeltaRx(b) + getDeltaVy(b) * getDeltaRy(b);
     }
 
     // detects particle collisions
     public double collides(@Nonnull Particle b) {
         double dotDeltaVR = getDotDeltaVR(b);
-        if (dotDeltaVR >= 0) return Double.POSITIVE_INFINITY;
+        if (dotDeltaVR >= 0)
+            return Double.POSITIVE_INFINITY;
 
         double deltaVPow2 = getDeltaVPow2(b);
         double deltaRPow2 = getDeltaRPow2(b);
-        double sigmaPow2  = Math.pow(getSigma(b), 2);
-        double d          = Math.pow(dotDeltaVR, 2) - deltaVPow2 * (deltaRPow2 - sigmaPow2);
-        if (d < 0) return Double.POSITIVE_INFINITY;
+        double sigmaPow2 = Math.pow(getSigma(b), 2);
+        double d = Math.pow(dotDeltaVR, 2) - deltaVPow2 * (deltaRPow2 - sigmaPow2);
+        if (d < 0)
+            return Double.POSITIVE_INFINITY;
 
-        return - (dotDeltaVR + Math.sqrt(d)) / deltaVPow2;
+        return -(dotDeltaVR + Math.sqrt(d)) / deltaVPow2;
     }
 
     private void bounceRigid(double x, double y) {
@@ -133,8 +151,8 @@ public class Particle {
 
         double fixedV = (-(cn + ct) * sin * cos);
 
-        this.vx = (-cn * cosPow2 + ct * sinPow2) * this.vx +                         fixedV * this.vy;
-        this.vy =                         fixedV * this.vx + (-cn * sinPow2 + ct * cosPow2) * this.vy;
+        this.vx = (-cn * cosPow2 + ct * sinPow2) * this.vx + fixedV * this.vy;
+        this.vy = fixedV * this.vx + (-cn * sinPow2 + ct * cosPow2) * this.vy;
     }
 
     // applies velocity changes to this particle (vs walls or vs other particle)
@@ -162,9 +180,9 @@ public class Particle {
 
     public void bounce(@Nonnull Particle b) {
         double sigma = getSigma(b);
-        double J     = getJ(b, sigma);
-        double Jx    = getJx(b, J, sigma);
-        double Jy    = getJy(b, J, sigma);
+        double J = getJ(b, sigma);
+        double Jx = getJx(b, J, sigma);
+        double Jy = getJy(b, J, sigma);
 
         this.vx = this.vx + Jx / this.mass;
         this.vy = this.vy + Jy / this.mass;
@@ -181,23 +199,27 @@ public class Particle {
 
     @Override
     public boolean equals(Object o) {
-        if (this.id == null) return super.equals(o);
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this.id == null)
+            return super.equals(o);
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Particle particle = (Particle) o;
         return Objects.equals(id, particle.id);
     }
 
     @Override
     public int hashCode() {
-        if (this.id == null) return super.hashCode();
+        if (this.id == null)
+            return super.hashCode();
         return Objects.hash(id);
     }
 }
 
 class Container {
-    private final double  L, w, h,
-                    r2UpperBound, r2LowerBound, r2RightBound;
+    private final double L, w, h,
+            r2UpperBound, r2LowerBound, r2RightBound;
     private static Container container = null;
 
     private Container(double L, double w, double h) {
@@ -206,7 +228,7 @@ class Container {
         this.h = h;
         this.r2LowerBound = getR2LowerBound(L, h);
         this.r2UpperBound = getR2UpperBound(r2LowerBound, L);
-        this.r2RightBound = w*2;
+        this.r2RightBound = w * 2;
     }
 
     double getL() {
@@ -234,7 +256,7 @@ class Container {
     }
 
     static Container getInstance() {
-        if (container == null){
+        if (container == null) {
             ParamsParser paramsParser = ParamsParser.getInstance();
             double L = paramsParser.getL();
             double h = paramsParser.getH();
@@ -246,7 +268,7 @@ class Container {
 
     private double getR2LowerBound(double L, double h) {
         double r2LowerBound = (h - L) / 2;
-        if (r2LowerBound < 0){
+        if (r2LowerBound < 0) {
             return 0;
         }
         return r2LowerBound;
@@ -254,7 +276,7 @@ class Container {
 
     private double getR2UpperBound(double r2LowerBound, double L) {
         double r2UpperBound = r2LowerBound + L;
-        if (r2UpperBound < 0){
+        if (r2UpperBound < 0) {
             return 0;
         }
         return r2UpperBound;
