@@ -26,12 +26,15 @@ public class Particle {
     }
 
     private double getYWhenChangingContainer(Container c) {
-        double tL = (c.getW() - this.x) / this.vx;
+        if (this.x > c.getW() && this.vx > 0) return Double.NaN;
+        if (this.x < c.getW() && this.vx < 0) return Double.NaN;
+        double tL = Math.abs((c.getW() - this.x) / this.vx);
         return this.y + this.vy * tL;
     }
 
     private boolean willChangeContainer(Container c) {
         double yL = getYWhenChangingContainer(c);
+        if (Double.isNaN(yL)) return false;
         return yL > c.getR2LowerBound() &&
                 yL < c.getR2UpperBound();
     }
@@ -82,6 +85,10 @@ public class Particle {
     public void bounceY() {
         this.vy = -this.vy;
         this.collisionCount += 1;
+    }
+
+    private double deltaR(){
+        return 0;
     }
 
     public void bounce(Particle b) {
