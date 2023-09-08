@@ -1,6 +1,6 @@
 package org.example;
 
-import java.math.BigInteger;
+import javax.annotation.Nonnull;
 import java.util.Objects;
 
 public class Particle {
@@ -25,21 +25,21 @@ public class Particle {
         this.id = id;
     }
 
-    private double getYWhenChangingContainer(Container c) {
+    private double getYWhenChangingContainer(@Nonnull Container c) {
         if (this.x > c.getW() && this.vx > 0) return Double.NaN;
         if (this.x < c.getW() && this.vx < 0) return Double.NaN;
         double tL = Math.abs((c.getW() - this.x) / this.vx);
         return this.y + this.vy * tL;
     }
 
-    private boolean willChangeContainer(Container c) {
+    private boolean willChangeContainer(@Nonnull Container c) {
         double yL = getYWhenChangingContainer(c);
         if (Double.isNaN(yL)) return false;
         return yL > c.getR2LowerBound() &&
                 yL < c.getR2UpperBound();
     }
 
-    private double collidesWall(Container c, double v, double pos,
+    private double collidesWall(@Nonnull Container c, double v, double pos,
                                 double leftLowerBound, double leftUpperBound,
                                 double rightLowerBound, double rightUpperBound) {
         double upperBound = leftUpperBound;
@@ -71,9 +71,45 @@ public class Particle {
                             c.getR2LowerBound(), c.getR2UpperBound());
     }
 
+    private double getDeltaRx(@Nonnull Particle b) {
+        return this.x - b.x;
+    }
+
+    private double getDeltaRy(@Nonnull Particle b) {
+        return this.y - b.y;
+    }
+
+    private double getDeltaVx(@Nonnull Particle b) {
+        return this.vx - b.vx;
+    }
+
+    private double getDeltaVy(@Nonnull Particle b) {
+        return this.vy - b.vy;
+    }
+
+    private double getDeltaRPow2(@Nonnull Particle b) {
+        return Math.pow(getDeltaRx(b), 2) + Math.pow(getDeltaRy(b), 2);
+    }
+
+    private double getDeltaVPow2(@Nonnull Particle b) {
+        return Math.pow(getDeltaVx(b), 2) + Math.pow(getDeltaVy(b), 2);
+    }
+
+    private double getDotDeltaVR(@Nonnull Particle b) {
+        return getDeltaVx(b)*getDeltaRx(b) + getDeltaVy(b)*getDeltaRy(b);
+    }
+
     // detects particle collisions
-    public double collides(Particle b) {
-        return Double.POSITIVE_INFINITY;
+    public double collides(@Nonnull Particle b) {
+        double dotDeltaVR = getDotDeltaVR(b);
+        if (dotDeltaVR >= 0) return Double.POSITIVE_INFINITY;
+
+        double deltaVPow2 = getDeltaVPow2(b);
+        double deltaRPow2 = getDeltaRPow2(b);
+        double d          = Math.pow(dotDeltaVR, 2) - deltaVPow2 * (deltaRPow2 - (this.radius * b.radius));
+        if (d < 0) return Double.POSITIVE_INFINITY;
+
+        return - (dotDeltaVR + Math.sqrt(d)) / deltaVPow2;
     }
 
     // applies velocity changes to this particle (vs walls or vs other particle)
@@ -87,12 +123,7 @@ public class Particle {
         this.collisionCount += 1;
     }
 
-    private double deltaR(){
-        return 0;
-    }
-
-    public void bounce(Particle b) {
-    }
+    public void bounce(Particle b) {}
 
     public int getCollisionCount() {
         return collisionCount;
