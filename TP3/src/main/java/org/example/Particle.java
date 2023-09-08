@@ -35,8 +35,8 @@ public class Particle {
     private boolean willChangeContainer(@Nonnull Container c) {
         double yL = getYWhenChangingContainer(c);
         if (Double.isNaN(yL)) return false;
-        return yL > c.getR2LowerBound() &&
-                yL < c.getR2UpperBound();
+        return yL - this.radius > c.getR2LowerBound() &&
+                yL + this.radius < c.getR2UpperBound();
     }
 
     private double collidesWall(@Nonnull Container c, double v, double pos,
