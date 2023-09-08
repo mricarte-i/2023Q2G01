@@ -71,6 +71,10 @@ public class Particle {
                             c.getR2LowerBound(), c.getR2UpperBound());
     }
 
+    private double getSigma(@Nonnull Particle b) {
+        return this.radius + b.radius;
+    }
+
     private double getDeltaRx(@Nonnull Particle b) {
         return this.x - b.x;
     }
@@ -106,7 +110,8 @@ public class Particle {
 
         double deltaVPow2 = getDeltaVPow2(b);
         double deltaRPow2 = getDeltaRPow2(b);
-        double d          = Math.pow(dotDeltaVR, 2) - deltaVPow2 * (deltaRPow2 - (this.radius * b.radius));
+        double sigmaPow2  = Math.pow(getSigma(b), 2);
+        double d          = Math.pow(dotDeltaVR, 2) - deltaVPow2 * (deltaRPow2 - sigmaPow2);
         if (d < 0) return Double.POSITIVE_INFINITY;
 
         return - (dotDeltaVR + Math.sqrt(d)) / deltaVPow2;
