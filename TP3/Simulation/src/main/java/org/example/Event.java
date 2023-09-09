@@ -1,13 +1,18 @@
 package org.example;
 
 public class Event {
-    private double t;
-    private Integer collisionsP1, collisionsP2; // on instantiation, save both particles getCollisionCount
+    private final double t;
+    private final Particle particleA, particleB;
+    private final int particleACollisionsAtEventCreation, particleBCollisionsAtEventCreation; // on instantiation, save both particles getCollisionCount
     // we will use that to check if this event is still valid
     private Particle p1, p2;
 
-    public Event(double t, Particle a, Particle b) {
-
+    public Event(double t, Particle particleA, Particle particleB) {
+        this.t = t;
+        this.particleA = particleA;
+        this.particleB = particleB;
+        this.particleACollisionsAtEventCreation = particleA.getCollisionCount();
+        this.particleBCollisionsAtEventCreation = particleB.getCollisionCount();
     }
 
     public double getTime() {
@@ -27,11 +32,13 @@ public class Event {
         return 0;
     }
 
-    // if collisionP1 == p1.getCollisionCount() that means
-    // that the particle hasn't been hit with a new unknown at the time event, so we
-    // can still use this event!
     public boolean wasSuperveningEvent() {
         return false;
+    }
+
+    public boolean isValid() {
+        return this.particleA.getCollisionCount() == this.particleACollisionsAtEventCreation && this.particleB.getCollisionCount() == this.particleBCollisionsAtEventCreation;
+
     }
 
 }
