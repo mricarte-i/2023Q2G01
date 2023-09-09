@@ -151,8 +151,29 @@ public class ParticleCollisionSystem {
     }
 
     public void simulate() {
+        Event event;
+        double t;
+
 
         updateCollisions();
+        // TODO: fix condition
+        for (int i = 0; i < 9999999; i++) {
+            try {
+                event = eventQueue.remove();
+
+            } catch (Exception e) {
+                // TODO: handle empty eventQueue
+                break;
+            }
+            if (!event.isValid())
+                continue;
+            // TODO: is it ok to evolve with event.getTime()?
+            t = event.getTime();
+            evolve(t);
+            saveState(t);
+            // etc...
+        }
+
         // iterate for a certain time or until some calculation of equilibrium is met
         // - pick the first event in the eventQueue, check for validity (if not, remove
         // from queue and get next event that is valid)
