@@ -156,16 +156,29 @@ public class Particle {
         return -(dotDeltaVR + Math.sqrt(d)) / deltaVPow2;
     }
 
+    private double getHypSign(double ady, double opp) {
+        if (ady > 0 && opp > 0) {
+            return 1;
+        } else if (ady < 0 && opp > 0) {
+            return -1;
+        } else if (ady < 0 && opp < 0) {
+            return 1;
+        } else if (ady > 0 && opp < 0) {
+            return -1;
+        }
+        return Double.NaN;
+    }
+
     private void bounceRigid(double x, double y) {
         double ct = 1;
         double cn = -1;
 
-        double ady = Math.abs(this.x - x);
-        double opp = Math.abs(this.y - y);
-        double hip = Math.sqrt(Math.pow(ady, 2) + Math.pow(opp, 2));
+        double ady = this.x - x;
+        double opp = this.y - y;
+        double hyp = Math.sqrt(Math.pow(ady, 2) + Math.pow(opp, 2)) * getHypSign(ady, opp);
 
-        double cos = ady / hip;
-        double sin = opp / hip;
+        double cos = ady / hyp;
+        double sin = opp / hyp;
 
         double cosPow2 = Math.pow(cos, 2);
         double sinPow2 = Math.pow(sin, 2);
