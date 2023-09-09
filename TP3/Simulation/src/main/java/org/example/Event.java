@@ -5,7 +5,6 @@ public class Event {
     private final Particle particleA, particleB;
     private final int particleACollisionsAtEventCreation, particleBCollisionsAtEventCreation; // on instantiation, save both particles getCollisionCount
     // we will use that to check if this event is still valid
-    private Particle p1, p2;
 
     public Event(double t, Particle particleA, Particle particleB) {
         this.t = t;
@@ -19,12 +18,12 @@ public class Event {
         return 0;
     }
 
-    public Particle getParticle1() {
-        return this.p1;
+    public Particle getParticleA() {
+        return this.particleA;
     }
 
-    public Particle getParticle2() {
-        return this.p2;
+    public Particle getParticleB() {
+        return this.particleB;
     }
 
     // compare times, the highest priority should be the earliest times
