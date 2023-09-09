@@ -85,6 +85,22 @@ public class Particle {
                 0, c.getR2RightBound());
     }
 
+    public double getRadius() {
+        return radius;
+    }
+
+    public double getMass() {
+        return mass;
+    }
+
+    public double getVx() {
+        return vx;
+    }
+
+    public double getVy() {
+        return vy;
+    }
+
     public double collidesY() {
         Container c = Container.getInstance();
         return collidesWall(c, this.vy, this.y,
