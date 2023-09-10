@@ -70,25 +70,22 @@ public class Particle {
     }
 
     private double collidesWall(@Nonnull Container c, double v, double pos,
-            double leftLowerBound, double leftUpperBound,
-            double rightLowerBound, double rightUpperBound) {
-        double upperBound;
-        double lowerBound;
-        if (isInR2(c)){
-            upperBound = rightUpperBound;
-            lowerBound = rightLowerBound;
-        } else {
-            upperBound = leftUpperBound;
-            lowerBound = leftLowerBound;
+                                double leftLowerBound, double leftUpperBound,
+                                double rightLowerBound, double rightUpperBound) {
+        if (isInR2(c)) {
+            return collidesWallAux(c, v, pos, rightLowerBound, rightUpperBound, leftLowerBound, leftUpperBound);
         }
+        return collidesWallAux(c, v, pos, leftLowerBound, leftUpperBound, rightLowerBound, rightUpperBound);
+    }
+
+    private double collidesWallAux(@Nonnull Container c, double v, double pos,
+            double currLowerBound, double currUpperBound,
+            double otherLowerBound, double otherUpperBound) {
+        double upperBound = currUpperBound;
+        double lowerBound = currLowerBound;
         if (willChangeContainer(c, getYWhenChangingContainer(c))) {
-            if (isInR2(c)){
-                upperBound = leftUpperBound;
-                lowerBound = leftLowerBound;
-            } else {
-                upperBound = rightUpperBound;
-                lowerBound = rightLowerBound;
-            }
+            upperBound = otherUpperBound;
+            lowerBound = otherLowerBound;
         }
         if (v > 0) {
             return (upperBound - this.radius - pos) / v;
