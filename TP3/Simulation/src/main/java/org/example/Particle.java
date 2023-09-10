@@ -341,7 +341,7 @@ class Container {
         return r2UpperBound;
     }
 
-    public double getR2RightBound() {
+    double getR2RightBound() {
         return r2RightBound;
     }
 
@@ -372,11 +372,11 @@ class Container {
         return r2UpperBound;
     }
 
-    public Particle getR2LowerVertex() {
+    Particle getR2LowerVertex() {
         return r2LowerVertex;
     }
 
-    public Particle getR2UpperVertex() {
+    Particle getR2UpperVertex() {
         return r2UpperVertex;
     }
 }
