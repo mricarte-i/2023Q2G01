@@ -1,20 +1,17 @@
 package org.example;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.PriorityQueue;
 
 public class ParticleCollisionSystem {
 
-    private double time;
+    private double simTime;
     private int maxEvents, postEq;
-    private Collection<Particle> particles, initParticles;
+    private Collection<Particle> particles;
     private PriorityQueue<Event> eventQueue;
-    private FileWriter fileWriter;
     private ParamsParser paramsParser;
+    private SimulationWriter simulationWriter;
 
     public ParticleCollisionSystem() {
         eventQueue = new PriorityQueue<>();
@@ -23,11 +20,13 @@ public class ParticleCollisionSystem {
 
     private void init() {
         paramsParser = ParamsParser.getInstance();
-        time = 0;
-        initParticles = paramsParser.getParticles();
-        particles = new ArrayList<>(initParticles); // making a copy of the initial
-                                                    // particles, will be used for
-                                                    // calculating Z
+        simulationWriter = new SimulationWriter(paramsParser.getStaticPath(), paramsParser.getDynamicPath());
+        simulationWriter.writeStatic();
+
+        simTime = 0;
+        particles = new ArrayList<>(paramsParser.getParticles()); // making a copy of the initial
+        // particles, will be used for
+        // calculating Z
         maxEvents = paramsParser.getEventsTillEq();
         postEq = paramsParser.getEventsPostEq();
     }
@@ -39,9 +38,28 @@ public class ParticleCollisionSystem {
         }
     }
 
-    private void applyCollisions() {
+    private void applyCollisions(Event event) {
         // updates particles velocity & tallies up collisions that happened (might be
         // kept in some state or kept in each particle)
+        Particle p1 = event.getParticleA();
+        Particle p2 = event.getParticleB();
+
+        if (p1 != null && p2 != null) {
+            p1.bounce(p2);
+        } else if (p1 != null && p2 == null) {
+            switch (event.getCollisionType()) {
+                case X:
+                    p1.bounceX();
+                    break;
+                case Y:
+                    p1.bounceY();
+                    break;
+                default:
+                    throw new RuntimeException("Event with only one particle and an unexpected WallCollision type");
+            }
+        } else {
+            throw new RuntimeException("Event without any particles");
+        }
     }
 
     private void updateCollisions() {
@@ -60,114 +78,36 @@ public class ParticleCollisionSystem {
             // convex vertex collisions
             double tUpperVertex = p1.collides(p1.getUpperVertex());
             if (tUpperVertex != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tUpperVertex, p1, p1.getUpperVertex()));
+                eventQueue.add(new Event(tUpperVertex, p1, p1.getUpperVertex(), WallCollision.VERTEX));
             }
             double tLowerVertex = p1.collides(p1.getLowerVertex());
             if (tUpperVertex != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tLowerVertex, p1, p1.getLowerVertex()));
+                eventQueue.add(new Event(tLowerVertex, p1, p1.getLowerVertex(), WallCollision.VERTEX));
             }
 
             // wall collisions
             double tCollX = p1.collidesX();
             if (tCollX != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tCollX, p1, null));
+                eventQueue.add(new Event(tCollX, p1, null, WallCollision.X));
             }
             double tCollY = p1.collidesY();
             if (tCollY != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tCollY, p1, null));
+                eventQueue.add(new Event(tCollY, p1, null, WallCollision.Y));
             }
         }
     }
 
-    private void openFile() {
-        // TODO: add fileName param
-        // this.fileName = fileName;
-        try {
-            // TODO: add fileName param
-            // File file = new File(fileName + ".txt");
-            File file = new File("output.txt");
-            if (file.exists()) {
-                file.delete();
-            }
-            file.createNewFile();
-            // TODO: add fileName param
-            // this.fileWriter = new FileWriter(fileName + ".txt", true);
-            this.fileWriter = new FileWriter("output.txt", true);
-        } catch (IOException e) {
-            // TODO: add fileName param
-            // System.out.println("Error creating file " + fileName + ".txt");
-            System.out.println("Error creating file output.txt");
-        }
-
+    private void saveState() {
+        simulationWriter.writeDynamic(particles, simTime);
     }
-
-    public void writeFile(double timestamp) {
-        try {
-            this.fileWriter.write(timestamp + "\n");
-            for (Particle p : particles) {
-                this.fileWriter.write(p.getPositionX() + " " + p.getPositionY() + " " + p.getVx() + " "
-                        + p.getVy() + " " + p.getMass() + " " + p.getRadius() + "\n");
-            }
-        } catch (IOException e) {
-            // TODO: add fileName param
-            // System.out.println("Error writing file " + this.fileName + ".txt");
-            System.out.println("Error writing file output.txt");
-        }
-    }
-
-    public void closeFile() {
-        try {
-            this.fileWriter.close();
-        } catch (IOException e) {
-            // TODO: add fileName param
-            // System.out.println("Error closing file " + this.fileName + ".txt");
-            System.out.println("Error closing file output.txt");
-        }
-    }
-
-    private void saveState(double timestamp) {
-        if (fileWriter == null)
-            openFile();
-        writeFile(timestamp);
-    }
-
-    private double getPressureFromFirstContainer() {
-        // returns pressure inside the first container
-        return 0;
-    }
-
-    private double getPressureFromSecondContainer() {
-        // returns pressure inside the other container
-        return 0;
-    }
-
-    // TODO:
-    // private double getPressureFromContainer(double x0, x1, x2, x3){
-    // particles inside / area;
-    // }
 
     private void writeOutput(boolean isInEq) {
+        // calls OutputWriter.addTransferedImpulse and .writeZ
         // prints pressures and Z over time (used in observables)
 
         // NOTE: print Z_i only after eq is reached (eventsTillEq) for the number of
         // events given (eventsPostEq)
         // use OutputWriter class!
-    }
-
-    private double getZ() {
-        // returns average getZ_i for each
-        return 0;
-    }
-
-    private double getZ_i(Particle p) {
-        // returns square distance to particles origin
-        Particle pOriginal = initParticles.stream().filter(pi -> pi.equals(p)).findFirst().orElse(null);
-        if (pOriginal == null) {
-            throw new RuntimeException("Could not find particle in initial particles???");
-        }
-        double vx = p.getPositionX() - pOriginal.getPositionX();
-        double vy = p.getPositionY() - pOriginal.getPositionY();
-        return ((vx * vx) + (vy * vy));
     }
 
     public void simulate() {
@@ -179,21 +119,21 @@ public class ParticleCollisionSystem {
         while (eventsParsed < (maxEvents + postEq)) {
             try {
                 event = eventQueue.remove();
-
             } catch (Exception e) {
                 // TODO: handle empty eventQueue
                 break;
             }
-            if (!event.isValid()) {
+            if (!event.wasSuperveningEvent()) {
                 continue; // skip loop without adding up to eventsParsed
             }
-            // TODO: is it ok to evolve with event.getTime()?
-            t = event.getTime();
-            evolve(t);
-            saveState(t); // TODO: pass time and not event.time when writing
-            writeOutput(eventsParsed >= maxEvents);
 
-            time += t;
+            t = event.getTime();
+            simTime += t;
+
+            evolve(t);
+            saveState();
+            applyCollisions(event);
+            writeOutput(eventsParsed >= maxEvents);
 
             // etc...
             eventsParsed++;
@@ -209,6 +149,6 @@ public class ParticleCollisionSystem {
         // - remove first valid event (this one) from the eventQueue
         // - updateCollsions() gets new events
 
-        closeFile();
+        simulationWriter.closeDynamic();
     }
 }
