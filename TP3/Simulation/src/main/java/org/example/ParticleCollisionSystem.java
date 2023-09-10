@@ -1,8 +1,5 @@
 package org.example;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.PriorityQueue;
@@ -13,8 +10,8 @@ public class ParticleCollisionSystem {
     private int maxEvents, postEq;
     private Collection<Particle> particles;
     private PriorityQueue<Event> eventQueue;
-    private FileWriter fileWriter;
     private ParamsParser paramsParser;
+    private SimulationWriter simulationWriter;
 
     public ParticleCollisionSystem() {
         eventQueue = new PriorityQueue<>();
@@ -23,6 +20,9 @@ public class ParticleCollisionSystem {
 
     private void init() {
         paramsParser = ParamsParser.getInstance();
+        simulationWriter = new SimulationWriter(paramsParser.getStaticPath(), paramsParser.getDynamicPath());
+        simulationWriter.writeStatic();
+
         simTime = 0;
         particles = new ArrayList<>(paramsParser.getParticles()); // making a copy of the initial
         // particles, will be used for
@@ -54,8 +54,11 @@ public class ParticleCollisionSystem {
                 case Y:
                     p1.bounceY();
                     break;
-
+                default:
+                    throw new RuntimeException("Event with only one particle and an unexpected WallCollision type");
             }
+        } else {
+            throw new RuntimeException("Event without any particles");
         }
     }
 
@@ -94,56 +97,8 @@ public class ParticleCollisionSystem {
         }
     }
 
-    private void openFile() {
-        // TODO: add fileName param
-        // this.fileName = fileName;
-        try {
-            // TODO: add fileName param
-            // File file = new File(fileName + ".txt");
-            File file = new File("output.txt");
-            if (file.exists()) {
-                file.delete();
-            }
-            file.createNewFile();
-            // TODO: add fileName param
-            // this.fileWriter = new FileWriter(fileName + ".txt", true);
-            this.fileWriter = new FileWriter("output.txt", true);
-        } catch (IOException e) {
-            // TODO: add fileName param
-            // System.out.println("Error creating file " + fileName + ".txt");
-            System.out.println("Error creating file output.txt");
-        }
-
-    }
-
-    public void writeFile(double timestamp) {
-        try {
-            this.fileWriter.write(timestamp + "\n");
-            for (Particle p : particles) {
-                this.fileWriter.write(p.getPositionX() + " " + p.getPositionY() + " " + p.getVx() + " "
-                        + p.getVy() + " " + p.getMass() + " " + p.getRadius() + "\n");
-            }
-        } catch (IOException e) {
-            // TODO: add fileName param
-            // System.out.println("Error writing file " + this.fileName + ".txt");
-            System.out.println("Error writing file output.txt");
-        }
-    }
-
-    public void closeFile() {
-        try {
-            this.fileWriter.close();
-        } catch (IOException e) {
-            // TODO: add fileName param
-            // System.out.println("Error closing file " + this.fileName + ".txt");
-            System.out.println("Error closing file output.txt");
-        }
-    }
-
-    private void saveState(double timestamp) {
-        if (fileWriter == null)
-            openFile();
-        writeFile(timestamp);
+    private void saveState() {
+        simulationWriter.writeDynamic(particles, simTime);
     }
 
     private void writeOutput(boolean isInEq) {
@@ -172,12 +127,11 @@ public class ParticleCollisionSystem {
                 continue; // skip loop without adding up to eventsParsed
             }
 
-            // TODO: is it ok to evolve with event.getTime()?
             t = event.getTime();
             simTime += t;
 
             evolve(t);
-            saveState(t); // TODO: pass time and not event.time when writing
+            saveState();
             applyCollisions(event);
             writeOutput(eventsParsed >= maxEvents);
 
@@ -195,6 +149,6 @@ public class ParticleCollisionSystem {
         // - remove first valid event (this one) from the eventQueue
         // - updateCollsions() gets new events
 
-        closeFile();
+        simulationWriter.closeDynamic();
     }
 }

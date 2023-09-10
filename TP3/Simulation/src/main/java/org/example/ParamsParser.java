@@ -18,7 +18,7 @@ public class ParamsParser {
   private Collection<Particle> particles;
   private double L, w, h, vm, r, m;
   private int N, eventsTillEq, eventsPostEq;
-  private String inputPath, dynamicPath, outputPath;
+  private String inputPath, staticPath, dynamicPath, outputPath;
 
   private ParamsParser() {
     particles = new ArrayList<>();
@@ -29,7 +29,7 @@ public class ParamsParser {
     N = 200;
     eventsTillEq = 5000;
     eventsPostEq = 50;
-    inputPath = dynamicPath = outputPath = null;
+    inputPath = staticPath = dynamicPath = outputPath = null;
   }
 
   public static ParamsParser getInstance() {
@@ -71,7 +71,7 @@ public class ParamsParser {
     // cambiaria L
 
     // --N=200 --L=0.09 --ITER=5000 --POSTEQ=50 --w=0.09 --h=0.09 --IN="../Input200"
-    // --DYNOUT="../Dynamic200"
+    // --STOUT="../Static200" --DYNOUT="../Dynamic200"
     // --OUT="../Out200"
     Map<String, String> paramMap = new HashMap<>();
 
@@ -83,9 +83,9 @@ public class ParamsParser {
       paramMap.put(parts[0].substring(2), parts[1]);
     }
 
-    if (paramMap.size() < 7) {
+    if (paramMap.size() < 8) {
       throw new RuntimeException(
-          "*need* parameters: N, L, ITER, POSTEQ, IN, DYNOUT, OUT; *optional*: w, h " + Arrays.toString(params));
+          "*need* parameters: N, L, ITER, POSTEQ, IN, STOUT, DYNOUT, OUT; *optional*: w, h " + Arrays.toString(params));
     }
 
     this.N = Integer.parseInt(paramMap.get("N"));
@@ -93,6 +93,7 @@ public class ParamsParser {
     this.eventsTillEq = Integer.parseInt(paramMap.get("ITER"));
     this.eventsPostEq = Integer.parseInt(paramMap.get("POSTEQ"));
     this.inputPath = paramMap.get("IN");
+    this.staticPath = paramMap.get("STOUT");
     this.dynamicPath = paramMap.get("DYNOUT");
     this.outputPath = paramMap.get("OUT");
 
@@ -142,7 +143,7 @@ public class ParamsParser {
 
     // --N=200 --L=0.09 --ITER=5000 --POSTEQ=50 --vm=0.01 --r=0.0015 --m=1 --w=0.09
     // --h=0.09
-    // --DYNOUT="../Dynamic200"
+    // --STOUT="../Static200" --DYNOUT="../Dynamic200"
     // --OUT="../Out200"
     Map<String, String> paramMap = new HashMap<>();
 
@@ -154,15 +155,17 @@ public class ParamsParser {
       paramMap.put(parts[0].substring(2), parts[1]);
     }
 
-    if (paramMap.size() < 6) {
+    if (paramMap.size() < 7) {
       throw new RuntimeException(
-          "*need* parameters: N, L, ITER, POSTEQ, DYNOUT, OUT; *optionals*: w, h, vm, r, m " + Arrays.toString(params));
+          "*need* parameters: N, L, ITER, POSTEQ, STOUT, DYNOUT, OUT; *optionals*: w, h, vm, r, m "
+              + Arrays.toString(params));
     }
 
     this.N = Integer.parseInt(paramMap.get("N"));
     this.L = Double.parseDouble(paramMap.get("L"));
     this.eventsTillEq = Integer.parseInt(paramMap.get("ITER"));
     this.eventsPostEq = Integer.parseInt(paramMap.get("POSTEQ"));
+    this.staticPath = paramMap.get("STOUT");
     this.dynamicPath = paramMap.get("DYNOUT");
     this.outputPath = paramMap.get("OUT");
 
@@ -237,6 +240,14 @@ public class ParamsParser {
 
   public void setInputPath(String inputPath) {
     this.inputPath = inputPath;
+  }
+
+  public String getStaticPath() {
+    return this.staticPath;
+  }
+
+  public void setStaticPath(String staticPath) {
+    this.staticPath = staticPath;
   }
 
   public String getDynamicPath() {
