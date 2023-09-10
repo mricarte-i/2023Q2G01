@@ -9,9 +9,9 @@ import java.util.PriorityQueue;
 
 public class ParticleCollisionSystem {
 
-    private double time;
+    private double simTime;
     private int maxEvents, postEq;
-    private Collection<Particle> particles, initParticles;
+    private Collection<Particle> particles;
     private PriorityQueue<Event> eventQueue;
     private FileWriter fileWriter;
     private ParamsParser paramsParser;
@@ -23,11 +23,10 @@ public class ParticleCollisionSystem {
 
     private void init() {
         paramsParser = ParamsParser.getInstance();
-        time = 0;
-        initParticles = paramsParser.getParticles();
-        particles = new ArrayList<>(initParticles); // making a copy of the initial
-                                                    // particles, will be used for
-                                                    // calculating Z
+        simTime = 0;
+        particles = new ArrayList<>(paramsParser.getParticles()); // making a copy of the initial
+        // particles, will be used for
+        // calculating Z
         maxEvents = paramsParser.getEventsTillEq();
         postEq = paramsParser.getEventsPostEq();
     }
@@ -39,9 +38,25 @@ public class ParticleCollisionSystem {
         }
     }
 
-    private void applyCollisions() {
+    private void applyCollisions(Event event) {
         // updates particles velocity & tallies up collisions that happened (might be
         // kept in some state or kept in each particle)
+        Particle p1 = event.getParticleA();
+        Particle p2 = event.getParticleB();
+
+        if (p1 != null && p2 != null) {
+            p1.bounce(p2);
+        } else if (p1 != null && p2 == null) {
+            switch (event.getCollisionType()) {
+                case X:
+                    p1.bounceX();
+                    break;
+                case Y:
+                    p1.bounceY();
+                    break;
+
+            }
+        }
     }
 
     private void updateCollisions() {
@@ -60,21 +75,21 @@ public class ParticleCollisionSystem {
             // convex vertex collisions
             double tUpperVertex = p1.collides(p1.getUpperVertex());
             if (tUpperVertex != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tUpperVertex, p1, p1.getUpperVertex()));
+                eventQueue.add(new Event(tUpperVertex, p1, p1.getUpperVertex(), WallCollision.VERTEX));
             }
             double tLowerVertex = p1.collides(p1.getLowerVertex());
             if (tUpperVertex != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tLowerVertex, p1, p1.getLowerVertex()));
+                eventQueue.add(new Event(tLowerVertex, p1, p1.getLowerVertex(), WallCollision.VERTEX));
             }
 
             // wall collisions
             double tCollX = p1.collidesX();
             if (tCollX != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tCollX, p1, null));
+                eventQueue.add(new Event(tCollX, p1, null, WallCollision.X));
             }
             double tCollY = p1.collidesY();
             if (tCollY != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tCollY, p1, null));
+                eventQueue.add(new Event(tCollY, p1, null, WallCollision.Y));
             }
         }
     }
@@ -131,43 +146,13 @@ public class ParticleCollisionSystem {
         writeFile(timestamp);
     }
 
-    private double getPressureFromFirstContainer() {
-        // returns pressure inside the first container
-        return 0;
-    }
-
-    private double getPressureFromSecondContainer() {
-        // returns pressure inside the other container
-        return 0;
-    }
-
-    // TODO:
-    // private double getPressureFromContainer(double x0, x1, x2, x3){
-    // particles inside / area;
-    // }
-
     private void writeOutput(boolean isInEq) {
+        // calls OutputWriter.addTransferedImpulse and .writeZ
         // prints pressures and Z over time (used in observables)
 
         // NOTE: print Z_i only after eq is reached (eventsTillEq) for the number of
         // events given (eventsPostEq)
         // use OutputWriter class!
-    }
-
-    private double getZ() {
-        // returns average getZ_i for each
-        return 0;
-    }
-
-    private double getZ_i(Particle p) {
-        // returns square distance to particles origin
-        Particle pOriginal = initParticles.stream().filter(pi -> pi.equals(p)).findFirst().orElse(null);
-        if (pOriginal == null) {
-            throw new RuntimeException("Could not find particle in initial particles???");
-        }
-        double vx = p.getPositionX() - pOriginal.getPositionX();
-        double vy = p.getPositionY() - pOriginal.getPositionY();
-        return ((vx * vx) + (vy * vy));
     }
 
     public void simulate() {
@@ -179,21 +164,22 @@ public class ParticleCollisionSystem {
         while (eventsParsed < (maxEvents + postEq)) {
             try {
                 event = eventQueue.remove();
-
             } catch (Exception e) {
                 // TODO: handle empty eventQueue
                 break;
             }
-            if (!event.isValid()) {
+            if (!event.wasSuperveningEvent()) {
                 continue; // skip loop without adding up to eventsParsed
             }
+
             // TODO: is it ok to evolve with event.getTime()?
             t = event.getTime();
+            simTime += t;
+
             evolve(t);
             saveState(t); // TODO: pass time and not event.time when writing
+            applyCollisions(event);
             writeOutput(eventsParsed >= maxEvents);
-
-            time += t;
 
             // etc...
             eventsParsed++;
