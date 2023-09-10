@@ -69,16 +69,6 @@ public class Particle {
                 yL + this.radius < c.getR2UpperBound();
     }
 
-    public double collidesUpperVertex() {
-        Container c = Container.getInstance();
-        return collides(c.getR2UpperVertex());
-    }
-
-    public double collidesLowerVertex() {
-        Container c = Container.getInstance();
-        return collides(c.getR2LowerVertex());
-    }
-
     private double collidesWall(@Nonnull Container c, double v, double pos,
             double leftLowerBound, double leftUpperBound,
             double rightLowerBound, double rightUpperBound) {
@@ -220,6 +210,16 @@ public class Particle {
         this.vy = fixedV * this.vx + (-cn * sinPow2 + ct * cosPow2) * this.vy;
     }
 
+    private void bounceUpperVertex(@Nonnull Container c) {
+        Particle upperVertex = c.getR2UpperVertex();
+        bounceRigid(upperVertex.x, upperVertex.y);
+    }
+
+    private void bounceLowerVertex(@Nonnull Container c) {
+        Particle lowerVertex = c.getR2LowerVertex();
+        bounceRigid(lowerVertex.x, lowerVertex.y);
+    }
+
     // applies velocity changes to this particle (vs walls or vs other particle)
     public void bounceX() {
         this.vx = -this.vx;
@@ -244,6 +244,20 @@ public class Particle {
     }
 
     public void bounce(@Nonnull Particle b) {
+        Container c = Container.getInstance();
+
+        if (b == c.getR2UpperVertex()) {
+            bounceUpperVertex(c);
+            this.collisionCount += 1;
+            return;
+        }
+
+        if (b == c.getR2LowerVertex()) {
+            bounceLowerVertex(c);
+            this.collisionCount += 1;
+            return;
+        }
+
         double sigma = getSigma(b);
         double J = getJ(b, sigma);
         double Jx = getJx(b, J, sigma);
@@ -256,6 +270,14 @@ public class Particle {
         b.vx = b.vx - Jx / b.mass;
         b.vy = b.vy - Jy / b.mass;
         b.collisionCount += 1;
+    }
+
+    public Particle getUpperVertex() {
+        return Container.getInstance().getR2UpperVertex();
+    }
+
+    public Particle getLowerVertex() {
+        return Container.getInstance().getR2LowerVertex();
     }
 
     public int getCollisionCount() {
