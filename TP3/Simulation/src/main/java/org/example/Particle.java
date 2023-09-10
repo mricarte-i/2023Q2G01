@@ -205,6 +205,8 @@ public class Particle {
 
         this.vx = (-cn * cosPow2 + ct * sinPow2) * this.vx + fixedV * this.vy;
         this.vy = fixedV * this.vx + (-cn * sinPow2 + ct * cosPow2) * this.vy;
+
+        this.collisionCount += 1;
     }
 
     private void bounceUpperVertex(@Nonnull Container c) {
@@ -245,13 +247,11 @@ public class Particle {
 
         if (b == c.getR2UpperVertex()) {
             bounceUpperVertex(c);
-            this.collisionCount += 1;
             return;
         }
 
         if (b == c.getR2LowerVertex()) {
             bounceLowerVertex(c);
-            this.collisionCount += 1;
             return;
         }
 
