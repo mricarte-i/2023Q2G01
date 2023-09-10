@@ -52,12 +52,21 @@ public class Particle {
         return this.y + this.vy * tL;
     }
 
-    private boolean willChangeContainer(@Nonnull Container c) {
-        double yL = getYWhenChangingContainer(c);
+    private boolean willChangeContainer(@Nonnull Container c, double yL) {
         if (Double.isNaN(yL))
             return false;
         return yL - this.radius > c.getR2LowerBound() &&
                 yL + this.radius < c.getR2UpperBound();
+    }
+
+    public double collidesUpperVertex() {
+        Container c = Container.getInstance();
+        return collides(c.getR2UpperVertex());
+    }
+
+    public double collidesLowerVertex() {
+        Container c = Container.getInstance();
+        return collides(c.getR2LowerVertex());
     }
 
     private double collidesWall(@Nonnull Container c, double v, double pos,
@@ -65,7 +74,7 @@ public class Particle {
             double rightLowerBound, double rightUpperBound) {
         double upperBound = leftUpperBound;
         double lowerBound = leftLowerBound;
-        if (willChangeContainer(c)) {
+        if (willChangeContainer(c, getYWhenChangingContainer(c))) {
             upperBound = rightUpperBound;
             lowerBound = rightLowerBound;
         }
@@ -254,6 +263,7 @@ public class Particle {
 class Container {
     private final double L, w, h,
             r2UpperBound, r2LowerBound, r2RightBound;
+    private final Particle r2UpperVertex, r2LowerVertex;
     private static Container container = null;
 
     private Container(double L, double w, double h) {
@@ -263,6 +273,8 @@ class Container {
         this.r2LowerBound = getR2LowerBound(L, h);
         this.r2UpperBound = getR2UpperBound(r2LowerBound, L);
         this.r2RightBound = w * 2;
+        this.r2UpperVertex = new Particle(w, r2UpperBound, 0d, 0d, Double.POSITIVE_INFINITY, 0d);
+        this.r2LowerVertex = new Particle(w, r2LowerBound, 0d, 0d, Double.POSITIVE_INFINITY, 0d);
     }
 
     double getL() {
@@ -314,5 +326,13 @@ class Container {
             return 0;
         }
         return r2UpperBound;
+    }
+
+    public Particle getR2LowerVertex() {
+        return r2LowerVertex;
+    }
+
+    public Particle getR2UpperVertex() {
+        return r2UpperVertex;
     }
 }
