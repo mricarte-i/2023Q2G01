@@ -43,10 +43,20 @@ public class Particle {
         this.id = id;
     }
 
+    private boolean isInR1(@Nonnull Container c) {
+        return this.x < c.getW();
+    }
+
+    private boolean isInR2(@Nonnull Container c) {
+        return this.x > c.getW();
+    }
+
     private double getYWhenChangingContainer(@Nonnull Container c) {
-        if (this.x > c.getW() && this.vx > 0)
+        if (this.vx == 0)
             return Double.NaN;
-        if (this.x < c.getW() && this.vx < 0)
+        if (isInR2(c) && this.vx > 0)
+            return Double.NaN;
+        if (isInR1(c) && this.vx < 0)
             return Double.NaN;
         double tL = Math.abs((c.getW() - this.x) / this.vx);
         return this.y + this.vy * tL;
@@ -72,11 +82,23 @@ public class Particle {
     private double collidesWall(@Nonnull Container c, double v, double pos,
             double leftLowerBound, double leftUpperBound,
             double rightLowerBound, double rightUpperBound) {
-        double upperBound = leftUpperBound;
-        double lowerBound = leftLowerBound;
-        if (willChangeContainer(c, getYWhenChangingContainer(c))) {
+        double upperBound;
+        double lowerBound;
+        if (isInR2(c)){
             upperBound = rightUpperBound;
             lowerBound = rightLowerBound;
+        } else {
+            upperBound = leftUpperBound;
+            lowerBound = leftLowerBound;
+        }
+        if (willChangeContainer(c, getYWhenChangingContainer(c))) {
+            if (isInR2(c)){
+                upperBound = leftUpperBound;
+                lowerBound = leftLowerBound;
+            } else {
+                upperBound = rightUpperBound;
+                lowerBound = rightLowerBound;
+            }
         }
         if (v > 0) {
             return (upperBound - this.radius - pos) / v;
