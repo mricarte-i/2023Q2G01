@@ -3,6 +3,7 @@ package org.example;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 public class SimulationWriter {
@@ -51,9 +52,9 @@ public class SimulationWriter {
     System.out.println("Succesfully written static properties to file: " + fnStatic + ".txt");
   }
 
-  public void writeDynamic(Collection<Particle> particles, double simTime) {
+  public void writeDynamic(Collection<Particle> particles, BigDecimal simTime) {
     try {
-      this.fwDynamic.write(simTime + "\n");
+      this.fwDynamic.write(simTime.toString() + "\n");
       for (Particle p : particles) {
         this.fwDynamic.write(p.getPositionX() + " " + p.getPositionY() + " " + p.getVx() + " " + p.getVy() + "\n");
       }

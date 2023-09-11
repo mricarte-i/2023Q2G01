@@ -3,6 +3,7 @@ package org.example;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 public class OutputWriter {
@@ -10,7 +11,8 @@ public class OutputWriter {
   private FileWriter fwZs, fwPressures;
   private String fnZs, fnPressures;
   private Collection<Particle> initParticles;
-  private double deltaT, fromTime, impulseA, impulseB, border;
+  private double impulseA, impulseB, border, dT;
+  private BigDecimal fromTime, deltaT;
   private double wA, hA, wB, hB;
 
   public OutputWriter(){
@@ -27,8 +29,10 @@ public class OutputWriter {
       System.out.println("Error creating file " + fnZs + ".txt");
     }
 
-    deltaT = paramsParser.getDeltaT();
-    fromTime = impulseA = impulseB = 0;
+    dT = paramsParser.getDeltaT();
+    deltaT = BigDecimal.valueOf(paramsParser.getDeltaT());
+    fromTime = BigDecimal.ZERO;
+    impulseA = impulseB = 0;
     wA = wB = border = paramsParser.getW();
     hA = paramsParser.getH();
     hB = paramsParser.getL();
@@ -47,8 +51,8 @@ public class OutputWriter {
     }
   }
 
-  public void addTransferredImpulse(double simTime, Event event) {
-    if(simTime - fromTime > deltaT){
+  public void addTransferredImpulse(BigDecimal simTime, Event event) {
+    if(simTime.subtract(fromTime).compareTo(deltaT) == 1){
       writePressures();
       impulseA = impulseB = 0;
       fromTime = simTime;
@@ -84,20 +88,20 @@ public class OutputWriter {
 
   private void writePressures() {
     try {
-      this.fwPressures.write((fromTime + deltaT) + "\n");
-      double pressureA = impulseA / ((2*wA + 2*hA) * deltaT);
-      double pressureB = impulseB / ((2*wB + 2*hB) * deltaT);
+      this.fwPressures.write(fromTime.add(deltaT).toString() + "\n");
+      double pressureA = impulseA / ((2*wA + 2*hA) * dT);
+      double pressureB = impulseB / ((2*wB + 2*hB) * dT);
       this.fwPressures.write(pressureA + " " + pressureB + "\n");
     } catch (IOException e) {
       System.out.println("Error writing to file " + fnPressures + ".txt");
     }
   }
 
-  public void writeZ(double simTime, Collection<Particle> currParticles) {
+  public void writeZ(BigDecimal simTime, Collection<Particle> currParticles) {
     // calculate each z_i against initialPositions
     // print to file
     try {
-      this.fwZs.write(simTime + "\n");
+      this.fwZs.write(simTime.toString() + "\n");
       for (Particle p : currParticles) {
         this.fwZs.write(getZ_i(p) + "\n");
       }
