@@ -25,12 +25,13 @@ def __add_instant_to_particle__(particle : ParticleInfo, x : float, y : float, v
 
 def convert_to_sequence(simulation_info : SimulationInfo, dt : float) -> SimulationInfo:
     instant_count = len(simulation_info.instants)
-    if instant_count <= 0:
-        return simulation_info
     
     N         = simulation_info.N
     instants  = []
     particles = __init_particles__(simulation_info)
+
+    if instant_count <= 0:
+        return SimulationInfo(N, instants, particles)
     
     current_time  = simulation_info.instants[0]
     end_time      = simulation_info.instants[-1]
@@ -57,3 +58,5 @@ def convert_to_sequence(simulation_info : SimulationInfo, dt : float) -> Simulat
             __add_instant_to_particle__(particles[i], x, y, vx, vy)
         
         current_time += dt
+
+    return SimulationInfo(N, instants, particles)
