@@ -23,7 +23,7 @@ public class Event implements Comparable<Event> {
         this.particleA = particleA;
         this.particleB = particleB;
         this.particleACollisionsAtEventCreation = particleA.getCollisionCount();
-        this.particleBCollisionsAtEventCreation = particleB.getCollisionCount();
+        this.particleBCollisionsAtEventCreation = particleB != null ? particleB.getCollisionCount() : -1;
         this.type = type;
     }
 
@@ -49,7 +49,13 @@ public class Event implements Comparable<Event> {
         return Double.compare(this.getTime(), o.getTime());
     }
 
-    public boolean wasSuperveningEvent() {
+    public boolean isInvalid(){
+        if(t < 0){
+            throw new RuntimeException("INVALID TIME");
+        }
+        return t < 0 || !wasSuperveningEvent();
+    }
+    private boolean wasSuperveningEvent() {
         // only the first is "real"
         if (this.particleB == null || this.type == WallCollision.VERTEX) {
             return this.particleA.getCollisionCount() == this.particleACollisionsAtEventCreation;
