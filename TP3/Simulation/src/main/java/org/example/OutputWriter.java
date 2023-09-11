@@ -1,13 +1,83 @@
 package org.example;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 public class OutputWriter {
-  // two fileparsers, one for each output (pressures, z's)
   // NOTE: maybe two files for each pressure? or all in one?
+  private FileWriter fwZs, fwPressures;
+  private String fnZs, fnPressures;
   private Collection<Particle> initParticles;
+  private double impulseA, impulseB, border, dT;
+  private BigDecimal fromTime, deltaT;
+  private double wA, hA, wB, hB;
 
-  public void addTransferedImpulse(double simTime, Particle p) {
+  public OutputWriter(){
+    ParamsParser paramsParser = ParamsParser.getInstance();
+    fnZs = paramsParser.getOutputPath() + "-Zs";
+    try {
+      File file = new File(fnZs + ".txt");
+      if (file.exists()) {
+        file.delete();
+      }
+      file.createNewFile();
+      this.fwZs = new FileWriter(fnZs + ".txt", true);
+    } catch (IOException e) {
+      System.out.println("Error creating file " + fnZs + ".txt");
+    }
+
+    dT = paramsParser.getDeltaT();
+    deltaT = BigDecimal.valueOf(paramsParser.getDeltaT());
+    fromTime = BigDecimal.ZERO;
+    impulseA = impulseB = 0;
+    wA = wB = border = paramsParser.getW();
+    hA = paramsParser.getH();
+    hB = paramsParser.getL();
+    initParticles = paramsParser.getParticles();
+
+    fnPressures = paramsParser.getOutputPath() + "-pressures";
+    try {
+      File file = new File(fnPressures + ".txt");
+      if (file.exists()) {
+        file.delete();
+      }
+      file.createNewFile();
+      this.fwPressures = new FileWriter(fnPressures + ".txt", true);
+    } catch (IOException e) {
+      System.out.println("Error creating file " + fnPressures + ".txt");
+    }
+  }
+
+  public void addTransferredImpulse(BigDecimal simTime, Event event) {
+    if(simTime.subtract(fromTime).compareTo(deltaT) == 1){
+      writePressures();
+      impulseA = impulseB = 0;
+      fromTime = simTime;
+    }
+
+
+    Particle p = event.getParticleA();
+    double transferredVelocity;
+    switch (event.getCollisionType()){
+      case X:
+        transferredVelocity = p.getVx();
+        break;
+      case Y:
+        transferredVelocity = p.getVy();
+        break;
+      default:
+        return; //ignore this collision event
+    }
+    double impulse = p.getMass() * Math.abs(transferredVelocity);
+    if(p.getPositionX() < border){
+      impulseA += impulse;
+    }else{
+      impulseB += impulse;
+    }
+
     // figure out in which container by checking the x position agaist params.w
 
     // keep a buffer of impulse taken by each container within a certain delta time
@@ -16,24 +86,38 @@ public class OutputWriter {
     // or when close() is called
   }
 
-  private double getPressureFromFirstContainer() {
-    // returns pressure inside the first container
-    return 0;
+  private void writePressures() {
+    try {
+      this.fwPressures.write(fromTime.add(deltaT).toString() + "\n");
+      double pressureA = impulseA / ((2*wA + 2*hA) * dT);
+      double pressureB = impulseB / ((2*wB + 2*hB) * dT);
+      this.fwPressures.write(pressureA + " " + pressureB + "\n");
+    } catch (IOException e) {
+      System.out.println("Error writing to file " + fnPressures + ".txt");
+    }
   }
 
-  private double getPressureFromSecondContainer() {
-    // returns pressure inside the other container
-    return 0;
-  }
-
-  // TODO:
-  // private double getPressureFromContainer(double x0, x1, x2, x3){
-  // particles inside / area;
-  // }
-
-  public void writeZ(double simTime, Collection<Particle> currParticles) {
+  public void writeZ(BigDecimal simTime, Collection<Particle> currParticles) {
     // calculate each z_i against initialPositions
     // print to file
+    try {
+      this.fwZs.write(simTime.toString() + "\n");
+      for (Particle p : currParticles) {
+        this.fwZs.write(getZ_i(p) + "\n");
+      }
+    } catch (IOException e) {
+      System.out.println("Error writing to file " + fnZs + ".txt");
+    }
+  }
+
+  public void close(){
+    try{
+      this.fwZs.close();
+      this.fwPressures.close();
+    }catch (IOException e){
+      throw new RuntimeException("Error closing the files " + fnZs + ".txt and " + fnPressures +".txt");
+    }
+    System.out.println("Successfully written to "+ fnZs + ".txt and " + fnPressures +".txt");
   }
 
   private double getZ_i(Particle p) {
@@ -46,15 +130,4 @@ public class OutputWriter {
     double vy = p.getPositionY() - pOriginal.getPositionY();
     return ((vx * vx) + (vy * vy));
   }
-
-  /*
-   * TODO:
-   * - write out collision events w/wall (maybe with a way to diff between
-   * containers)
-   * OR write out pressure values (might need to pass a delta time from params)
-   * - write out Z_i over time after some number of events (~t_equilibrium) for
-   * some
-   * number of events (50?)
-   */
-
 }

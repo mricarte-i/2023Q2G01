@@ -1,15 +1,17 @@
 package org.example;
 
+import java.math.BigDecimal;
+
 public class Event implements Comparable<Event> {
     private final WallCollision type;
-    private final double t;
+    private final BigDecimal t;
     private final Particle particleA, particleB;
     private final int particleACollisionsAtEventCreation, particleBCollisionsAtEventCreation; // on instantiation, save
                                                                                               // both particles
                                                                                               // getCollisionCount
     // we will use that to check if this event is still valid
 
-    public Event(double t, Particle particleA, Particle particleB) {
+    public Event(BigDecimal t, Particle particleA, Particle particleB) {
         this.t = t;
         this.particleA = particleA;
         this.particleB = particleB;
@@ -18,7 +20,7 @@ public class Event implements Comparable<Event> {
         this.type = null;
     }
 
-    public Event(double t, Particle particleA, Particle particleB, WallCollision type) {
+    public Event(BigDecimal t, Particle particleA, Particle particleB, WallCollision type) {
         this.t = t;
         this.particleA = particleA;
         this.particleB = particleB;
@@ -31,7 +33,7 @@ public class Event implements Comparable<Event> {
         return type;
     }
 
-    public double getTime() {
+    public BigDecimal getTime() {
         return t;
     }
 
@@ -46,14 +48,16 @@ public class Event implements Comparable<Event> {
     // compare times, the highest priority should be the earliest times
     @Override
     public int compareTo(Event o) {
-        return Double.compare(this.getTime(), o.getTime());
+        //return Double.compare(this.getTime(), o.getTime());
+        return this.getTime().compareTo(o.getTime());
     }
 
     public boolean isInvalid(){
-        if(t < 0){
+        if(t.signum() == -1){ //negative time???
             throw new RuntimeException("INVALID TIME");
         }
-        return t < 0 || !wasSuperveningEvent();
+
+        return t.signum() == -1 || !wasSuperveningEvent();
     }
     private boolean wasSuperveningEvent() {
         // only the first is "real"

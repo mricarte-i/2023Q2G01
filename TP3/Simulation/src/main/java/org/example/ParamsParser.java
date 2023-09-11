@@ -17,7 +17,7 @@ public class ParamsParser {
 
   private Collection<Particle> particles;
   private long seed;
-  private double L, w, h, vm, r, m;
+  private double L, w, h, vm, r, m, deltaT;
   private int N, eventsTillEq, eventsPostEq;
   private String inputPath, staticPath, dynamicPath, outputPath;
 
@@ -28,6 +28,7 @@ public class ParamsParser {
     vm = 0.01;
     r = 0.0015;
     m = 1;
+    deltaT = 0.1;
     N = 200;
     eventsTillEq = 5000;
     eventsPostEq = 50;
@@ -72,8 +73,8 @@ public class ParamsParser {
     // NOTA: w & h son opcionales, el enunciado los deja siempre como 0.09, solo
     // cambiaria L
 
-    // --N=200 --L=0.09 --ITER=5000 --POSTEQ=50 --w=0.09 --h=0.09 --IN="../Input200"
-    // --STOUT="../Static200" --DYNOUT="../Dynamic200"
+    // --N=200 --L=0.09 --ITER=5000 --POSTEQ=50 --w=0.09 --h=0.09 --dT=0.1
+    // --IN="../Input200" --STOUT="../Static200" --DYNOUT="../Dynamic200"
     // --OUT="../Out200"
     Map<String, String> paramMap = new HashMap<>();
 
@@ -87,7 +88,7 @@ public class ParamsParser {
 
     if (paramMap.size() < 8) {
       throw new RuntimeException(
-          "*need* parameters: N, L, ITER, POSTEQ, IN, STOUT, DYNOUT, OUT; *optional*: w, h " + Arrays.toString(params));
+          "*need* parameters: N, L, ITER, POSTEQ, IN, STOUT, DYNOUT, OUT; *optional*: w, h, dT " + Arrays.toString(params));
     }
 
     this.N = Integer.parseInt(paramMap.get("N"));
@@ -101,6 +102,7 @@ public class ParamsParser {
 
     this.w = paramMap.containsKey("w") ? Double.parseDouble(paramMap.get("w")) : 0.09;
     this.h = paramMap.containsKey("h") ? Double.parseDouble(paramMap.get("h")) : 0.09;
+    this.deltaT = paramMap.containsKey("dT") ? Double.parseDouble(paramMap.get("dT")) : 0.1;
 
     // parse particles from file
     parseParticles();
@@ -144,7 +146,7 @@ public class ParamsParser {
     // 0.0015, 0.01 y 0.09, solo cambiaria L
 
     // --N=200 --L=0.09 --ITER=5000 --POSTEQ=50 --vm=0.01 --r=0.0015 --m=1 --w=0.09
-    // --h=0.09 --seed=42
+    // --h=0.09 --seed=42 --dT=0.1
     // --STOUT="../Static200" --DYNOUT="../Dynamic200"
     // --OUT="../Out200"
     Map<String, String> paramMap = new HashMap<>();
@@ -159,7 +161,7 @@ public class ParamsParser {
 
     if (paramMap.size() < 7) {
       throw new RuntimeException(
-          "*need* parameters: N, L, ITER, POSTEQ, STOUT, DYNOUT, OUT; *optionals*: w, h, seed, vm, r, m "
+          "*need* parameters: N, L, ITER, POSTEQ, STOUT, DYNOUT, OUT; *optionals*: w, h, seed, vm, r, m, dT "
               + Arrays.toString(params));
     }
 
@@ -177,6 +179,7 @@ public class ParamsParser {
     this.vm = paramMap.containsKey("vm") ? Double.parseDouble(paramMap.get("vm")) : 0.01;
     this.r = paramMap.containsKey("r") ? Double.parseDouble(paramMap.get("r")) : 0.0015;
     this.m = paramMap.containsKey("m") ? Double.parseDouble(paramMap.get("m")) : 1;
+    this.deltaT = paramMap.containsKey("dT") ? Double.parseDouble(paramMap.get("dT")) : 0.1;
 
     // random particle generation within first container's bounds
     generateParticles();
@@ -303,4 +306,9 @@ public class ParamsParser {
   public void setEventsPostEq(int afterEq) {
     this.eventsPostEq = afterEq;
   }
+
+  public void setDeltaT(double deltaT) {this.deltaT = deltaT;}
+
+  public double getDeltaT() {return this.deltaT;}
+
 }
