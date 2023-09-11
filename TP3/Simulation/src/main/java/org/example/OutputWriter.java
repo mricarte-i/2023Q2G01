@@ -13,9 +13,9 @@ public class OutputWriter {
   private Collection<Particle> initParticles;
   private double impulseA, impulseB, border, dT;
   private BigDecimal fromTime, deltaT;
-  private double wA, hA, wB, hB;
+  private double wA, hA, wB, hB, L;
 
-  public OutputWriter(){
+  public OutputWriter() {
     ParamsParser paramsParser = ParamsParser.getInstance();
     fnZs = paramsParser.getOutputPath() + "-Zs";
     try {
@@ -35,7 +35,7 @@ public class OutputWriter {
     impulseA = impulseB = 0;
     wA = wB = border = paramsParser.getW();
     hA = paramsParser.getH();
-    hB = paramsParser.getL();
+    L = hB = paramsParser.getL();
     initParticles = paramsParser.getParticles();
 
     fnPressures = paramsParser.getOutputPath() + "-pressures";
@@ -52,16 +52,15 @@ public class OutputWriter {
   }
 
   public void addTransferredImpulse(BigDecimal simTime, Event event) {
-    if(simTime.subtract(fromTime).compareTo(deltaT) == 1){
+    if (simTime.subtract(fromTime).compareTo(deltaT) == 1) {
       writePressures();
       impulseA = impulseB = 0;
       fromTime = simTime;
     }
 
-
     Particle p = event.getParticleA();
     double transferredVelocity;
-    switch (event.getCollisionType()){
+    switch (event.getCollisionType()) {
       case X:
         transferredVelocity = p.getVx();
         break;
@@ -69,12 +68,12 @@ public class OutputWriter {
         transferredVelocity = p.getVy();
         break;
       default:
-        return; //ignore this collision event
+        return; // ignore this collision event
     }
     double impulse = p.getMass() * Math.abs(transferredVelocity);
-    if(p.getPositionX() < border){
+    if (p.getPositionX() < border) {
       impulseA += impulse;
-    }else{
+    } else {
       impulseB += impulse;
     }
 
@@ -89,8 +88,9 @@ public class OutputWriter {
   private void writePressures() {
     try {
       this.fwPressures.write(fromTime.add(deltaT).toString() + "\n");
-      double pressureA = impulseA / ((2*wA + 2*hA) * dT);
-      double pressureB = impulseB / ((2*wB + 2*hB) * dT);
+      // don't assume the perimeters are without the gap!
+      double pressureA = impulseA / ((2 * wA + hA + (hA - L)) * dT);
+      double pressureB = impulseB / ((2 * wB + hB + (hB - L)) * dT);
       this.fwPressures.write(pressureA + " " + pressureB + "\n");
     } catch (IOException e) {
       System.out.println("Error writing to file " + fnPressures + ".txt");
@@ -110,14 +110,14 @@ public class OutputWriter {
     }
   }
 
-  public void close(){
-    try{
+  public void close() {
+    try {
       this.fwZs.close();
       this.fwPressures.close();
-    }catch (IOException e){
-      throw new RuntimeException("Error closing the files " + fnZs + ".txt and " + fnPressures +".txt");
+    } catch (IOException e) {
+      throw new RuntimeException("Error closing the files " + fnZs + ".txt and " + fnPressures + ".txt");
     }
-    System.out.println("Successfully written to "+ fnZs + ".txt and " + fnPressures +".txt");
+    System.out.println("Successfully written to " + fnZs + ".txt and " + fnPressures + ".txt");
   }
 
   private double getZ_i(Particle p) {
