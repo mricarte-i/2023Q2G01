@@ -60,9 +60,6 @@ public class SimulationWriter {
     } catch (IOException e) {
       System.out.println("Error writing to file " + fnDynamic + ".txt");
     }
-
-    // System.out.println("Succesfully written static properties to file :" +
-    // fnDynamic + ".txt");
   }
 
   public void closeDynamic() {

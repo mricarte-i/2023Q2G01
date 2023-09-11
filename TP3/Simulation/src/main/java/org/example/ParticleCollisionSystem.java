@@ -12,6 +12,7 @@ public class ParticleCollisionSystem {
     private PriorityQueue<Event> eventQueue;
     private ParamsParser paramsParser;
     private SimulationWriter simulationWriter;
+    private OutputWriter outputWriter;
 
     public ParticleCollisionSystem() {
         eventQueue = new PriorityQueue<>();
@@ -22,6 +23,7 @@ public class ParticleCollisionSystem {
         paramsParser = ParamsParser.getInstance();
         simulationWriter = new SimulationWriter(paramsParser.getStaticPath(), paramsParser.getDynamicPath());
         simulationWriter.writeStatic();
+        outputWriter = new OutputWriter();
 
         simTime = 0;
         particles = new ArrayList<>(paramsParser.getParticles()); // making a copy of the initial
@@ -101,9 +103,16 @@ public class ParticleCollisionSystem {
         simulationWriter.writeDynamic(particles, simTime);
     }
 
-    private void writeOutput(boolean isInEq) {
+    private void writeOutput(Event event, boolean isInEq) {
         // calls OutputWriter.addTransferedImpulse and .writeZ
         // prints pressures and Z over time (used in observables)
+        if(event.getCollisionType() != null){
+            outputWriter.addTransferredImpulse(simTime, event);
+        }
+
+        if(isInEq){
+            outputWriter.writeZ(simTime, particles);
+        }
 
         // NOTE: print Z_i only after eq is reached (eventsTillEq) for the number of
         // events given (eventsPostEq)
@@ -113,7 +122,7 @@ public class ParticleCollisionSystem {
     public void simulate() {
         Event event;
         double t;
-
+        saveState(); //initial state
         updateCollisions();
         int eventsParsed = 0;
         while (eventsParsed < (maxEvents + postEq)) {
@@ -133,11 +142,13 @@ public class ParticleCollisionSystem {
             evolve(t);
             saveState();
             applyCollisions(event);
-            writeOutput(eventsParsed >= maxEvents);
+            writeOutput(event, eventsParsed >= maxEvents);
 
             // etc...
             eventsParsed++;
         }
+
+
 
         // iterate for a certain time or until some calculation of equilibrium is met
         // - pick the first event in the eventQueue, check for validity (if not, remove
@@ -150,5 +161,6 @@ public class ParticleCollisionSystem {
         // - updateCollsions() gets new events
 
         simulationWriter.closeDynamic();
+        outputWriter.close();
     }
 }
