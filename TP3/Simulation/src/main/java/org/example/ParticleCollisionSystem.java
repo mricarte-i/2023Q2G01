@@ -8,7 +8,7 @@ public class ParticleCollisionSystem {
 
     private double simTime;
     private int maxEvents, postEq;
-    private Collection<Particle> particles;
+    private Collection<Particle> particles, involvedParticles;
     private PriorityQueue<Event> eventQueue;
     private ParamsParser paramsParser;
     private SimulationWriter simulationWriter;
@@ -46,9 +46,14 @@ public class ParticleCollisionSystem {
         Particle p1 = event.getParticleA();
         Particle p2 = event.getParticleB();
 
+        involvedParticles = new ArrayList<>();
+
         if (p1 != null && p2 != null) {
             p1.bounce(p2);
+            involvedParticles.add(p1);
+            involvedParticles.add(p2);
         } else if (p1 != null && p2 == null) {
+            involvedParticles.add(p1);
             switch (event.getCollisionType()) {
                 case X:
                     p1.bounceX();
@@ -65,36 +70,39 @@ public class ParticleCollisionSystem {
     }
 
     private void updateCollisions() {
+        updateCollisions(particles);
+    }
+    private void updateCollisions(Collection<Particle> fromParticles) {
         // recalculates possible collisions using the list of particles that have
         // collided (see applyCollisions tally)
-        for (Particle p1 : particles) {
+        for (Particle p1 : fromParticles) {
             // particle v. particle collisions
             for (Particle p2 : particles) {
                 if (!p1.equals(p2)) {
                     double timeUntilCollision = p1.collides(p2);
                     if (timeUntilCollision != Double.POSITIVE_INFINITY) {
-                        eventQueue.add(new Event(timeUntilCollision, p1, p2));
+                        eventQueue.add(new Event(timeUntilCollision + simTime, p1, p2));
                     }
                 }
             }
             // convex vertex collisions
             double tUpperVertex = p1.collides(p1.getUpperVertex());
             if (tUpperVertex != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tUpperVertex, p1, p1.getUpperVertex(), WallCollision.VERTEX));
+                eventQueue.add(new Event(tUpperVertex + simTime, p1, p1.getUpperVertex(), WallCollision.VERTEX));
             }
             double tLowerVertex = p1.collides(p1.getLowerVertex());
             if (tUpperVertex != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tLowerVertex, p1, p1.getLowerVertex(), WallCollision.VERTEX));
+                eventQueue.add(new Event(tLowerVertex + simTime, p1, p1.getLowerVertex(), WallCollision.VERTEX));
             }
 
             // wall collisions
             double tCollX = p1.collidesX();
             if (tCollX != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tCollX, p1, null, WallCollision.X));
+                eventQueue.add(new Event(tCollX + simTime, p1, null, WallCollision.X));
             }
             double tCollY = p1.collidesY();
             if (tCollY != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tCollY, p1, null, WallCollision.Y));
+                eventQueue.add(new Event(tCollY + simTime, p1, null, WallCollision.Y));
             }
         }
     }
@@ -121,9 +129,9 @@ public class ParticleCollisionSystem {
 
     public void simulate() {
         Event event;
-        double t;
+        double deltaT;
         saveState(); //initial state
-        updateCollisions();
+        updateCollisions(); //initial events (all particles are involved)
         int eventsParsed = 0;
         while (eventsParsed < (maxEvents + postEq)) {
             try {
@@ -136,13 +144,14 @@ public class ParticleCollisionSystem {
                 continue; // skip loop without adding up to eventsParsed
             }
 
-            t = event.getTime();
-            simTime += t;
+            deltaT = event.getTime() - simTime; //get deltaT
+            simTime = deltaT;
 
-            evolve(t);
+            evolve(deltaT);
             saveState();
             applyCollisions(event);
             writeOutput(event, eventsParsed >= maxEvents);
+            updateCollisions(involvedParticles); //only recalculate for latest involved particles
 
             // etc...
             eventsParsed++;

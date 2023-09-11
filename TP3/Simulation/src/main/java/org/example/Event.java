@@ -50,9 +50,11 @@ public class Event implements Comparable<Event> {
     }
 
     public boolean isInvalid(){
+        /*
         if(t < 0){
             throw new RuntimeException("INVALID TIME");
         }
+        */
         return t < 0 || !wasSuperveningEvent();
     }
     private boolean wasSuperveningEvent() {
