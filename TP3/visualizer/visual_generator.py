@@ -4,7 +4,7 @@ from ovito.io       import import_file
 import ovito
 import os
 
-def add_cell(w : float, h : float, x: float = 0, y: float = 0, cell_width : float = 0.001) -> None:
+def add_cell(w : float, h : float, x: float = 0, y: float = 0, cell_width : float = 0.0001) -> None:
     cell_data = DataCollection()
     cell_dims = [[w,0,0,x],
                  [0,h,0,y],
