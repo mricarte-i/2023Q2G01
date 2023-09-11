@@ -1,8 +1,11 @@
-from ovito.data     import DataCollection
-from ovito.pipeline import Pipeline, StaticSource
-from ovito.io       import import_file
+from ovito.data      import DataCollection
+from ovito.pipeline  import Pipeline, StaticSource
+from ovito.io        import import_file
+from ovito.vis       import ParticlesVis
+from ovito.modifiers import AssignColorModifier
 import ovito
 import os
+import numpy as np
 
 def add_cell(w : float, h : float, x: float = 0, y: float = 0, cell_width : float = 0.0001) -> None:
     cell_data = DataCollection()
@@ -18,8 +21,12 @@ def add_cell(w : float, h : float, x: float = 0, y: float = 0, cell_width : floa
 
 def add_particles(xyz_file : str) -> None:
     particles_pipeline = import_file(xyz_file, columns=["Particle Identifier", "Position.X", "Position.Y", "Position.Z", "Radius"])
+    particles_pipeline.modifiers.append(AssignColorModifier(operate_on="particles", color=(0.9882352941176471, 0.7803921568627451, 0.16470588235294117)))
     particle_data = particles_pipeline.compute()
+
+    particle_data.particles_.vis.shape = ParticlesVis.Shape.Circle
     particle_data.cell_.vis.enabled = False
+
     particles_pipeline.add_to_scene()
 
 def save_animation_state_file(ovito_file : str) -> None:
