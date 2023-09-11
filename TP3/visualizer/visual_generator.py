@@ -1,7 +1,7 @@
 from ovito.data      import DataCollection
 from ovito.pipeline  import Pipeline, StaticSource
 from ovito.io        import import_file
-from ovito.vis       import ParticlesVis
+from ovito.vis       import ParticlesVis, Viewport
 from ovito.modifiers import AssignColorModifier
 import ovito
 import os
@@ -34,6 +34,16 @@ def save_animation_state_file(ovito_file : str) -> None:
     if len(ovito_file_split) > 1:
         os.makedirs(ovito_file_split[0], exist_ok=True)
     ovito.scene.save(ovito_file)
+
+def render_animation(animation_file : str, h_res : int = 1920, v_res : int = 1080) -> None:
+    vp = Viewport()
+    vp.type = Viewport.Type.Top
+    vp.zoom_all()
+
+    animation_file_split = animation_file.rsplit('/', 1)
+    if len(animation_file_split) > 1:
+        os.makedirs(animation_file_split[0], exist_ok=True)
+    vp.render_anim(animation_file, size=(h_res,v_res))
 
 def generate_visualization(w : float, h : float, L : float, xyz_file : str, ovito_file : str) -> None:
     add_cell(w, h, x=0, y=0)
