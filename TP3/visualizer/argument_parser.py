@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 
 def parse_arguments() -> tuple[float, str, str, str]:
     parser = ArgumentParser()
-    parser.add_argument("-L", "--snd-container-height", dest="L",              action="store", required=True)
+    parser.add_argument("-L",                           dest="L",              action="store", required=True)
     parser.add_argument("-s", "--static-file",          dest="static_file",    action="store", required=True)
     parser.add_argument("-d", "--dynamic-file",         dest="dynamic_file",   action="store", required=True)
     #parser.add_argument("--xyz",                        dest="xyz_file",       action="store", required=True)
