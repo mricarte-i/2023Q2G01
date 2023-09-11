@@ -1,12 +1,13 @@
 package org.example;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.PriorityQueue;
 
 public class ParticleCollisionSystem {
 
-    private double simTime;
+    private BigDecimal simTime;
     private int maxEvents, postEq;
     private Collection<Particle> particles, involvedParticles;
     private PriorityQueue<Event> eventQueue;
@@ -25,7 +26,7 @@ public class ParticleCollisionSystem {
         simulationWriter.writeStatic();
         outputWriter = new OutputWriter();
 
-        simTime = 0;
+        simTime = BigDecimal.ZERO;
         particles = new ArrayList<>(paramsParser.getParticles()); // making a copy of the initial
         // particles, will be used for
         // calculating Z
@@ -81,28 +82,33 @@ public class ParticleCollisionSystem {
                 if (!p1.equals(p2)) {
                     double timeUntilCollision = p1.collides(p2);
                     if (timeUntilCollision != Double.POSITIVE_INFINITY) {
-                        eventQueue.add(new Event(timeUntilCollision + simTime, p1, p2));
+                        BigDecimal time = BigDecimal.valueOf(timeUntilCollision).add(simTime);
+                        eventQueue.add(new Event(time, p1, p2));
                     }
                 }
             }
             // convex vertex collisions
             double tUpperVertex = p1.collides(p1.getUpperVertex());
             if (tUpperVertex != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tUpperVertex + simTime, p1, p1.getUpperVertex(), WallCollision.VERTEX));
+                BigDecimal time = BigDecimal.valueOf(tUpperVertex).add(simTime);
+                eventQueue.add(new Event(time, p1, p1.getUpperVertex(), WallCollision.VERTEX));
             }
             double tLowerVertex = p1.collides(p1.getLowerVertex());
-            if (tUpperVertex != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tLowerVertex + simTime, p1, p1.getLowerVertex(), WallCollision.VERTEX));
+            if (tLowerVertex != Double.POSITIVE_INFINITY) {
+                BigDecimal time = BigDecimal.valueOf(tLowerVertex).add(simTime);
+                eventQueue.add(new Event(time, p1, p1.getLowerVertex(), WallCollision.VERTEX));
             }
 
             // wall collisions
             double tCollX = p1.collidesX();
             if (tCollX != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tCollX + simTime, p1, null, WallCollision.X));
+                BigDecimal time = BigDecimal.valueOf(tCollX).add(simTime);
+                eventQueue.add(new Event(time, p1, null, WallCollision.X));
             }
             double tCollY = p1.collidesY();
             if (tCollY != Double.POSITIVE_INFINITY) {
-                eventQueue.add(new Event(tCollY + simTime, p1, null, WallCollision.Y));
+                BigDecimal time = BigDecimal.valueOf(tCollY).add(simTime);
+                eventQueue.add(new Event(time, p1, null, WallCollision.Y));
             }
         }
     }
@@ -144,8 +150,8 @@ public class ParticleCollisionSystem {
                 continue; // skip loop without adding up to eventsParsed
             }
 
-            deltaT = event.getTime() - simTime; //get deltaT
-            simTime = deltaT;
+            deltaT = event.getTime().subtract(simTime).doubleValue(); //get deltaT
+            simTime = event.getTime();
 
             evolve(deltaT);
             saveState();
