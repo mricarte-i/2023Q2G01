@@ -123,7 +123,7 @@ public class ParticleCollisionSystem {
                 // TODO: handle empty eventQueue
                 break;
             }
-            if (!event.wasSuperveningEvent()) {
+            if (event.isInvalid()) {
                 continue; // skip loop without adding up to eventsParsed
             }
 

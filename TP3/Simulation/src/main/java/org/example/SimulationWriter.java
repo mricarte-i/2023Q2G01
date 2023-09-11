@@ -23,7 +23,7 @@ public class SimulationWriter {
       System.out.println("Error creating file " + fnStatic + ".txt");
     }
 
-    this.fnDynamic = fileNameStatic;
+    this.fnDynamic = fileNameDynamic;
     try {
       File file = new File(fnDynamic + ".txt");
       if (file.exists()) {

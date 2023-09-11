@@ -16,12 +16,14 @@ public class ParamsParser {
   private static ParamsParser instance;
 
   private Collection<Particle> particles;
+  private long seed;
   private double L, w, h, vm, r, m;
   private int N, eventsTillEq, eventsPostEq;
   private String inputPath, staticPath, dynamicPath, outputPath;
 
   private ParamsParser() {
     particles = new ArrayList<>();
+    seed = -1;
     L = w = h = 0.09;
     vm = 0.01;
     r = 0.0015;
@@ -61,7 +63,7 @@ public class ParamsParser {
     } else if (runMode.equals("random")) {
       parseWithRandom(params);
     } else {
-      throw new RuntimeException("runTime argument value must be 'parse' or 'random'");
+      throw new RuntimeException("runmode argument value must be 'parse' or 'random'");
     }
 
   }
@@ -142,7 +144,7 @@ public class ParamsParser {
     // 0.0015, 0.01 y 0.09, solo cambiaria L
 
     // --N=200 --L=0.09 --ITER=5000 --POSTEQ=50 --vm=0.01 --r=0.0015 --m=1 --w=0.09
-    // --h=0.09
+    // --h=0.09 --seed=42
     // --STOUT="../Static200" --DYNOUT="../Dynamic200"
     // --OUT="../Out200"
     Map<String, String> paramMap = new HashMap<>();
@@ -157,7 +159,7 @@ public class ParamsParser {
 
     if (paramMap.size() < 7) {
       throw new RuntimeException(
-          "*need* parameters: N, L, ITER, POSTEQ, STOUT, DYNOUT, OUT; *optionals*: w, h, vm, r, m "
+          "*need* parameters: N, L, ITER, POSTEQ, STOUT, DYNOUT, OUT; *optionals*: w, h, seed, vm, r, m "
               + Arrays.toString(params));
     }
 
@@ -171,6 +173,7 @@ public class ParamsParser {
 
     this.w = paramMap.containsKey("w") ? Double.parseDouble(paramMap.get("w")) : 0.09;
     this.h = paramMap.containsKey("h") ? Double.parseDouble(paramMap.get("h")) : 0.09;
+    this.seed = paramMap.containsKey("seed") ? Long.parseLong(paramMap.get("seed")) : -1;
     this.vm = paramMap.containsKey("vm") ? Double.parseDouble(paramMap.get("vm")) : 0.01;
     this.r = paramMap.containsKey("r") ? Double.parseDouble(paramMap.get("r")) : 0.0015;
     this.m = paramMap.containsKey("m") ? Double.parseDouble(paramMap.get("m")) : 1;
@@ -181,11 +184,30 @@ public class ParamsParser {
 
   private void generateParticles() {
     particles = new ArrayList<>(N);
-    Random rand = new Random();
+    Random rand = seed == -1 ? new Random() : new Random(seed);
 
     for (int id = 0; id < N; id++) {
-      double x = rand.nextDouble() * w;
-      double y = rand.nextDouble() * h;
+      double x, y;
+      //NO overlapping is allowed!
+      boolean overlaps = false;
+      do {
+        //make sure it won't overlap with the bounds!
+        x = rand.nextDouble() * (w - 2*r) + r;
+        y = rand.nextDouble() * (h - 2*r) + r;
+        overlaps = false;
+
+        for(Particle other : particles) {
+          double dx = x - other.getPositionX();
+          double dy = y - other.getPositionY();
+          double minDist = r + other.getRadius();
+
+          if((dx * dx) + (dy * dy) <= (minDist * minDist)){
+            overlaps = true;
+            break; //overlapped with another particle, retry
+          }
+        }
+      } while(overlaps);
+
       double angle = rand.nextDouble() * 2 * Math.PI;
       double vx = vm * Math.cos(angle);
       double vy = vm * Math.sin(angle);
