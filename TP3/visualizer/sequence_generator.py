@@ -23,7 +23,7 @@ def __add_instant_to_particle__(particle : ParticleInfo, x : float, y : float, v
     particle.position.append((x, y))
     particle.velocity.append((vx, vy))
 
-def convert_to_sequence(simulation_info : SimulationInfo, dt : float) -> SimulationInfo:
+def convert_to_sequence(simulation_info : SimulationInfo, dt : float, no_interpolation : bool = False) -> SimulationInfo:
     instant_count = len(simulation_info.instants)
     
     N         = simulation_info.N
@@ -54,7 +54,10 @@ def convert_to_sequence(simulation_info : SimulationInfo, dt : float) -> Simulat
             position, velocity = __get_particle_dynamic_vals_at__(current_event, event_particle)
             x0, y0 = position
             vx, vy = velocity
-            x , y  = __get_position_at__(current_time_diff, x0, y0, vx, vy)  
+            if no_interpolation:
+                x , y  = x0, y0
+            else:
+                x , y  = __get_position_at__(current_time_diff, x0, y0, vx, vy)  
             __add_instant_to_particle__(particles[i], x, y, vx, vy)
         
         current_time += dt

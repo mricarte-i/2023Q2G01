@@ -7,11 +7,11 @@ from visual_generator   import generate_visualization
 w = 0.09
 h = 0.09
 
-L, dt, static_file, dynamic_file, xyz_file, ovito_file = parse_arguments()
+L, dt, no_interpolation, static_file, dynamic_file, xyz_file, ovito_file = parse_arguments()
 
 simulation_info = parse_simulation_files(static_file, dynamic_file)
 
-simulation_info = convert_to_sequence(simulation_info, dt)
+simulation_info = convert_to_sequence(simulation_info, dt, no_interpolation)
 
 generate_frames(simulation_info, xyz_file)
 
