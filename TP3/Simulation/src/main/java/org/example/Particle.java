@@ -22,9 +22,17 @@ public class Particle {
         return y;
     }
 
+    private double getXPositionAt(double t) {
+        return this.x + vx * t;
+    }
+
+    private double getYPositionAt(double t) {
+        return this.y + vy * t;
+    }
+
     public void updatePosition(double t) {
-        this.x += vx * t;
-        this.y += vy * t;
+        this.x = getXPositionAt(t);
+        this.y = getYPositionAt(t);
     }
 
     // NOTE: initial speed is 0.01, random direction, vx vy are the components of v
@@ -42,7 +50,7 @@ public class Particle {
         this(rx, ry, vx, vy, mass, radius);
         this.id = id;
     }
-
+    /*
     private boolean isInR1(@Nonnull Container c) {
         return this.x < c.getW();
     }
@@ -58,7 +66,11 @@ public class Particle {
             return Double.NaN;
         if (isInR1(c) && this.vx < 0)
             return Double.NaN;
-        double tL = Math.abs((c.getW() - this.x) / this.vx);
+        double tL = Double.NaN;
+        if (this.vx > 0)
+            tL = (c.getW() - this.x - this.radius) / this.vx;
+        if (this.vx < 0)
+            tL = (- c.getW() + this.x + this.radius) / this.vx;
         return this.y + this.vy * tL;
     }
 
@@ -93,14 +105,30 @@ public class Particle {
             return (lowerBound + this.radius - pos) / v;
         }
         return Double.POSITIVE_INFINITY;
-    }
+    }*/
 
     // collidesX|Y detects wall collisions
     public double collidesX() {
         Container c = Container.getInstance();
+        /*
         return collidesWall(c, this.vx, this.x,
                 0, c.getW(),
-                0, c.getR2RightBound());
+                0, c.getR2RightBound());*/
+        if (this.vx < 0) {
+            return (this.radius - this.x) / this.vx;
+        }
+        if (this.vx > 0) {
+            double tColSep     = (c.getW() - this.radius - this.x) / this.vx;
+            double tColR2Right = (c.getR2RightBound() - this.radius - this.x) / this.vx;
+            if (tColSep < 0)
+                return tColR2Right;
+            double yAtSep = getYPositionAt(tColSep);
+            if (yAtSep < c.getR2UpperBound() && yAtSep > c.getR2LowerBound()){
+                return tColR2Right;
+            }
+            return tColSep;
+        }
+        return Double.POSITIVE_INFINITY;
     }
 
     public double getRadius() {
@@ -121,9 +149,32 @@ public class Particle {
 
     public double collidesY() {
         Container c = Container.getInstance();
-        return collidesWall(c, this.vy, this.y,
+        /*return collidesWall(c, this.vy, this.y,
                 0, c.getH(),
-                c.getR2LowerBound(), c.getR2UpperBound());
+                c.getR2LowerBound(), c.getR2UpperBound());*/
+        if (this.vy > 0) {
+            double tColR1 = (c.getH() - this.radius - this.y) / this.vy;
+            double tColR2 = (c.getR2UpperBound() - this.radius - this.y) / this.vy;
+            if (tColR2 < 0)
+                return tColR1;
+            double xAtColR2 = getXPositionAt(tColR2);
+            if (xAtColR2 > c.getW()) {
+                return tColR2;
+            }
+            return tColR1;
+        }
+        if (this.vy < 0) {
+            double tColR1 = (this.radius - this.y) / this.vy;
+            double tColR2 = (c.getR2LowerBound() + this.radius - this.y) / this.vy;
+            if (tColR2 < 0)
+                return tColR1;
+            double xAtColR2 = getXPositionAt(tColR2);
+            if (xAtColR2 > c.getW()) {
+                return tColR2;
+            }
+            return tColR1;
+        }
+        return Double.POSITIVE_INFINITY;
     }
 
     private double getSigma(@Nonnull Particle b) {
@@ -189,7 +240,7 @@ public class Particle {
 
     private void bounceRigid(double x, double y) {
         double ct = 1;
-        double cn = -1;
+        double cn = 1;
 
         double ady = this.x - x;
         double opp = this.y - y;

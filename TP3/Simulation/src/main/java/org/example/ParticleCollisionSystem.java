@@ -52,7 +52,9 @@ public class ParticleCollisionSystem {
         if (p1 != null && p2 != null) {
             p1.bounce(p2);
             involvedParticles.add(p1);
-            involvedParticles.add(p2);
+            if(p2 != p1.getLowerVertex() && p2 != p1.getUpperVertex()){
+                involvedParticles.add(p2);
+            }
         } else if (p1 != null && p2 == null) {
             involvedParticles.add(p1);
             switch (event.getCollisionType()) {
@@ -81,7 +83,7 @@ public class ParticleCollisionSystem {
             for (Particle p2 : particles) {
                 if (!p1.equals(p2)) {
                     double timeUntilCollision = p1.collides(p2);
-                    if (timeUntilCollision != Double.POSITIVE_INFINITY) {
+                    if (Double.isFinite(timeUntilCollision)) {
                         BigDecimal time = BigDecimal.valueOf(timeUntilCollision).add(simTime);
                         eventQueue.add(new Event(time, p1, p2));
                     }
@@ -89,24 +91,24 @@ public class ParticleCollisionSystem {
             }
             // convex vertex collisions
             double tUpperVertex = p1.collides(p1.getUpperVertex());
-            if (tUpperVertex != Double.POSITIVE_INFINITY) {
+            if (Double.isFinite(tUpperVertex)) {
                 BigDecimal time = BigDecimal.valueOf(tUpperVertex).add(simTime);
                 eventQueue.add(new Event(time, p1, p1.getUpperVertex(), WallCollision.VERTEX));
             }
             double tLowerVertex = p1.collides(p1.getLowerVertex());
-            if (tLowerVertex != Double.POSITIVE_INFINITY) {
+            if (Double.isFinite(tLowerVertex)) {
                 BigDecimal time = BigDecimal.valueOf(tLowerVertex).add(simTime);
                 eventQueue.add(new Event(time, p1, p1.getLowerVertex(), WallCollision.VERTEX));
             }
 
             // wall collisions
             double tCollX = p1.collidesX();
-            if (tCollX != Double.POSITIVE_INFINITY) {
+            if (Double.isFinite(tCollX)) {
                 BigDecimal time = BigDecimal.valueOf(tCollX).add(simTime);
                 eventQueue.add(new Event(time, p1, null, WallCollision.X));
             }
             double tCollY = p1.collidesY();
-            if (tCollY != Double.POSITIVE_INFINITY) {
+            if (Double.isFinite(tCollY)) {
                 BigDecimal time = BigDecimal.valueOf(tCollY).add(simTime);
                 eventQueue.add(new Event(time, p1, null, WallCollision.Y));
             }

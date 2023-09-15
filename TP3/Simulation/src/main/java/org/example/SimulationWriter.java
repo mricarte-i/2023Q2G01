@@ -11,6 +11,8 @@ public class SimulationWriter {
   private FileWriter fwStatic, fwDynamic;
   private String fnStatic, fnDynamic;
 
+  private double leftBound, rightBound, upperBound, lowerBound;
+
   public SimulationWriter(String fileNameStatic, String fileNameDynamic) {
     this.fnStatic = fileNameStatic;
     try {
@@ -35,6 +37,12 @@ public class SimulationWriter {
     } catch (IOException e) {
       System.out.println("Error creating file " + fnDynamic + ".txt");
     }
+
+    ParamsParser pp = ParamsParser.getInstance();
+    this.leftBound = 0;
+    this.rightBound = pp.getW() *2;
+    this.lowerBound = 0;
+    this.upperBound = pp.getH();
   }
 
   public void writeStatic() {
@@ -56,6 +64,11 @@ public class SimulationWriter {
     try {
       this.fwDynamic.write(simTime.toString() + "\n");
       for (Particle p : particles) {
+        double x = p.getPositionX();
+        double y = p.getPositionY();
+        if(x > this.rightBound || x < this.leftBound || y > this.upperBound || y < this.lowerBound || !Double.isFinite(x) || !Double.isFinite(y)){
+          throw new RuntimeException("OUT OF BOUNDS!");
+        }
         this.fwDynamic.write(p.getPositionX() + " " + p.getPositionY() + " " + p.getVx() + " " + p.getVy() + "\n");
       }
     } catch (IOException e) {
