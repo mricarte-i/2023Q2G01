@@ -51,13 +51,17 @@ def convert_to_sequence(simulation_info : SimulationInfo, dt : float, no_interpo
         current_time_diff = current_time - simulation_info.instants[current_event]
         for i in range(N):
             event_particle = simulation_info.particles[i]
-            position, velocity = __get_particle_dynamic_vals_at__(current_event, event_particle)
-            x0, y0 = position
-            vx, vy = velocity
+            
             if no_interpolation:
-                x , y  = x0, y0
+                position, velocity = __get_particle_dynamic_vals_at__(next_event, event_particle)
+                x , y  = position
+                vx, vy = velocity
             else:
+                position, velocity = __get_particle_dynamic_vals_at__(current_event, event_particle)
+                x0, y0 = position
+                vx, vy = velocity
                 x , y  = __get_position_at__(current_time_diff, x0, y0, vx, vy)  
+
             __add_instant_to_particle__(particles[i], x, y, vx, vy)
         
         current_time += dt
