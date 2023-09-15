@@ -154,8 +154,8 @@ public class ParticleCollisionSystem {
             simTime = event.getTime();
 
             evolve(deltaT);
-            saveState();
             applyCollisions(event);
+            saveState();
             writeOutput(event, eventsParsed >= maxEvents);
             updateCollisions(involvedParticles); //only recalculate for latest involved particles
 
