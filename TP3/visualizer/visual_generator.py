@@ -1,4 +1,4 @@
-from ovito.data      import DataCollection
+from ovito.data      import DataCollection, Particles
 from ovito.pipeline  import Pipeline, StaticSource
 from ovito.io        import import_file
 from ovito.vis       import ParticlesVis, Viewport
@@ -15,6 +15,7 @@ def add_cell(w : float, h : float, x: float = 0, y: float = 0, cell_width : floa
     
     cell = cell_data.create_cell(cell_dims, pbc=(False, False, False))
     cell.vis.line_width = cell_width
+    cell.vis.enabled = False
     cell_data.objects.append(cell)
     cell_pipeline = Pipeline(source=StaticSource(data=cell_data))
     cell_pipeline.add_to_scene()
@@ -28,6 +29,60 @@ def add_particles(xyz_file : str) -> None:
     particle_data.cell_.vis.enabled = False
 
     particles_pipeline.add_to_scene()
+
+def add_poly(L : float):
+    data = DataCollection()
+    data.particles = Particles(count = 8)
+
+    data.particles_.vis.enabled = False
+    data.particles_.vis.shape = ParticlesVis.Shape.Circle
+
+    coordinates = data.particles.create_property('Position')
+
+    coordinates[0,0] = 0
+    coordinates[0,1] = 0
+    coordinates[0,2] = 0
+
+    coordinates[1,0] = 0.09
+    coordinates[1,1] = 0
+    coordinates[1,2] = 0
+
+    coordinates[2,0] = 0
+    coordinates[2,1] = 0.09
+    coordinates[2,2] = 0
+
+    coordinates[3,0] = 0.09
+    coordinates[3,1] = 0.09
+    coordinates[3,2] = 0
+
+    coordinates[4,0] = 0.09
+    coordinates[4,1] = (0.09 - L) / 2
+    coordinates[4,2] = 0
+
+    coordinates[5,0] = 0.09
+    coordinates[5,1] = (0.09 - L) / 2 + L
+    coordinates[5,2] = 0
+
+    coordinates[6,0] = 0.18
+    coordinates[6,1] = (0.09 - L) / 2
+    coordinates[6,2] = 0
+
+    coordinates[7,0] = 0.18
+    coordinates[7,1] = (0.09 - L) / 2 + L
+    coordinates[7,2] = 0
+
+    radii = data.particles.create_property("Radius")
+    radii[:] = 0.001
+
+    color = data.particles.create_property("Color")
+    color[:] = (0.9803921568627451, 0.1450980392156863, 0.01568627450980392)
+
+    pairs = [(0, 1), (0, 2), (2, 3), (1, 4), (3, 5), (4, 6), (5, 7), (6, 7)] # Pairs of particle indices to connect by bonds
+    bonds = data.particles_.create_bonds(count=len(pairs), vis_params={'width': 0.0005, 'flat_shading' : True})
+    bonds.colors_ = (0.06274509803921569, 0.10980392156862745, 0.6313725490196078)
+    bonds.create_property('Topology', data=pairs)
+    pipeline = Pipeline(source=StaticSource(data=data))
+    pipeline.add_to_scene()
 
 def save_animation_state_file(ovito_file : str) -> None:
     ovito_file_split = ovito_file.rsplit('/', 1)
@@ -46,8 +101,10 @@ def render_animation(animation_file : str, h_res : int = 1920, v_res : int = 108
     vp.render_anim(animation_file, size=(h_res,v_res))
 
 def generate_visualization(w : float, h : float, L : float, xyz_file : str, ovito_file : str) -> None:
-    add_cell(w, h, x=0, y=0)
-    add_cell(w, L, x=w, y=(h - L)/2)
+    #add_cell(w, h, x=0, y=0)
+    #add_cell(w, L, x=w, y=(h - L)/2)
+
+    add_poly(L)
 
     add_particles(xyz_file)
 
