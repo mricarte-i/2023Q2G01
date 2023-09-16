@@ -50,70 +50,10 @@ public class Particle {
         this(rx, ry, vx, vy, mass, radius);
         this.id = id;
     }
-    /*
-    private boolean isInR1(@Nonnull Container c) {
-        return this.x < c.getW();
-    }
-
-    private boolean isInR2(@Nonnull Container c) {
-        return this.x > c.getW();
-    }
-
-    private double getYWhenChangingContainer(@Nonnull Container c) {
-        if (this.vx == 0)
-            return Double.NaN;
-        if (isInR2(c) && this.vx > 0)
-            return Double.NaN;
-        if (isInR1(c) && this.vx < 0)
-            return Double.NaN;
-        double tL = Double.NaN;
-        if (this.vx > 0)
-            tL = (c.getW() - this.x - this.radius) / this.vx;
-        if (this.vx < 0)
-            tL = (- c.getW() + this.x + this.radius) / this.vx;
-        return this.y + this.vy * tL;
-    }
-
-    private boolean willChangeContainer(@Nonnull Container c, double yL) {
-        if (Double.isNaN(yL))
-            return false;
-        return yL - this.radius > c.getR2LowerBound() &&
-                yL + this.radius < c.getR2UpperBound();
-    }
-
-    private double collidesWall(@Nonnull Container c, double v, double pos,
-                                double leftLowerBound, double leftUpperBound,
-                                double rightLowerBound, double rightUpperBound) {
-        if (isInR2(c)) {
-            return collidesWallAux(c, v, pos, rightLowerBound, rightUpperBound, leftLowerBound, leftUpperBound);
-        }
-        return collidesWallAux(c, v, pos, leftLowerBound, leftUpperBound, rightLowerBound, rightUpperBound);
-    }
-
-    private double collidesWallAux(@Nonnull Container c, double v, double pos,
-            double currLowerBound, double currUpperBound,
-            double otherLowerBound, double otherUpperBound) {
-        double upperBound = currUpperBound;
-        double lowerBound = currLowerBound;
-        if (willChangeContainer(c, getYWhenChangingContainer(c))) {
-            upperBound = otherUpperBound;
-            lowerBound = otherLowerBound;
-        }
-        if (v > 0) {
-            return (upperBound - this.radius - pos) / v;
-        } else if (v < 0) {
-            return (lowerBound + this.radius - pos) / v;
-        }
-        return Double.POSITIVE_INFINITY;
-    }*/
 
     // collidesX|Y detects wall collisions
     public double collidesX() {
         Container c = Container.getInstance();
-        /*
-        return collidesWall(c, this.vx, this.x,
-                0, c.getW(),
-                0, c.getR2RightBound());*/
         if (this.vx < 0) {
             return (this.radius - this.x) / this.vx;
         }
@@ -149,9 +89,6 @@ public class Particle {
 
     public double collidesY() {
         Container c = Container.getInstance();
-        /*return collidesWall(c, this.vy, this.y,
-                0, c.getH(),
-                c.getR2LowerBound(), c.getR2UpperBound());*/
         if (this.vy > 0) {
             double tColR1 = (c.getH() - this.radius - this.y) / this.vy;
             double tColR2 = (c.getR2UpperBound() - this.radius - this.y) / this.vy;
@@ -223,20 +160,6 @@ public class Particle {
             return Double.POSITIVE_INFINITY;
 
         return -(dotDeltaVR + Math.sqrt(d)) / deltaVPow2;
-    }
-
-    private double getHypSign(double ady, double opp) {
-        if (opp == 0) return 0;
-        if (ady > 0 && opp > 0) {
-            return 1;
-        } else if (ady < 0 && opp > 0) {
-            return -1;
-        } else if (ady < 0 && opp < 0) {
-            return 1;
-        } else if (ady > 0 && opp < 0) {
-            return -1;
-        }
-        return Double.NaN;
     }
 
     private void bounceRigid(double x, double y) {
