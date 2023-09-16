@@ -226,6 +226,7 @@ public class Particle {
     }
 
     private double getHypSign(double ady, double opp) {
+        if (opp == 0) return 0;
         if (ady > 0 && opp > 0) {
             return 1;
         } else if (ady < 0 && opp > 0) {
@@ -244,18 +245,21 @@ public class Particle {
 
         double ady = this.x - x;
         double opp = this.y - y;
-        double hyp = Math.sqrt(Math.pow(ady, 2) + Math.pow(opp, 2)) * getHypSign(ady, opp);
+        double alpha = Math.atan(opp / ady);
 
-        double cos = ady / hyp;
-        double sin = opp / hyp;
+        double cos = Math.cos(alpha);
+        double sin = Math.sin(alpha);
 
         double cosPow2 = Math.pow(cos, 2);
         double sinPow2 = Math.pow(sin, 2);
 
         double fixedV = (-(cn + ct) * sin * cos);
 
-        this.vx = (-cn * cosPow2 + ct * sinPow2) * this.vx + fixedV * this.vy;
-        this.vy = fixedV * this.vx + (-cn * sinPow2 + ct * cosPow2) * this.vy;
+        double currVx = this.vx;
+        double currVy = this.vy;
+
+        this.vx = (-cn * cosPow2 + ct * sinPow2) * currVx + fixedV * currVy;
+        this.vy = fixedV * currVx + (-cn * sinPow2 + ct * cosPow2) * currVy;
 
         this.collisionCount += 1;
     }
