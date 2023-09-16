@@ -30,55 +30,57 @@ def add_particles(xyz_file : str) -> None:
 
     particles_pipeline.add_to_scene()
 
-def add_poly(L : float):
-    data = DataCollection()
+def add_poly(w : float, h : float, L : float, flask_width : float = 0.0005):
+    data           = DataCollection()
     data.particles = Particles(count = 8)
 
-    data.particles_.vis.enabled = False
-    data.particles_.vis.shape = ParticlesVis.Shape.Circle
+    data.particles_.vis.enabled = True
+    data.particles_.vis.shape = ParticlesVis.Shape.Square
 
     coordinates = data.particles.create_property('Position')
 
-    coordinates[0,0] = 0
-    coordinates[0,1] = 0
+    half_flask_width = flask_width / 2
+
+    coordinates[0,0] = 0                        - half_flask_width
+    coordinates[0,1] = 0                        - half_flask_width
     coordinates[0,2] = 0
 
-    coordinates[1,0] = 0.09
-    coordinates[1,1] = 0
+    coordinates[1,0] = w                        + half_flask_width
+    coordinates[1,1] = 0                        - half_flask_width
     coordinates[1,2] = 0
 
-    coordinates[2,0] = 0
-    coordinates[2,1] = 0.09
+    coordinates[2,0] = 0                        - half_flask_width
+    coordinates[2,1] = h                        + half_flask_width
     coordinates[2,2] = 0
 
-    coordinates[3,0] = 0.09
-    coordinates[3,1] = 0.09
+    coordinates[3,0] = w                        + half_flask_width
+    coordinates[3,1] = h                        + half_flask_width
     coordinates[3,2] = 0
 
-    coordinates[4,0] = 0.09
-    coordinates[4,1] = (0.09 - L) / 2
+    coordinates[4,0] = w                        + half_flask_width
+    coordinates[4,1] = (h- L) / 2               - half_flask_width
     coordinates[4,2] = 0
 
-    coordinates[5,0] = 0.09
-    coordinates[5,1] = (0.09 - L) / 2 + L
+    coordinates[5,0] = w                        + half_flask_width
+    coordinates[5,1] = (h - L) / 2 + L          + half_flask_width
     coordinates[5,2] = 0
 
-    coordinates[6,0] = 0.18
-    coordinates[6,1] = (0.09 - L) / 2
+    coordinates[6,0] = 2*w                      + half_flask_width
+    coordinates[6,1] = (h - L) / 2              - half_flask_width
     coordinates[6,2] = 0
 
-    coordinates[7,0] = 0.18
-    coordinates[7,1] = (0.09 - L) / 2 + L
+    coordinates[7,0] = 2*w                      + half_flask_width
+    coordinates[7,1] = (h - L) / 2 + L          + half_flask_width
     coordinates[7,2] = 0
 
     radii = data.particles.create_property("Radius")
-    radii[:] = 0.001
+    radii[:] = half_flask_width
 
     color = data.particles.create_property("Color")
-    color[:] = (0.9803921568627451, 0.1450980392156863, 0.01568627450980392)
+    color[:] = (0.06274509803921569, 0.10980392156862745, 0.6313725490196078)
 
     pairs = [(0, 1), (0, 2), (2, 3), (1, 4), (3, 5), (4, 6), (5, 7), (6, 7)] # Pairs of particle indices to connect by bonds
-    bonds = data.particles_.create_bonds(count=len(pairs), vis_params={'width': 0.0005, 'flat_shading' : True})
+    bonds = data.particles_.create_bonds(count=len(pairs), vis_params={'width': flask_width, 'flat_shading' : True})
     bonds.colors_ = (0.06274509803921569, 0.10980392156862745, 0.6313725490196078)
     bonds.create_property('Topology', data=pairs)
     pipeline = Pipeline(source=StaticSource(data=data))
@@ -104,7 +106,7 @@ def generate_visualization(w : float, h : float, L : float, xyz_file : str, ovit
     #add_cell(w, h, x=0, y=0)
     #add_cell(w, L, x=w, y=(h - L)/2)
 
-    add_poly(L)
+    add_poly(w, h, L)
 
     add_particles(xyz_file)
 
