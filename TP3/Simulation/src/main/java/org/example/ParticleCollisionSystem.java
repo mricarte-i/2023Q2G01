@@ -8,7 +8,7 @@ import java.util.PriorityQueue;
 public class ParticleCollisionSystem {
 
     private BigDecimal simTime;
-    private int maxEvents, postEq;
+    private int maxEvents, postEq, eventsPerPrint;
     private Collection<Particle> particles, involvedParticles;
     private PriorityQueue<Event> eventQueue;
     private ParamsParser paramsParser;
@@ -32,6 +32,7 @@ public class ParticleCollisionSystem {
         // calculating Z
         maxEvents = paramsParser.getEventsTillEq();
         postEq = paramsParser.getEventsPostEq();
+        eventsPerPrint = paramsParser.getEventsPerPrint();
     }
 
     private void evolve(double t) {
@@ -157,7 +158,10 @@ public class ParticleCollisionSystem {
 
             evolve(deltaT);
             applyCollisions(event);
-            saveState();
+            //print every {epp} events or on final event
+            if(eventsParsed % eventsPerPrint == 0 || eventsParsed == maxEvents + postEq - 1){
+                saveState();
+            }
             writeOutput(event, eventsParsed >= maxEvents);
             updateCollisions(involvedParticles); //only recalculate for latest involved particles
 
