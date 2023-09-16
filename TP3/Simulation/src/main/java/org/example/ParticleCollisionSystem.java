@@ -120,20 +120,16 @@ public class ParticleCollisionSystem {
         simulationWriter.writeDynamic(particles, simTime);
     }
 
-    private void writeOutput(Event event, boolean isInEq) {
-        // calls OutputWriter.addTransferedImpulse and .writeZ
-        // prints pressures and Z over time (used in observables)
+    private void writeOutput(Event event) {
+        /*
+        secret post-processing optimization: (allowed by daniel)
+            - prints the transferred impulse to the wall on these type of events,
+            making it simpler to later parse in python, add up based on the given dT and
+            calculate each container's pressures
+        */
         if(event.getCollisionType() != null){
-            outputWriter.addTransferredImpulse(simTime, event);
+            outputWriter.writeWallCollisionEvent(simTime, event);
         }
-
-        if(isInEq){
-            outputWriter.writeZ(simTime, particles);
-        }
-
-        // NOTE: print Z_i only after eq is reached (eventsTillEq) for the number of
-        // events given (eventsPostEq)
-        // use OutputWriter class!
     }
 
     public void simulate() {
@@ -158,28 +154,18 @@ public class ParticleCollisionSystem {
 
             evolve(deltaT);
             applyCollisions(event);
-            //print every {epp} events or on final event
+            //secret post-processing optimization: (allowed by daniel)
+            //  - print every {epp} events or on final event
             if(eventsParsed % eventsPerPrint == 0 || eventsParsed == maxEvents + postEq - 1){
                 saveState();
             }
-            writeOutput(event, eventsParsed >= maxEvents);
+            writeOutput(event);
             updateCollisions(involvedParticles); //only recalculate for latest involved particles
 
             // etc...
             eventsParsed++;
         }
 
-
-
-        // iterate for a certain time or until some calculation of equilibrium is met
-        // - pick the first event in the eventQueue, check for validity (if not, remove
-        // from queue and get next event that is valid)
-        // - evolve(event.time) moves particles to event's time
-        // - saveState(event.time) writes current positions and velocities...
-        // - applyCollisions() / could also just call p1.bounce(p2)
-        // - writeOutputs()
-        // - remove first valid event (this one) from the eventQueue
-        // - updateCollsions() gets new events
 
         simulationWriter.closeDynamic();
         outputWriter.close();
