@@ -23,6 +23,12 @@ def __add_instant_to_particle__(particle : ParticleInfo, x : float, y : float, v
     particle.position.append((x, y))
     particle.velocity.append((vx, vy))
 
+def __log_sequence__(simulation_info : SimulationInfo) -> None:
+    with open("sequence.txt", "wt") as file:
+        for i in range(len(simulation_info.instants)):
+            file.write("frame={} \t t={} \n".format(i, simulation_info.instants[i]))
+
+
 def convert_to_sequence(simulation_info : SimulationInfo, dt : float, no_interpolation : bool = False) -> SimulationInfo:
     instant_count = len(simulation_info.instants)
     
@@ -66,4 +72,8 @@ def convert_to_sequence(simulation_info : SimulationInfo, dt : float, no_interpo
         
         current_time += dt
 
-    return SimulationInfo(N, instants, particles)
+    sequence = SimulationInfo(N, instants, particles)
+
+    __log_sequence__(sequence)
+
+    return sequence
