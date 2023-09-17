@@ -95,9 +95,9 @@ public class ParamsParser {
     this.eventsTillEq = Integer.parseInt(paramMap.get("ITER"));
     this.eventsPostEq = Integer.parseInt(paramMap.get("POSTEQ"));
     this.inputPath = paramMap.get("IN");
-    this.staticPath = paramMap.get("STOUT");
-    this.dynamicPath = paramMap.get("DYNOUT");
-    this.outputPath = paramMap.get("OUT");
+    this.staticPath = paramMap.get("STOUT") + "-N" + this.N + "-L" + this.L + "-ITER"+ this.eventsTillEq + "-POST" + this.eventsPostEq;
+    this.dynamicPath = paramMap.get("DYNOUT") + "-N" + this.N + "-L" + this.L + "-ITER"+ this.eventsTillEq + "-POST" + this.eventsPostEq;
+    this.outputPath = paramMap.get("OUT") + "-N" + this.N + "-L" + this.L + "-ITER"+ this.eventsTillEq + "-POST" + this.eventsPostEq;
 
     this.w = paramMap.containsKey("w") ? Double.parseDouble(paramMap.get("w")) : 0.09;
     this.h = paramMap.containsKey("h") ? Double.parseDouble(paramMap.get("h")) : 0.09;
@@ -166,9 +166,9 @@ public class ParamsParser {
     this.L = Double.parseDouble(paramMap.get("L"));
     this.eventsTillEq = Integer.parseInt(paramMap.get("ITER"));
     this.eventsPostEq = Integer.parseInt(paramMap.get("POSTEQ"));
-    this.staticPath = paramMap.get("STOUT");
-    this.dynamicPath = paramMap.get("DYNOUT");
-    this.outputPath = paramMap.get("OUT");
+    this.staticPath = paramMap.get("STOUT") + "-N" + this.N + "-L" + this.L + "-ITER"+ this.eventsTillEq + "-POST" + this.eventsPostEq;
+    this.dynamicPath = paramMap.get("DYNOUT") + "-N" + this.N + "-L" + this.L + "-ITER"+ this.eventsTillEq + "-POST" + this.eventsPostEq;
+    this.outputPath = paramMap.get("OUT") + "-N" + this.N + "-L" + this.L + "-ITER"+ this.eventsTillEq + "-POST" + this.eventsPostEq;
 
     this.w = paramMap.containsKey("w") ? Double.parseDouble(paramMap.get("w")) : 0.09;
     this.h = paramMap.containsKey("h") ? Double.parseDouble(paramMap.get("h")) : 0.09;

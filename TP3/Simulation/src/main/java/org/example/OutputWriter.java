@@ -16,7 +16,7 @@ public class OutputWriter {
     ParamsParser paramsParser = ParamsParser.getInstance();
     border = paramsParser.getW();
 
-    fnWallEvents = paramsParser.getOutputPath() + "-wallEvents-w-" + border +"-L-" + paramsParser.getL();
+    fnWallEvents = paramsParser.getOutputPath() + "-wallEvents-w-" + border;
     try {
       File file = new File(fnWallEvents + ".txt");
       if (file.exists()) {
