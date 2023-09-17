@@ -1,4 +1,6 @@
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 from typing      import Callable, Any
 from dataclasses import dataclass
 
@@ -66,3 +68,14 @@ def perform_regression(X : np.ndarray, Ks : np.ndarray, f : Callable[[Any, Any],
             min_F      = F
     
     return min_F, RegressionData(best_k_idx, Ks, K_errs)
+
+def plot_regression_data(reg_data : RegressionData, file_name : str, x_label : str = "Pendiente") -> None:
+    plt.figure()
+    sns.set_style("darkgrid")
+
+    data_range = min(reg_data.best_k_idx, reg_data.Ks.size - reg_data.best_k_idx)
+    plt.plot(reg_data.Ks[reg_data.best_k_idx-data_range:reg_data.best_k_idx+data_range+1], reg_data.K_errs[reg_data.best_k_idx-data_range:reg_data.best_k_idx+data_range+1])
+    plt.ylabel("Error cuadrático")
+    plt.xlabel(x_label)
+    plt.savefig(file_name, bbox_inches='tight', dpi=1200)
+    
