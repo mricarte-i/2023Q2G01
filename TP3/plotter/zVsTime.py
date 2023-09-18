@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+from min_sqrs import min_sqrs, perform_regression, plot_regression_data
 
 
 class Particle:
@@ -9,7 +10,7 @@ class Particle:
         self.y = y
 
 
-def read_data(dynamic_file_path, from_time, plot_to_time): # TODO: params from_time, to_time
+def read_data(dynamic_file_path, from_time, plot_to_time):
     times = np.array([])
     particles = {}
     save = False
@@ -43,16 +44,14 @@ def calculate_zi_squared(particle, particleAtOrigin):
 
 
 def calculate_z_squared(particles, time, start_time):
-    sum_zi_squared = 0
     zi_squareds = np.array([])
 
     for idx in range(0, len(particles[time]), 1): 
         zi_squared = calculate_zi_squared(particles[time][idx], particles[start_time][idx])
         zi_squareds = np.append(zi_squareds, zi_squared)
-        sum_zi_squared = sum_zi_squared + zi_squared
-
-    z_squared = sum_zi_squared / len(particles[time])
+    
     std_deviation = np.std(zi_squareds)
+    z_squared = np.mean(zi_squareds)
 
     return z_squared, std_deviation
 
@@ -63,40 +62,46 @@ def generate_plot_and_return_slope(times, z_squareds, std_deviations, interpolat
     interpolation_times = times[interpolation_indices]
     interpolation_z_squareds = z_squareds[interpolation_indices]
 
-    # # Plot the data within the specified time range
-    # plot_indices = np.where(times <= plot_to_time)
-    # plot_times = times[plot_indices]
-    # plot_z_squareds = z_squareds[plot_indices]
-
     # Perform linear regression on data
-    coefficients = np.polyfit(interpolation_times, interpolation_z_squareds, 1)
-    slope = coefficients[0]
-    intercept = coefficients[1]
-    z_approximations = slope * interpolation_times + intercept
+    # coefficients = np.polyfit(interpolation_times, interpolation_z_squareds, 1)
+    coefficients = min_sqrs(interpolation_times - interpolation_times[0], [lambda x:x], interpolation_z_squareds)
+    slope = coefficients[0][0]
+    # intercept = coefficients[1]
+    # z_approximations = slope * interpolation_times + intercept
+    z_approximations = slope * (interpolation_times - interpolation_times[0])
 
     # Plot the filtered data and the linear approximation
-    plt.scatter(times, z_squareds, label='z', s=5)  # TODO: ver si está bien el label
-    plt.plot(interpolation_times, z_approximations, color='red', label='z: aproximación')  # TODO: ver si está bien el label
-    plt.errorbar(times, z_squareds, yerr=std_deviations, fmt="o")
-    # plt.bar(times, z_squareds, yerr=std_deviations, capsize=5, align='center', alpha=0.7)
+    plt.scatter(times, z_squareds, label='Coeficiente de difusión', s=1, color='teal')
+    plt.plot(interpolation_times, z_approximations, color='red', label='Coeficiente de difusión - regresión lineal')
+    plt.fill_between(times, z_squareds-std_deviations, z_squareds+std_deviations, alpha=0.2, color='teal')
+    # plot_sqr_err_regression(interpolation_times - interpolation_times[0], interpolation_z_squareds)
 
     # Add labels and legend
-    plt.xlabel('t') # TODO: ver si está bien el label
-    plt.ylabel('z') # TODO: ver si está bien el label
-    plt.legend()
+    plt.xlabel('Tiempo (s)')
+    plt.ylabel('Coeficiente de difusión (m²)')
+    plt.legend(loc='upper left')
 
     # Show the plot
     plt.show()
 
+
     return slope
 
 
-def main(): # TODO: args
+def plot_sqr_err_regression(X : np.ndarray, Y : np.ndarray) -> float:
+    plt.figure()
+    Ks = np.arange(0, 5, 0.001)
+    _, reg_data = perform_regression(X, Ks, lambda x, c : c*x, Y)
+    plot_regression_data(reg_data, "z_regression_sqr_err.png")
+    return reg_data.Ks[reg_data.best_k_idx]
+
+
+def main():
     # PARAMS:
     dynamic_file_path = 'dynamic.txt'
     from_time = 80
-    to_time = 800
-    interpolation_to_time = 550
+    to_time = 450
+    interpolation_to_time = 200
 
     print('Reading data...')
     times, particles = read_data(dynamic_file_path, from_time, to_time)
