@@ -118,3 +118,12 @@ def main(): # TODO: args
 
 if __name__ == "__main__":
     main()
+
+from min_sqrs import perform_regression, plot_regression_data
+
+def plot_sqr_err_regression(X : np.ndarray, Y : np.ndarray) -> float:
+    plt.figure()
+    Ks = np.arange(3, 4, 0.001)
+    _, reg_data = perform_regression(X, Ks, [lambda x, c : c*x], Y)
+    plot_regression_data(reg_data, "z_regression_sqr_err.png")
+    return reg_data.Ks[reg_data.best_k_idx]
