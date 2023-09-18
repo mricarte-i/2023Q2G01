@@ -33,7 +33,8 @@ def plot_pressure_over_inverse_area(impulse_files : list[str], Ls : list[float],
 
         df = pd.concat([df, l_df])
 
-    sns.lineplot(data=df, x=area_colname, y=pressure_colname, errorbar="se", marker="o", err_style="bars")
+    sns.lineplot(data=df, x=area_colname, y=pressure_colname, errorbar="sd", marker="o", err_style="bars", linestyle="", err_kws={'capsize': 10})
+    print(df.groupby([area_colname]).mean(), df.groupby([area_colname]).std())
     plt.ylabel("Presión [N/m]")
     plt.xlabel("Inversa del área [1/m^2]")
     plt.savefig(filename, bbox_inches='tight', dpi=1200)
