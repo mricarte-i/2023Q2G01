@@ -31,6 +31,8 @@ def pressure_over_inverse_area(impulse_files : list[str], Ls : list[float], delt
         l_df = pd.DataFrame(stationary_pressures.pressures, columns=[pressure_colname])
         l_df.insert(1, area_colname, (1 / area))
 
+        print(L, len(stationary_pressures.pressures))
+
         dfs.append(l_df)
     
     return dfs
@@ -47,8 +49,8 @@ def plot_pressure_over_inverse_area(dfs : list[pd.DataFrame], Ls : list[float], 
         sns.lineplot(data=df, x=area_colname, y=pressure_colname, errorbar="sd", marker="o", err_style="bars", linestyle="", err_kws={'capsize': 10}, label=label)
         i += 1
     print(df.groupby([area_colname]).mean(), df.groupby([area_colname]).std())
-    plt.ylabel("<P>$_{est}$ [$\\frac{N}{m}$]")
-    plt.xlabel("A$^{-1}$ [$\\frac{1}{m^{2}}$]")
+    plt.ylabel("Presión promedio estacionaria ($\\frac{N}{m}$)")
+    plt.xlabel("Inversa del área del sistema ($\\frac{1}{m^{2}}$)")
     plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
     plt.savefig(filename, bbox_inches='tight', dpi=1200)
 

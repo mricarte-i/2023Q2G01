@@ -69,16 +69,16 @@ def perform_regression(X : np.ndarray, Ks : np.ndarray, f : Callable[[Any, Any],
     
     return min_F, RegressionData(best_k_idx, Ks, K_errs)
 
-def plot_regression_data(reg_data : RegressionData, file_name : str, x_label : str = "c", color : str = "purple") -> None:
+def plot_regression_data(reg_data : RegressionData, file_name : str, x_label : str = "Valor del coeficiente del modelo", color : str = "purple") -> None:
     sns.set_style("darkgrid")
 
     data_range = min(reg_data.best_k_idx, reg_data.Ks.size - reg_data.best_k_idx)
     c_star   = reg_data.Ks[reg_data.best_k_idx]
     err_star = reg_data.K_errs[reg_data.best_k_idx]
-    label    = "E(c*) = {:.2f}\nc* = {}".format(err_star, c_star)
+    label    = "Error cuadrático en el coeficiente óptimo = {:.2f}\nValor del coeficiente óptimo = {}".format(err_star, c_star)
     plt.plot(reg_data.Ks[reg_data.best_k_idx-data_range:reg_data.best_k_idx+data_range+1], reg_data.K_errs[reg_data.best_k_idx-data_range:reg_data.best_k_idx+data_range+1], color=color)
     sns.lineplot(x=[c_star], y=[err_star], marker="o", linestyle="", label=label, color="purple")
-    plt.ylabel("E(c)")
+    plt.ylabel("Error cuadrático")
     plt.xlabel(x_label)
     plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
     plt.savefig(file_name, bbox_inches='tight', dpi=1200)
