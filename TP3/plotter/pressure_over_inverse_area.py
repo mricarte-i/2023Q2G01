@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 import pandas  as pd
 import seaborn as sns
 
-def plot_pressure_over_inverse_area(impulse_files : list[str], Ls : list[float], delta_t : float, stationary_ts : list[float], filename : str = "pressure_over_inverse_area.png") -> None:
+def pressure_over_inverse_area(impulse_files : list[str], Ls : list[float], delta_t : float, stationary_ts : list[float]) -> list[pd.DataFrame]:
     pressure_colname, area_colname = "Pressure", "Area"
-    df = pd.DataFrame(data={}, columns=[pressure_colname, area_colname])
+    dfs = []
 
     for i in range(len(impulse_files)):
         L = Ls[i]
@@ -31,11 +31,24 @@ def plot_pressure_over_inverse_area(impulse_files : list[str], Ls : list[float],
         l_df = pd.DataFrame(stationary_pressures.pressures, columns=[pressure_colname])
         l_df.insert(1, area_colname, (1 / area))
 
-        df = pd.concat([df, l_df])
+        dfs.append(l_df)
+    
+    return dfs
 
-    sns.lineplot(data=df, x=area_colname, y=pressure_colname, errorbar="sd", marker="o", err_style="bars", linestyle="", err_kws={'capsize': 10})
+def plot_pressure_over_inverse_area(dfs : list[pd.DataFrame], Ls : list[float], filename : str = "pressure_over_inverse_area.png" ) -> pd.DataFrame:
+    pressure_colname, area_colname = "Pressure", "Area"
+    sns.set_style("darkgrid")
+    i = 0
+    for df in dfs:
+        mean = df.mean().values[0]
+        std  = df.std().values[0]
+        label  = "<P>$_{est}$ = " + "{:.2f}".format(mean) + " ± " + "{:.1g}".format(std) + "\n"
+        label += "L = {}\n".format(Ls[i])
+        sns.lineplot(data=df, x=area_colname, y=pressure_colname, errorbar="sd", marker="o", err_style="bars", linestyle="", err_kws={'capsize': 10}, label=label)
+        i += 1
     print(df.groupby([area_colname]).mean(), df.groupby([area_colname]).std())
-    plt.ylabel("Presión [N/m]")
-    plt.xlabel("Inversa del área [1/m^2]")
+    plt.ylabel("<P>$_{est}$ [$\\frac{N}{m}$]")
+    plt.xlabel("A$^{-1}$ [$\\frac{1}{m^{2}}$]")
+    plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
     plt.savefig(filename, bbox_inches='tight', dpi=1200)
 
