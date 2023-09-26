@@ -12,12 +12,20 @@ public class InputParser {
     private final int N;
     private final int n;
 
-    private InputParser(double radius, double mass, double L, int N, int n) {
-        this.radius = radius;
-        this.mass = mass;
-        this.L = L;
-        this.N = N;
-        this.n = n;
+    private final String staticFile;
+    private final String dynamicFile;
+
+    private final Long seed;
+
+    private InputParser(int N, int n, String staticFile, String dynamicFile, Long seed) {
+        this.radius = 21.49d; // in cm
+        this.mass   = 25d;    // in g
+        this.L      = 135d;   // in cm
+        this.N      = N;
+        this.n      = n;
+        this.staticFile  = staticFile;
+        this.dynamicFile = dynamicFile;
+        this.seed        = seed;
     }
 
     @Command(name                    = "timeDrivenSimulation",
@@ -25,20 +33,16 @@ public class InputParser {
             version                  = "timeDrivenSimulation 1.0",
             mixinStandardHelpOptions = true)
     private static class ParseInputCommand implements Runnable {
-        @Option(names       = {"-r", "--radius"},
-                description = "Radii of particles.",
-                required    = true)
-        private double radius;
 
-        @Option(names       = {"-m", "--mass"},
-                description = "Masses of particles.",
+        @Option(names       = {"-s", "--static-file"},
+                description = "Static file path with number of particles (N), radii and masses per particle.",
                 required    = true)
-        private double mass;
+        private String staticFile;
 
-        @Option(names       = {"-L", "--length"},
-                description = "Length of the line where particles move.",
+        @Option(names       = {"-d", "--dynamic-file"},
+                description = "Dynamic file path with positions and velocities per particle.",
                 required    = true)
-        private double L;
+        private String dynamicFile;
 
         @Option(names       = {"-N", "--particle-amount"},
                 description = "Amount of particles to be created on top of the line.",
@@ -49,6 +53,11 @@ public class InputParser {
                 description = "Scale of the integration step (10^-n).",
                 required    = true)
         private int n;
+
+        @Option(names       = "--seed",
+                description = "Seed to use for pseudo-random generation.",
+                required    = false)
+        private Long seed;
 
         public void run() {}
     }
@@ -73,6 +82,18 @@ public class InputParser {
         return n;
     }
 
+    public String getStaticFile() {
+        return staticFile;
+    }
+
+    public String getDynamicFile() {
+        return dynamicFile;
+    }
+
+    public Long getSeed() {
+        return seed;
+    }
+
     public static InputParser parse(String[] args) {
         InputParser inputParser = null;
 
@@ -84,11 +105,11 @@ public class InputParser {
                 return null;
 
             inputParser = new InputParser(
-                                parseInputCommand.radius,
-                                parseInputCommand.mass,
-                                parseInputCommand.L,
                                 parseInputCommand.N,
-                                parseInputCommand.n
+                                parseInputCommand.n,
+                                parseInputCommand.staticFile,
+                                parseInputCommand.dynamicFile,
+                                parseInputCommand.seed
                         );
 
         } catch (ParameterException e) {
