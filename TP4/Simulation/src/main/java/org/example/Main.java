@@ -16,6 +16,10 @@ public class Main {
     private static final double R0 = 1;
     private static final double V0 = - AMPLITUDE * GAMMA / (2 * MASS);
 
+    // Output files names
+    private static final String STATIC_FILE = "Static.txt";
+    private static final String DYNAMIC_FILE = "Dynamic.txt";
+
     public static void main(String[] args) {
 
     }
