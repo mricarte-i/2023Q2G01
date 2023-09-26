@@ -3,7 +3,8 @@ package org.example;
 public class Main {
 
     // Parametrized conditions
-    private static final double STEP_SCALE = 1.0d;
+    private static final double MIN_STEP_SCALE = 0.0d;
+    private static final double MAX_STEP_SCALE = 1.0d;
     private static final double AMPLITUDE = 1.0d;
 
     // Fixed conditions
