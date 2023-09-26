@@ -3,7 +3,12 @@ package org.example;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Scanner;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 
 public class ParamsParser {
@@ -81,7 +86,13 @@ public class ParamsParser {
 
             @Override
             public ParamsParser call() throws Exception {
-                return null;
+                return new ParamsParser(
+                        this.N,
+                        parseInputCommand.n,
+                        parseInputCommand.staticFile,
+                        parseInputCommand.dynamicFile,
+                        this.seed
+                );
             }
         }
 
@@ -94,6 +105,29 @@ public class ParamsParser {
 
             @Override
             public ParamsParser call() throws Exception {
+                Scanner input = null;
+                try {
+                    File file = new File(parseInputCommand.staticFile);
+                    input = new Scanner(file);
+                    int particleNumber = Arrays.stream(
+                                                input.nextLine().split("\\s"))
+                                                    .filter(s -> !s.isEmpty())
+                                                    .map(Double::valueOf)
+                                                    .collect(Collectors.toList()).get(0).intValue();
+                    return new ParamsParser(
+                                particleNumber,
+                                parseInputCommand.n,
+                                parseInputCommand.staticFile,
+                                parseInputCommand.dynamicFile,
+                                null);
+                } catch (FileNotFoundException e) {
+                    System.out.println("Error parsing input file \"" + parseInputCommand.staticFile + "\"");
+                } finally {
+                    if (input != null) {
+                        input.close();
+                    }
+                    System.out.println("Input file parsed sucessfully!");
+                }
                 return null;
             }
         }
