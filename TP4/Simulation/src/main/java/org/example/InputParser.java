@@ -36,26 +36,31 @@ public class InputParser {
 
         @Option(names       = {"-s", "--static-file"},
                 description = "Static file path with number of particles (N), radii and masses per particle.",
+                paramLabel  = "STATIC_FILE",
                 required    = true)
         private String staticFile;
 
         @Option(names       = {"-d", "--dynamic-file"},
                 description = "Dynamic file path with positions and velocities per particle.",
+                paramLabel  = "DYNAMIC_FILE",
                 required    = true)
         private String dynamicFile;
 
         @Option(names       = {"-N", "--particle-amount"},
                 description = "Amount of particles to be created on top of the line.",
+                paramLabel  = "N",
                 required    = true)
         private int N;
 
         @Option(names       = {"-n", "--step-scale"},
                 description = "Scale of the integration step (10^-n).",
+                paramLabel  = "STEP_SCALE",
                 required    = true)
         private int n;
 
         @Option(names       = "--seed",
                 description = "Seed to use for pseudo-random generation.",
+                paramLabel  = "SEED",
                 required    = false)
         private Long seed;
 
