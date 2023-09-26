@@ -4,6 +4,12 @@ package org.example;
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) {
+        // Parser test
+        InputParser inputParser = InputParser.parse(args);
+        if(inputParser == null)
+            return;
+        System.out.println(inputParser.getRadius());
+
         // Press Alt+Enter with your caret at the highlighted text to see how
         // IntelliJ IDEA suggests fixing it.
         System.out.printf("Hello and welcome!");
