@@ -4,7 +4,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.*;
 
 
-public class InputParser {
+public class ParamsParser {
 
     private final double radius;
     private final double mass;
@@ -17,7 +17,7 @@ public class InputParser {
 
     private final Long seed;
 
-    private InputParser(int N, int n, String staticFile, String dynamicFile, Long seed) {
+    private ParamsParser(int N, int n, String staticFile, String dynamicFile, Long seed) {
         this.radius = 21.49d; // in cm
         this.mass   = 25d;    // in g
         this.L      = 135d;   // in cm
@@ -99,8 +99,8 @@ public class InputParser {
         return seed;
     }
 
-    public static InputParser parse(String[] args) {
-        InputParser inputParser = null;
+    public static ParamsParser parse(String[] args) {
+        ParamsParser paramsParser = null;
 
         ParseInputCommand parseInputCommand = new ParseInputCommand();
         CommandLine cmdCommand              = new CommandLine(parseInputCommand);
@@ -109,7 +109,7 @@ public class InputParser {
             if (exitCode != 0)
                 return null;
 
-            inputParser = new InputParser(
+            paramsParser = new ParamsParser(
                                 parseInputCommand.N,
                                 parseInputCommand.n,
                                 parseInputCommand.staticFile,
@@ -120,7 +120,7 @@ public class InputParser {
         } catch (ParameterException e) {
             return null;
         }
-        return inputParser;
+        return paramsParser;
     }
 }
 
