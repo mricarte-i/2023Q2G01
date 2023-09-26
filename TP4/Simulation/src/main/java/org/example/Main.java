@@ -1,25 +1,22 @@
 package org.example;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
 public class Main {
+
+    // Parametrized conditions
+    private static final double STEP_SCALE = 1.0d;
+    private static final double AMPLITUDE = 1.0d;
+
+    // Fixed conditions
+    private static final double MASS = 70.0d;
+    private static final double K = 10^4;
+    private static final double GAMMA = 100.0d;
+    private static final double TF = 5.0d;
+
+    // Initial conditions (fixed)
+    private static final double R0 = 1;
+    private static final double V0 = - AMPLITUDE * GAMMA / (2 * MASS);
+
     public static void main(String[] args) {
-        // Parser test
-        ParamsParser paramsParser = ParamsParser.parse(args);
-        if(paramsParser == null)
-            return;
-        System.out.println(paramsParser.getRadius());
 
-        // Press Alt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
-
-        // Press Shift+F10 or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
-
-            // Press Shift+F9 to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Ctrl+F8.
-            System.out.println("i = " + i);
-        }
     }
 }
