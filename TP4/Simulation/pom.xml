@@ -42,7 +42,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        org.example.Main
+                                        org.example.HarmonicOscillatorSystem
                                     </mainClass>
                                 </manifest>
                             </archive>
