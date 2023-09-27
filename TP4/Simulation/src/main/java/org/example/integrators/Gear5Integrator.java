@@ -5,8 +5,8 @@ public class Gear5Integrator implements Integrator {
     private static final int POSITION_DERIVATIVE = 0;
     private static final int VELOCITY_DERIVATIVE = 1;
     private static final int ACCELERATION_DERIVATIVE = 2;
-    private static final int DERIVATIVE_COUNT = 6;
-    private static final int LAST_DERIVATIVE = 5;
+    public static final int DERIVATIVE_COUNT = 6;
+    public static final int LAST_DERIVATIVE = 5;
     private static final double[] FACTORIALS = {
             1.0d,
             1.0d,
