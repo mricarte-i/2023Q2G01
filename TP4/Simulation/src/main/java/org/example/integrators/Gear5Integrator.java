@@ -44,7 +44,6 @@ public class Gear5Integrator implements Integrator {
 
     private final double mass;
     private final double deltaT;
-    private int stepCount;
 
     private Double previousForce;
     private double previousAcceleration;
@@ -64,7 +63,6 @@ public class Gear5Integrator implements Integrator {
         this.predictedDerivatives = new double[DERIVATIVE_COUNT];
         this.mass = mass;
         this.deltaT = deltaT;
-        this.stepCount = 0;
         this.previousForce = null;
         this.forceIsVDependent = forceIsVelocityDependent;
         this.correctedCoefficients = new double[DERIVATIVE_COUNT];
@@ -151,12 +149,5 @@ public class Gear5Integrator implements Integrator {
 
         double deltaR2 = evaluateForce(nextStepForce);
         correct(deltaR2);
-
-        this.stepCount += 1;
-    }
-
-    @Override
-    public int getStep() {
-        return stepCount;
     }
 }
