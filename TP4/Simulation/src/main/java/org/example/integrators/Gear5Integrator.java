@@ -111,9 +111,12 @@ public class Gear5Integrator implements Integrator {
     }
 
     private void predict() {
+        int currCoef;
         for (int i = LAST_DERIVATIVE; i >= 0; i--) {
-            for (int j = LAST_DERIVATIVE; j >= 0; j--){
-                predictedDerivatives[i] = correctedDerivatives[j] * correctedCoefficients[j];
+            currCoef = 0;
+            for (int j = i; j <= LAST_DERIVATIVE; j++){
+                predictedDerivatives[i] = correctedDerivatives[j] * correctedCoefficients[currCoef];
+                currCoef += 1;
             }
         }
     }
