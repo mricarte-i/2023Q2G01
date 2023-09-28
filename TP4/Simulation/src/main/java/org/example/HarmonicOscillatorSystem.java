@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.integrators.BeemanIntegrator;
 import org.example.integrators.Gear5Integrator;
 import org.example.integrators.Integrator;
 
@@ -83,6 +84,10 @@ public class HarmonicOscillatorSystem {
         );
     }
 
+    private Integrator setUpBeeman(double deltaT) {
+        return new BeemanIntegrator(deltaT, R0, V0, MASS, K, GAMMA);
+    }
+
     public void simulate() {
         Integrator gear5;
         double currStep;
@@ -90,10 +95,10 @@ public class HarmonicOscillatorSystem {
             currStep = Math.pow(10, -stepScale);
 
             gear5 = setUpGear5(currStep);
+            //gear5 = setUpBeeman(currStep);
 
             double time = 0;
-            //print state
-            System.out.println(time + " " + gear5.getPosition());
+
             while(time < TF) {
                 gear5.advanceStep(HarmonicOscillatorSystem::getForce);
                 //print state
