@@ -5,18 +5,24 @@ import picocli.CommandLine.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 
 public class ParamsParser {
 
+    private final static double RADIUS = 21.49d; // in cm
+    private final static double MASS = 25d;      // in g
+    private final static double LENGTH = 135d;   // in cm
+
+
+    // TODO: Replace uncomment Particle
+
     private final Simulation simulation;
 
-    private final double radius;
-    private final double mass;
+    private final List/*<Particle>*/ particles;
+
     private final double L;
     private final int N;
     private final int n;
@@ -26,11 +32,21 @@ public class ParamsParser {
 
     private final Long seed;
 
-    private ParamsParser(Simulation simulation, int N, int n, String staticFile, String dynamicFile, Long seed) {
+    private ParamsParser(Simulation simulation, List/*<Particle>*/ particles, int N, int n, String staticFile, String dynamicFile, Long seed) {
         this.simulation = simulation;
-        this.radius = 21.49d; // in cm
-        this.mass   = 25d;    // in g
-        this.L      = 135d;   // in cm
+        this.particles = particles;
+        this.L      = LENGTH;
+        this.N      = N;
+        this.n      = n;
+        this.staticFile  = staticFile;
+        this.dynamicFile = dynamicFile;
+        this.seed        = seed;
+    }
+
+    private ParamsParser(Simulation simulation, List/*<Particle>*/ particles, int N, int n, String staticFile, String dynamicFile, Long seed, double L) {
+        this.simulation = simulation;
+        this.particles = particles;
+        this.L      = L;
         this.N      = N;
         this.n      = n;
         this.staticFile  = staticFile;
@@ -61,6 +77,7 @@ public class ParamsParser {
                 HarmonicOscillatorSystem hos = HarmonicOscillatorSystem.getInstance();
                 return new ParamsParser(
                         hos::simulate,
+                        null,
                         0,
                         0,
                         null,
@@ -116,14 +133,54 @@ public class ParamsParser {
 
             @Override
             public ParamsParser call() throws Exception {
+                List/*<Particle>*/ particles = generateParticles();
+
                 return new ParamsParser(
-                        null,
+                        () -> {}, // TODO: Replace with ParticleSystem simulate
+                        particles,
                         this.N,
                         timeDrivenParseMixin.n,
                         timeDrivenParseMixin.staticFile,
                         timeDrivenParseMixin.dynamicFile,
                         timeDrivenParseMixin.seed
                 );
+            }
+
+            private List/*<Particle>*/ generateParticles() {
+                List/*<Particle>*/ particles = new ArrayList<>(N);
+                Random rand = timeDrivenParseMixin.seed == null ? new Random() : new Random(timeDrivenParseMixin.seed);
+                /*
+                for (int id = 0; id < N; id++) {
+                    double x, y;
+                    //NO overlapping is allowed!
+                    boolean overlaps = false;
+                    do {
+                        //make sure it won't overlap with the bounds!
+                        x = rand.nextDouble() * (w - 2*r) + r;
+                        y = rand.nextDouble() * (h - 2*r) + r;
+                        overlaps = false;
+
+                        for(Particle other : particles) {
+                            double dx = x - other.getPositionX();
+                            double dy = y - other.getPositionY();
+                            double minDist = r + other.getRadius();
+
+                            if((dx * dx) + (dy * dy) <= (minDist * minDist)){
+                                overlaps = true;
+                                break; //overlapped with another particle, retry
+                            }
+                        }
+                    } while(overlaps);
+
+                    double angle = rand.nextDouble() * 2 * Math.PI;
+                    double vx = vm * Math.cos(angle);
+                    double vy = vm * Math.sin(angle);
+
+                    // particles.add(new Particle(id, x, y, vx, vy, MASS, RADIUS));
+                }
+
+                 */
+                return particles;
             }
         }
 
@@ -136,46 +193,146 @@ public class ParamsParser {
 
             @Override
             public ParamsParser call() throws Exception {
+                List/*<Particle>*/ particles = null;
+
+                int particleNumber = parseParticleNumber();
+                double lineLength  = parseL();
+
+                if (particleNumber > 0) {
+                    particles = parseParticles();
+                    if (particles.size() != particleNumber) {
+                        System.out.println("Error in input file \"" + timeDrivenParseMixin.staticFile + "\". Wrong number of particles: expected " + particleNumber + ", parsed " + particles.size());
+                        return null;
+                    }
+                } else {
+                    System.out.println("Error in input file. No particles found");
+                    return null;
+                }
+
+                return new ParamsParser(
+                        () -> {}, // TODO: Replace with ParticleSystem simulate
+                        particles,
+                        particleNumber,
+                        timeDrivenParseMixin.n,
+                        timeDrivenParseMixin.staticFile,
+                        timeDrivenParseMixin.dynamicFile,
+                        timeDrivenParseMixin.seed,
+                        lineLength
+                );
+            }
+
+            private int parseParticleNumber() {
                 Scanner input = null;
+                int particleNumber = 0;
                 try {
                     File file = new File(timeDrivenParseMixin.staticFile);
                     input = new Scanner(file);
-                    int particleNumber = Arrays.stream(
+                    particleNumber = Arrays.stream(
                                     input.nextLine().split("\\s"))
                             .filter(s -> !s.isEmpty())
                             .map(Double::valueOf)
                             .collect(Collectors.toList()).get(0).intValue();
-                    return new ParamsParser(
-                            null,
-                            particleNumber,
-                            timeDrivenParseMixin.n,
-                            timeDrivenParseMixin.staticFile,
-                            timeDrivenParseMixin.dynamicFile,
-                            timeDrivenParseMixin.seed
-                    );
-                } catch (FileNotFoundException e) {
-                    System.out.println("Error parsing input file \"" + timeDrivenParseMixin.staticFile + "\"");
+                    System.out.println("Particle number in input file parsed sucessfully!");
+                } catch (Exception e) {
+                    System.out.println("Error parsing particle number in input file \"" + timeDrivenParseMixin.staticFile + "\"");
                 } finally {
                     if (input != null) {
                         input.close();
                     }
-                    System.out.println("Input file parsed sucessfully!");
                 }
-                return null;
+                return particleNumber;
+            }
+
+            private double parseL() {
+                Scanner input = null;
+                double L = 0;
+                try {
+                    File file = new File(timeDrivenParseMixin.staticFile);
+                    input = new Scanner(file);
+
+                    // Ignore particle number
+                    input.nextLine();
+
+                    L = Arrays.stream(
+                                    input.nextLine().split("\\s"))
+                            .filter(s -> !s.isEmpty())
+                            .map(Double::valueOf)
+                            .collect(Collectors.toList()).get(0);
+
+                    System.out.println("Line length in input file parsed sucessfully!");
+                } catch (Exception e) {
+                    System.out.println("Error parsing line length in input file \"" + timeDrivenParseMixin.staticFile + "\"");
+                } finally {
+                    if (input != null) {
+                        input.close();
+                    }
+                }
+                return L;
+            }
+
+            private List/*<Particle>*/ parseParticles(){
+                Scanner staticInput  = null;
+                Scanner dynamicInput = null;
+                List/*<Particle>*/ particles = new ArrayList<>();
+                try {
+                    File staticFile  = new File(timeDrivenParseMixin.staticFile);
+                    File dynamicFile = new File(timeDrivenParseMixin.dynamicFile);
+
+                    staticInput  = new Scanner(staticFile);
+                    dynamicInput = new Scanner(dynamicFile);
+
+                    // Ignore particle number
+                    staticInput.nextLine();
+                    // Ignore L
+                    staticInput.nextLine();
+
+                    // Ignore t=0 time-stamp
+                    dynamicInput.nextLine();
+
+                    int id = 0;
+
+                    while (staticInput.hasNext() && dynamicInput.hasNext()) {
+                        String nextStaticLine  = staticInput.nextLine();
+                        String nextDynamicLine = dynamicInput.nextLine();
+
+                        List<Double> staticProperties = Arrays.stream(nextStaticLine.split("[\\s\\t]+")).filter(s -> !s.isEmpty())
+                                .map(Double::valueOf).collect(Collectors.toList());
+
+                        List<Double> dynamicProperties = Arrays.stream(nextDynamicLine.split("[\\s\\t]+")).filter(s -> !s.isEmpty())
+                                .map(Double::valueOf).collect(Collectors.toList());
+
+                        double mass   = staticProperties.get(0);
+                        double radius = staticProperties.get(1);
+
+                        double x  = dynamicProperties.get(0);
+                        double y  = dynamicProperties.get(1);
+                        double vx = dynamicProperties.get(2);
+                        double vy = dynamicProperties.get(3);
+
+                        // particles.add(new Particle(id, x, y, vx, vy, mass, radius);
+
+                        id++;
+                    }
+                    System.out.println("Particles in input file parsed sucessfully!");
+                } catch (Exception e) {
+                    System.out.println("Error parsing particles in input files \"" + timeDrivenParseMixin.staticFile + "\" and \"" + timeDrivenParseMixin.dynamicFile + "\"");
+                } finally {
+                    if (staticInput != null) {
+                        staticInput.close();
+                    }
+                    if (dynamicInput != null) {
+                        dynamicInput.close();
+                    }
+                }
+                return particles;
             }
         }
+
+
     }
 
     public Simulation getSimulation() {
         return simulation;
-    }
-
-    public double getRadius() {
-        return radius;
-    }
-
-    public double getMass() {
-        return mass;
     }
 
     public double getL() {
