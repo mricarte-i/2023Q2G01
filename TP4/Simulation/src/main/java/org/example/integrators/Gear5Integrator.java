@@ -99,7 +99,7 @@ public class Gear5Integrator implements Integrator {
     }
 
     private double getNextStepRealAcceleration(ForceCalculator forceCalculator) {
-        double nextStepForce = forceCalculator.calculate(null, predictedDerivatives[POSITION_DERIVATIVE], predictedDerivatives[VELOCITY_DERIVATIVE]);
+        double nextStepForce = forceCalculator.calculateForce(null, predictedDerivatives[POSITION_DERIVATIVE], predictedDerivatives[VELOCITY_DERIVATIVE]);
         if (previousForce != null && previousForce == nextStepForce)
             return previousAcceleration;
 
