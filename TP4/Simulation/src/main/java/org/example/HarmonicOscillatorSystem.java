@@ -13,16 +13,16 @@ public class HarmonicOscillatorSystem {
             //4.0d,
             //5.0d
     }; // TIME_STEP = 10^(-STEP_SCALE)
-    private static final double AMPLITUDE = 1.0d;
+    private static final double AMPLITUDE = 1.0;
 
     // Fixed conditions
-    private static final double MASS = 70.0d;
+    private static final double MASS = 70.0;
     private static final double K = 10^4;
-    private static final double GAMMA = 100.0d;
-    private static final double TF = 5.0d;
+    private static final double GAMMA = 100.0;
+    private static final double TF = 5.0;
 
     // Initial conditions (fixed)
-    private static final double R0 = 1;
+    private static final double R0 = AMPLITUDE;
     private static final double V0 = - AMPLITUDE * GAMMA / (2 * MASS);
     private static final double ELASTIC_COEFFICIENT = - K / MASS;
     private static final double VISCOSITY_COEFFICIENT = - GAMMA / MASS;
@@ -42,11 +42,11 @@ public class HarmonicOscillatorSystem {
     }
 
     private double getAcceleration(double pos, double vel) {
-        return (ELASTIC_COEFFICIENT * pos + VISCOSITY_COEFFICIENT * vel)/MASS;
+        return (ELASTIC_COEFFICIENT * pos + VISCOSITY_COEFFICIENT * vel);
     }
 
     private double getForce(double pos, double vel) {
-        return (ELASTIC_COEFFICIENT * pos + VISCOSITY_COEFFICIENT * vel);
+        return (ELASTIC_COEFFICIENT * pos + VISCOSITY_COEFFICIENT * vel)*MASS;
     }
 
     private double[] getGear5InitialDerivatives() {
