@@ -42,7 +42,7 @@ public class HarmonicOscillatorSystem {
         return harmonicOscillatorSystem;
     }
 
-    private static double getForce(Double t, Double pos, Double vel) {
+    private static double getForce(double pos, double vel) {
         return (- K * pos - GAMMA * vel);
     }
 
@@ -56,7 +56,7 @@ public class HarmonicOscillatorSystem {
         int positionDerivative = 0;
         int velocityDerivative = 1;
         for (int i = 2; i < Gear5Integrator.DERIVATIVE_COUNT; i++) {
-            derivatives[i] = getForce(null, derivatives[positionDerivative], derivatives[velocityDerivative]) / MASS;
+            derivatives[i] = getForce(derivatives[positionDerivative], derivatives[velocityDerivative]) / MASS;
             positionDerivative += 1;
             velocityDerivative += 1;
         }
