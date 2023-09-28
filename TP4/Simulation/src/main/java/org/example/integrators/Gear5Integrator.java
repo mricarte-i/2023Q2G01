@@ -40,6 +40,13 @@ public class Gear5Integrator implements Integrator {
     private final double[] correctedDerivatives;
     private final double[] predictedDerivatives;
 
+    private Gear5Stage stage;
+
+    private enum Gear5Stage {
+        PREDICTED,
+        CORRECTED
+    }
+
     private final boolean forceIsVDependent;
 
     private final double mass;
@@ -61,6 +68,7 @@ public class Gear5Integrator implements Integrator {
     ){
         this.correctedDerivatives = new double[] { r0, r1, r2, r3, r4, r5 };
         this.predictedDerivatives = new double[DERIVATIVE_COUNT];
+        this.stage = Gear5Stage.CORRECTED;
         this.mass = mass;
         this.deltaT = deltaT;
         this.previousForce = null;
@@ -109,7 +117,10 @@ public class Gear5Integrator implements Integrator {
         return previousAcceleration;
     }
 
-    private void predict() {
+    public void predict() {
+        if (this.stage == Gear5Stage.PREDICTED)
+            throw new RuntimeException("Attempted prediction on already predicted stage.");
+
         int currCoef;
         for (int i = LAST_DERIVATIVE; i >= 0; i--) {
             currCoef = 0;
@@ -119,6 +130,7 @@ public class Gear5Integrator implements Integrator {
                 currCoef += 1;
             }
         }
+        this.stage = Gear5Stage.PREDICTED;
     }
 
     private double evaluateForce(ForceCalculator forceCalculator) {
@@ -129,27 +141,42 @@ public class Gear5Integrator implements Integrator {
         return deltaA * correctedCoefficients[ACCELERATION_DERIVATIVE];
     }
 
-    private void correct(double deltaR2) {
+    public void correct(ForceCalculator forceCalculator) {
+        if (this.stage == Gear5Stage.CORRECTED)
+            throw new RuntimeException("Attempted correction on already corrected stage.");
+
+        double deltaR2 = evaluateForce(forceCalculator);
         for (int i = 0; i < DERIVATIVE_COUNT; i++) {
             correctedDerivatives[i] = predictedDerivatives[i] + getPredictorCoefficient(i) * deltaR2 * inverseCorrectedCoefficients[i];
         }
+        this.stage = Gear5Stage.CORRECTED;
     }
 
     @Override
     public double getPosition() {
-        return correctedDerivatives[POSITION_DERIVATIVE];
+        switch (this.stage){
+            case PREDICTED:
+                return predictedDerivatives[POSITION_DERIVATIVE];
+            case CORRECTED:
+                return correctedDerivatives[POSITION_DERIVATIVE];
+        }
+        return Double.NaN;
     }
 
     @Override
     public double getVelocity() {
-        return correctedDerivatives[VELOCITY_DERIVATIVE];
+        switch (this.stage) {
+            case PREDICTED:
+                return predictedDerivatives[VELOCITY_DERIVATIVE];
+            case CORRECTED:
+                return correctedDerivatives[VELOCITY_DERIVATIVE];
+        }
+        return Double.NaN;
     }
 
     @Override
     public void advanceStep(ForceCalculator forceCalculator) {
         predict();
-
-        double deltaR2 = evaluateForce(forceCalculator);
-        correct(deltaR2);
+        correct(forceCalculator);
     }
 }

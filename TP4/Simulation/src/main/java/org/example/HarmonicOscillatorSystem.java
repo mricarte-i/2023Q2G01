@@ -52,7 +52,6 @@ public class HarmonicOscillatorSystem {
         derivatives[0] = R0;
         derivatives[1] = V0;
 
-
         int positionDerivative = 0;
         int velocityDerivative = 1;
         for (int i = 2; i < Gear5Integrator.DERIVATIVE_COUNT; i++) {
@@ -63,7 +62,7 @@ public class HarmonicOscillatorSystem {
         return derivatives;
     }
 
-    private Integrator setUpGear5(double deltaT) {
+    private Gear5Integrator setUpGear5(double deltaT) {
         double[] initialDerivatives = getGear5InitialDerivatives();
         return new Gear5Integrator(
                 initialDerivatives[0],
@@ -78,7 +77,7 @@ public class HarmonicOscillatorSystem {
         );
     }
 
-    private Integrator setUpBeeman(double deltaT) {
+    private BeemanIntegrator setUpBeeman(double deltaT) {
         return new BeemanIntegrator(deltaT, R0, V0, MASS, K, GAMMA);
     }
 
@@ -92,6 +91,7 @@ public class HarmonicOscillatorSystem {
             //gear5 = setUpBeeman(currStep);
 
             double time = 0;
+            System.out.println(time + " " + gear5.getPosition());
 
             while(time < TF) {
                 gear5.advanceStep(HarmonicOscillatorSystem::getForce);
