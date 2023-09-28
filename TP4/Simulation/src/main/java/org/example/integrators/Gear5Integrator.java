@@ -98,7 +98,8 @@ public class Gear5Integrator implements Integrator {
         return forceIsVDependent ? VELOCITY_DEPENDENT_COEFFICIENTS[order] : VELOCITY_INDEPENDENT_COEFFICIENTS[order];
     }
 
-    private double getNextStepRealAcceleration(double nextStepForce) {
+    private double getNextStepRealAcceleration(ForceCalculator forceCalculator) {
+        double nextStepForce = forceCalculator.calculate(null, predictedDerivatives[POSITION_DERIVATIVE], predictedDerivatives[VELOCITY_DERIVATIVE]);
         if (previousForce != null && previousForce == nextStepForce)
             return previousAcceleration;
 
@@ -112,16 +113,17 @@ public class Gear5Integrator implements Integrator {
         int currCoef;
         for (int i = LAST_DERIVATIVE; i >= 0; i--) {
             currCoef = 0;
+            predictedDerivatives[i] = 0;
             for (int j = i; j <= LAST_DERIVATIVE; j++){
-                predictedDerivatives[i] = correctedDerivatives[j] * correctedCoefficients[currCoef];
+                predictedDerivatives[i] += correctedDerivatives[j] * correctedCoefficients[currCoef];
                 currCoef += 1;
             }
         }
     }
 
-    private double evaluateForce(double nextStepForce) {
+    private double evaluateForce(ForceCalculator forceCalculator) {
         double predictedA = predictedDerivatives[ACCELERATION_DERIVATIVE];
-        double realA  = getNextStepRealAcceleration(nextStepForce);
+        double realA  = getNextStepRealAcceleration(forceCalculator);
         double deltaA = realA - predictedA;
 
         return deltaA * correctedCoefficients[ACCELERATION_DERIVATIVE];
@@ -144,10 +146,10 @@ public class Gear5Integrator implements Integrator {
     }
 
     @Override
-    public void advanceStep(double nextStepForce) {
+    public void advanceStep(ForceCalculator forceCalculator) {
         predict();
 
-        double deltaR2 = evaluateForce(nextStepForce);
+        double deltaR2 = evaluateForce(forceCalculator);
         correct(deltaR2);
     }
 }

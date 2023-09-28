@@ -3,12 +3,14 @@ package org.example;
 import org.example.integrators.Gear5Integrator;
 import org.example.integrators.Integrator;
 
+import java.util.Arrays;
+
 public class HarmonicOscillatorSystem {
 
     // Parametrized conditions
     private static final double[] STEP_SCALES = {
-            1.0d,
-            //2.0d,
+            //1.0d,
+            2.0d,
             //3.0d,
             //4.0d,
             //5.0d
@@ -17,7 +19,7 @@ public class HarmonicOscillatorSystem {
 
     // Fixed conditions
     private static final double MASS = 70.0;
-    private static final double K = 10^4;
+    private static final double K = 10000;
     private static final double GAMMA = 100.0;
     private static final double TF = 5.0;
 
@@ -45,19 +47,21 @@ public class HarmonicOscillatorSystem {
         return (ELASTIC_COEFFICIENT * pos + VISCOSITY_COEFFICIENT * vel);
     }
 
-    private double getForce(double pos, double vel) {
-        return (ELASTIC_COEFFICIENT * pos + VISCOSITY_COEFFICIENT * vel)*MASS;
+    private static double getForce(Double t, Double pos, Double vel) {
+        return (- K * pos - GAMMA * vel);
     }
 
     private double[] getGear5InitialDerivatives() {
         double[] derivatives = new double[Gear5Integrator.DERIVATIVE_COUNT];
+        Arrays.fill(derivatives, 0);
         derivatives[0] = R0;
         derivatives[1] = V0;
+
 
         int positionDerivative = 0;
         int velocityDerivative = 1;
         for (int i = 2; i < Gear5Integrator.DERIVATIVE_COUNT; i++) {
-            derivatives[i] = ELASTIC_COEFFICIENT * derivatives[positionDerivative] + VISCOSITY_COEFFICIENT * derivatives[velocityDerivative];
+            derivatives[i] = getForce(null, derivatives[positionDerivative], derivatives[velocityDerivative]) / MASS;
             positionDerivative += 1;
             velocityDerivative += 1;
         }
@@ -91,10 +95,10 @@ public class HarmonicOscillatorSystem {
             //print state
             System.out.println(time + " " + gear5.getPosition());
             while(time < TF) {
-                gear5.advanceStep(getForce(gear5.getPosition(), gear5.getVelocity()));
+                gear5.advanceStep(HarmonicOscillatorSystem::getForce);
                 //print state
-                System.out.println(time + " " + gear5.getPosition());
                 time += currStep;
+                System.out.println(time + " " + gear5.getPosition());
             }
         }
 
