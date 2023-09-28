@@ -99,7 +99,7 @@ public class Gear5Integrator implements Integrator {
     }
 
     private double getNextStepRealAcceleration(double nextStepForce) {
-        if (previousForce == nextStepForce)
+        if (previousForce != null && previousForce == nextStepForce)
             return previousAcceleration;
 
         previousForce        = nextStepForce;

@@ -8,10 +8,10 @@ public class HarmonicOscillatorSystem {
     // Parametrized conditions
     private static final double[] STEP_SCALES = {
             1.0d,
-            2.0d,
-            3.0d,
-            4.0d,
-            5.0d
+            //2.0d,
+            //3.0d,
+            //4.0d,
+            //5.0d
     }; // TIME_STEP = 10^(-STEP_SCALE)
     private static final double AMPLITUDE = 1.0d;
 
@@ -39,6 +39,14 @@ public class HarmonicOscillatorSystem {
         if (harmonicOscillatorSystem == null)
             harmonicOscillatorSystem = new HarmonicOscillatorSystem();
         return harmonicOscillatorSystem;
+    }
+
+    private double getAcceleration(double pos, double vel) {
+        return (ELASTIC_COEFFICIENT * pos + VISCOSITY_COEFFICIENT * vel)/MASS;
+    }
+
+    private double getForce(double pos, double vel) {
+        return (ELASTIC_COEFFICIENT * pos + VISCOSITY_COEFFICIENT * vel);
     }
 
     private double[] getGear5InitialDerivatives() {
@@ -78,6 +86,16 @@ public class HarmonicOscillatorSystem {
             currStep = Math.pow(10, -stepScale);
 
             gear5 = setUpGear5(currStep);
+
+            double time = 0;
+            //print state
+            System.out.println(time + " " + gear5.getPosition());
+            while(time < TF) {
+                gear5.advanceStep(getForce(gear5.getPosition(), gear5.getVelocity()));
+                //print state
+                System.out.println(time + " " + gear5.getPosition());
+                time += currStep;
+            }
         }
 
     }
