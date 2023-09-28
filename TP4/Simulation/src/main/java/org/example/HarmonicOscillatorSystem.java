@@ -27,8 +27,6 @@ public class HarmonicOscillatorSystem {
     // Initial conditions (fixed)
     private static final double R0 = AMPLITUDE;
     private static final double V0 = - AMPLITUDE * GAMMA / (2 * MASS);
-    private static final double ELASTIC_COEFFICIENT = - K / MASS;
-    private static final double VISCOSITY_COEFFICIENT = - GAMMA / MASS;
 
     // Output files names
     private static final String STATIC_FILE = "Static.txt";
@@ -42,10 +40,6 @@ public class HarmonicOscillatorSystem {
         if (harmonicOscillatorSystem == null)
             harmonicOscillatorSystem = new HarmonicOscillatorSystem();
         return harmonicOscillatorSystem;
-    }
-
-    private double getAcceleration(double pos, double vel) {
-        return (ELASTIC_COEFFICIENT * pos + VISCOSITY_COEFFICIENT * vel);
     }
 
     private static double getForce(Double t, Double pos, Double vel) {
