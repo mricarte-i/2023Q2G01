@@ -66,6 +66,13 @@ public class ParamsParser {
                 required    = true)
         private int n;
 
+        @Option(names       = "--seed",
+                description = "Seed to use for pseudo-random generation.",
+                paramLabel  = "[SEED]",
+                scope       = ScopeType.INHERIT,
+                required    = false)
+        private Long seed;
+
         @Command(name       = "random",
                 description = "Use randomly generated particles.")
         private static class ParseRandomInputCommand implements Callable<ParamsParser> {
@@ -78,12 +85,6 @@ public class ParamsParser {
                     required    = true)
             private int N;
 
-            @Option(names       = "--seed",
-                    description = "Seed to use for pseudo-random generation.",
-                    paramLabel  = "[SEED]",
-                    required    = false)
-            private Long seed;
-
             @Override
             public ParamsParser call() throws Exception {
                 return new ParamsParser(
@@ -91,7 +92,7 @@ public class ParamsParser {
                         parseInputCommand.n,
                         parseInputCommand.staticFile,
                         parseInputCommand.dynamicFile,
-                        this.seed
+                        parseInputCommand.seed
                 );
             }
         }
@@ -119,7 +120,8 @@ public class ParamsParser {
                                 parseInputCommand.n,
                                 parseInputCommand.staticFile,
                                 parseInputCommand.dynamicFile,
-                                null);
+                                parseInputCommand.seed
+                    );
                 } catch (FileNotFoundException e) {
                     System.out.println("Error parsing input file \"" + parseInputCommand.staticFile + "\"");
                 } finally {
