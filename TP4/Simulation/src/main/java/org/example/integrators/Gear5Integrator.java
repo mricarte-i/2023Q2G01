@@ -119,7 +119,7 @@ public class Gear5Integrator implements Integrator {
 
     public void predict() {
         if (this.stage == Gear5Stage.PREDICTED)
-            throw new RuntimeException("Attempted prediction on already predicted stage.");
+            throw new RuntimeException("Attempted prediction on already predicted stage. Call correct() before calling predict() again.");
 
         int currCoef;
         for (int i = LAST_DERIVATIVE; i >= 0; i--) {
@@ -143,7 +143,7 @@ public class Gear5Integrator implements Integrator {
 
     public void correct(ForceCalculator forceCalculator) {
         if (this.stage == Gear5Stage.CORRECTED)
-            throw new RuntimeException("Attempted correction on already corrected stage.");
+            throw new RuntimeException("Attempted correction on already corrected stage. Call predict() before calling correct() again.");
 
         double deltaR2 = evaluateForce(forceCalculator);
         for (int i = 0; i < DERIVATIVE_COUNT; i++) {
