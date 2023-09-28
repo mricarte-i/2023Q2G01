@@ -176,7 +176,8 @@ public class Gear5Integrator implements Integrator {
 
     @Override
     public void advanceStep(ForceCalculator forceCalculator) {
-        predict();
+        if (this.stage == Gear5Stage.CORRECTED)
+            predict();
         correct(forceCalculator);
     }
 }
