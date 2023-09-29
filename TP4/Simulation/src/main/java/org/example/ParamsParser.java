@@ -158,40 +158,52 @@ public class ParamsParser {
                 );
             }
 
+            private boolean checkIfPositionIsOccupied(double x, List/*<Particle>*/ particles) {
+                double particleX;
+                double particleLeftBound;
+                double particleRightBound;
+
+                boolean particleNotWrapped;
+                boolean positionBetweenBounds;
+
+                for (Object particle : particles) {
+                    particleX = 0 /*particle.getPosition()*/;
+
+                    particleLeftBound  = particleX - RADIUS;
+                    particleRightBound = particleX + RADIUS;
+
+                    particleNotWrapped = particleLeftBound >= 0 && particleRightBound <= LENGTH;
+                    if (particleNotWrapped){
+                        positionBetweenBounds = x >= particleLeftBound && x <= particleRightBound;
+                        if (positionBetweenBounds)
+                            return true;
+                    } else {
+                        if (particleLeftBound < 0)
+                            particleLeftBound += LENGTH;
+
+                        if (particleRightBound > LENGTH)
+                            particleRightBound += LENGTH;
+
+                        positionBetweenBounds = x < particleRightBound || x > particleLeftBound;
+                        if (positionBetweenBounds)
+                            return true;
+                    }
+                }
+                return false;
+            }
+
             private List/*<Particle>*/ generateParticles() {
                 List/*<Particle>*/ particles = new ArrayList<>(N);
                 Random rand = timeDrivenParseMixin.seed == null ? new Random() : new Random(timeDrivenParseMixin.seed);
-                /*
+                boolean overlaps;
+                double x;
                 for (int id = 0; id < N; id++) {
-                    double x, y;
-                    //NO overlapping is allowed!
-                    boolean overlaps = false;
                     do {
-                        //make sure it won't overlap with the bounds!
-                        x = rand.nextDouble() * (w - 2*r) + r;
-                        y = rand.nextDouble() * (h - 2*r) + r;
-                        overlaps = false;
-
-                        for(Particle other : particles) {
-                            double dx = x - other.getPositionX();
-                            double dy = y - other.getPositionY();
-                            double minDist = r + other.getRadius();
-
-                            if((dx * dx) + (dy * dy) <= (minDist * minDist)){
-                                overlaps = true;
-                                break; //overlapped with another particle, retry
-                            }
-                        }
-                    } while(overlaps);
-
-                    double angle = rand.nextDouble() * 2 * Math.PI;
-                    double vx = vm * Math.cos(angle);
-                    double vy = vm * Math.sin(angle);
-
+                        x = rand.nextDouble() * LENGTH;
+                        overlaps = checkIfPositionIsOccupied(x, particles);
+                    } while (overlaps);
                     // particles.add(new Particle(id, x, y, vx, vy, MASS, RADIUS));
                 }
-
-                 */
                 return particles;
             }
         }
