@@ -2,25 +2,20 @@ package org.example.integrators;
 
 public class BeemanIntegrator implements Integrator {
 
-    private double dT, MASS, K, G;
+    private double dT, MASS;
     private double prevA, auxR, auxV, a, currR, currV;
 
-    private double getAcceleration(double r, double v) {
-        return -(K*r + G*v) / MASS;
-    }
-
-    public BeemanIntegrator(double deltaT, double position, double velocity, double mass, double k, double g) {
+    public BeemanIntegrator(double deltaT, double position, double velocity, double mass,
+            ForceCalculator forceCalculator) {
         this.dT = deltaT;
-        this.K = k;
-        this.G= g;
         this.MASS = mass;
         this.auxR = this.currR = position;
         this.auxV = this.currV = velocity;
-        this.a = getAcceleration(position, velocity);
-        this.prevA = getAcceleration(auxR-(deltaT*velocity), auxV-(deltaT*a));
-
+        this.a = forceCalculator.calculateForce(position, velocity) / MASS;
+        this.prevA = forceCalculator.calculateForce(auxR - (deltaT * velocity), auxV - (deltaT * a)) / MASS;
 
     }
+
     @Override
     public double getPosition() {
         return this.currR;
@@ -33,26 +28,25 @@ public class BeemanIntegrator implements Integrator {
 
     @Override
     public void advanceStep(ForceCalculator forceCalculator) {
-        //TODO: what about that nextStepForce ???
         double nextR = getNextPosition();
-        double nextV = getNextVelocity(nextR);
+        double nextV = getNextVelocity(nextR, forceCalculator);
 
         auxR = nextR;
         auxV = nextV;
 
         prevA = a;
 
-        a = getAcceleration(auxR, auxV);
+        a = forceCalculator.calculateForce(auxR, auxV) / MASS;
         currR = nextR;
         currV = nextV;
     }
 
     private double getNextPosition() {
-        return auxR + auxV*dT + ((2.0/3.0)*a - (1.0/6.0)*prevA)*Math.pow(dT, 2);
+        return auxR + auxV * dT + ((2.0 / 3.0) * a - (1.0 / 6.0) * prevA) * Math.pow(dT, 2);
     }
 
-    private double getNextVelocity(double nextR) {
-        double futureA = getAcceleration(nextR, auxV);
-        return auxV + (1.0/3.0)*futureA*dT + (5.0/6.0)*a*dT - (1.0/6.0)*prevA*dT;
+    private double getNextVelocity(double nextR, ForceCalculator forceCalculator) {
+        double futureA = forceCalculator.calculateForce(nextR, auxV) / MASS;
+        return auxV + (1.0 / 3.0) * futureA * dT + (5.0 / 6.0) * a * dT - (1.0 / 6.0) * prevA * dT;
     }
 }
