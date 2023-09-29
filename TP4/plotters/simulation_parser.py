@@ -78,3 +78,38 @@ def parse_simulation_files(static_file : str, dynamic_file : str) -> SimulationI
     static_info         = parse_static_file(static_file)
     dynamic_info        = parse_dynamic_file(static_info, dynamic_file)
     return get_simulation_info(static_info, dynamic_info)
+
+def parse_multiple_simulation_files(static_files : list[str], dynamic_files : list[str]) -> list[SimulationInfo]:
+    static_file_count  = len(static_files)
+    dynamic_file_count = len(dynamic_files)
+
+    if static_file_count != dynamic_file_count:
+        raise ValueError("number of static files and dynamic files don't match. static files are {}, dynamic files are {}".format(static_file_count, dynamic_file_count))
+    
+    sim_info_list = []
+    for i in range(static_file_count):
+        static_file  = static_files[i]
+        dynamic_file = dynamic_files[i]
+
+        sim_info = parse_simulation_files(static_file, dynamic_file)
+
+        sim_info_list.append(sim_info)
+
+    return sim_info_list
+
+def parse_multiple_simulation_files_from_various_simulations(static_files_list : list[list[str]], dynamic_files_list : list[list[str]]) -> list[list[SimulationInfo]]:
+    static_files_list_count  = len(static_files_list)
+    dynamic_files_list_count = len(dynamic_files_list) 
+
+    if static_files_list_count != dynamic_files_list_count:
+        raise ValueError("number of static files from various simulations and dynamic files from various simulations don't match. static files of various simulations are {}, dynamic files of various simulations are {}".format(static_files_list_count, dynamic_files_list_count))
+    
+    sim_info_lists = []
+    for i in range(static_files_list_count):
+        static_files  = static_files_list[i]
+        dynamic_files = dynamic_files_list[i]
+        
+        sim_info_list = parse_multiple_simulation_files(static_files, dynamic_files)
+        sim_info_lists.append(sim_info_list)
+
+    return sim_info_lists
