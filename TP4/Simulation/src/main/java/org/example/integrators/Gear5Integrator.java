@@ -38,6 +38,7 @@ public class Gear5Integrator implements Integrator {
     private final double[] inverseCorrectedCoefficients;
 
     private final double[] correctedDerivatives;
+    private Double deltaR2;
     private final double[] predictedDerivatives;
 
     private Gear5Stage stage;
@@ -67,6 +68,7 @@ public class Gear5Integrator implements Integrator {
             boolean forceIsVelocityDependent
     ){
         this.correctedDerivatives = new double[] { r0, r1, r2, r3, r4, r5 };
+        this.deltaR2 = null;
         this.predictedDerivatives = new double[DERIVATIVE_COUNT];
         this.stage = Gear5Stage.CORRECTED;
         this.mass = mass;
@@ -133,19 +135,18 @@ public class Gear5Integrator implements Integrator {
         this.stage = Gear5Stage.PREDICTED;
     }
 
-    private double evaluateForce(ForceCalculator forceCalculator) {
+    public void evaluateForce(ForceCalculator forceCalculator) {
         double predictedA = predictedDerivatives[ACCELERATION_DERIVATIVE];
         double realA  = getNextStepRealAcceleration(forceCalculator);
         double deltaA = realA - predictedA;
 
-        return deltaA * correctedCoefficients[ACCELERATION_DERIVATIVE];
+        this.deltaR2 = deltaA * correctedCoefficients[ACCELERATION_DERIVATIVE];
     }
 
-    public void correct(ForceCalculator forceCalculator) {
+    public void correct() {
         if (this.stage == Gear5Stage.CORRECTED)
             throw new RuntimeException("Attempted correction on already corrected stage. Call predict() before calling correct() again.");
 
-        double deltaR2 = evaluateForce(forceCalculator);
         for (int i = 0; i < DERIVATIVE_COUNT; i++) {
             correctedDerivatives[i] = predictedDerivatives[i] + getPredictorCoefficient(i) * deltaR2 * inverseCorrectedCoefficients[i];
         }
@@ -178,6 +179,7 @@ public class Gear5Integrator implements Integrator {
     public void advanceStep(ForceCalculator forceCalculator) {
         if (this.stage == Gear5Stage.CORRECTED)
             predict();
-        correct(forceCalculator);
+        evaluateForce(forceCalculator);
+        correct();
     }
 }
