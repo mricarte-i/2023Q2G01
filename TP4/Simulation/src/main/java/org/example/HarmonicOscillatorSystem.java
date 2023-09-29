@@ -10,11 +10,11 @@ public class HarmonicOscillatorSystem {
 
     // Parametrized conditions
     private static final double[] STEP_SCALES = {
-            //1.0d,
+            // 1.0d,
             2.0d,
-            //3.0d,
-            //4.0d,
-            //5.0d
+            // 3.0d,
+            // 4.0d,
+            // 5.0d
     }; // TIME_STEP = 10^(-STEP_SCALE)
     private static final double AMPLITUDE = 1.0;
 
@@ -26,7 +26,7 @@ public class HarmonicOscillatorSystem {
 
     // Initial conditions (fixed)
     private static final double R0 = AMPLITUDE;
-    private static final double V0 = - AMPLITUDE * GAMMA / (2 * MASS);
+    private static final double V0 = -AMPLITUDE * GAMMA / (2 * MASS);
 
     // Output files names
     private static final String STATIC_FILE = "Static.txt";
@@ -34,7 +34,8 @@ public class HarmonicOscillatorSystem {
 
     private static HarmonicOscillatorSystem harmonicOscillatorSystem = null;
 
-    private HarmonicOscillatorSystem() {}
+    private HarmonicOscillatorSystem() {
+    }
 
     public static HarmonicOscillatorSystem getInstance() {
         if (harmonicOscillatorSystem == null)
@@ -43,7 +44,7 @@ public class HarmonicOscillatorSystem {
     }
 
     private static double getForce(double pos, double vel) {
-        return (- K * pos - GAMMA * vel);
+        return (-K * pos - GAMMA * vel);
     }
 
     private double[] getGear5InitialDerivatives() {
@@ -73,12 +74,11 @@ public class HarmonicOscillatorSystem {
                 initialDerivatives[5],
                 deltaT,
                 MASS,
-                true
-        );
+                true);
     }
 
     private BeemanIntegrator setUpBeeman(double deltaT) {
-        return new BeemanIntegrator(deltaT, R0, V0, MASS, K, GAMMA);
+        return new BeemanIntegrator(deltaT, R0, V0, MASS, HarmonicOscillatorSystem::getForce);
     }
 
     public void simulate() {
@@ -87,15 +87,15 @@ public class HarmonicOscillatorSystem {
         for (double stepScale : STEP_SCALES) {
             currStep = Math.pow(10, -stepScale);
 
-            gear5 = setUpGear5(currStep);
-            //gear5 = setUpBeeman(currStep);
+            // gear5 = setUpGear5(currStep);
+            gear5 = setUpBeeman(currStep);
 
             double time = 0;
             System.out.println(time + " " + gear5.getPosition());
 
-            while(time < TF) {
+            while (time < TF) {
                 gear5.advanceStep(HarmonicOscillatorSystem::getForce);
-                //print state
+                // print state
                 time += currStep;
                 System.out.println(time + " " + gear5.getPosition());
             }
