@@ -1,4 +1,4 @@
-from simulation_parser import SimulationInfo, parse_multiple_simulation_files, parse_multiple_simulation_files_from_various_simulations
+from simulation_parser import SimulationInfo, StaticInfo, parse_multiple_simulation_files, parse_multiple_simulation_files_from_various_simulations
 import numpy  as np
 import pandas as pd
 
@@ -77,8 +77,34 @@ def calculate_sqr_err_df_from_files(steps : list[float], analytical_static_files
         numerical_sim_info_list = numerical_sim_info_lists[i]
 
         sqr_err_df = calculate_sqr_err_df_from_sim_info(steps, analytical_sim_info_list, numerical_sim_info_list)
-        sqr_err_df.assign(integrator=numerical_labels[i])
+        sqr_err_df = sqr_err_df.assign(integrator=numerical_labels[i])
 
         sqr_err_dfs = pd.concat([sqr_err_dfs, sqr_err_df], ignore_index=True)
 
     return sqr_err_dfs
+
+from typing import Any
+
+def __same_length_list_of_const__(value : Any, reference_list : list) -> list:
+    reference_list_count = len(reference_list)
+    same_length_list     = [value] * reference_list_count
+    return same_length_list
+
+def __multiple_same_length_list_of_lists_const__(value : Any, reference_list_of_lists : list[list]) -> list[list]:
+    reference_list_of_lists_count = len(reference_list_of_lists)
+    same_length_list_of_lists = []
+    for i in range(reference_list_of_lists_count):
+        reference_list   = reference_list_of_lists[i]
+        same_length_list = __same_length_list_of_const__(value, reference_list)
+
+        same_length_list_of_lists.append(same_length_list)
+    
+    return same_length_list_of_lists
+
+
+def calculate_sqr_err_df_from_files_w_same_static_file(static_file : str, steps: list[float], analytical_dynamic_files : list[str], numerical_dynamic_files_list : list[list[str]], numerical_labels : list[str]):
+    
+    analytical_static_files     = __same_length_list_of_const__(static_file, analytical_dynamic_files)
+    numerical_static_files_list = __multiple_same_length_list_of_lists_const__(static_file, numerical_dynamic_files_list)
+
+    return calculate_sqr_err_df_from_files(steps, analytical_static_files, analytical_dynamic_files, numerical_static_files_list, numerical_dynamic_files_list, numerical_labels)
