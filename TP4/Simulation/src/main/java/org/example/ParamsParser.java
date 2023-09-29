@@ -26,29 +26,32 @@ public class ParamsParser {
     private final double L;
     private final int N;
     private final int n;
+    private final int k;
 
     private final String staticFile;
     private final String dynamicFile;
 
     private final Long seed;
 
-    private ParamsParser(Simulation simulation, List/*<Particle>*/ particles, int N, int n, String staticFile, String dynamicFile, Long seed) {
+    private ParamsParser(Simulation simulation, List/*<Particle>*/ particles, int N, int n, int k, String staticFile, String dynamicFile, Long seed) {
         this.simulation = simulation;
         this.particles = particles;
         this.L      = LENGTH;
         this.N      = N;
         this.n      = n;
+        this.k      = k;
         this.staticFile  = staticFile;
         this.dynamicFile = dynamicFile;
         this.seed        = seed;
     }
 
-    private ParamsParser(Simulation simulation, List/*<Particle>*/ particles, int N, int n, String staticFile, String dynamicFile, Long seed, double L) {
+    private ParamsParser(Simulation simulation, List/*<Particle>*/ particles, int N, int n, int k, String staticFile, String dynamicFile, Long seed, double L) {
         this.simulation = simulation;
         this.particles = particles;
         this.L      = L;
         this.N      = N;
         this.n      = n;
+        this.k      = k;
         this.staticFile  = staticFile;
         this.dynamicFile = dynamicFile;
         this.seed        = seed;
@@ -78,6 +81,7 @@ public class ParamsParser {
                 return new ParamsParser(
                         hos::simulate,
                         null,
+                        0,
                         0,
                         0,
                         null,
@@ -111,6 +115,13 @@ public class ParamsParser {
                     required = true)
             private int n;
 
+            @Option(names = {"-k", "--state-step-scale"},
+                    description = "Save state every k steps (k*10^-n).",
+                    paramLabel = "[STATE_STEP_SCALE]",
+                    scope = ScopeType.INHERIT,
+                    required = true)
+            private int k;
+
             @Option(names = "--seed",
                     description = "Seed to use for pseudo-random generation.",
                     paramLabel = "[SEED]",
@@ -140,6 +151,7 @@ public class ParamsParser {
                         particles,
                         this.N,
                         timeDrivenParseMixin.n,
+                        timeDrivenParseMixin.k,
                         timeDrivenParseMixin.staticFile,
                         timeDrivenParseMixin.dynamicFile,
                         timeDrivenParseMixin.seed
@@ -214,6 +226,7 @@ public class ParamsParser {
                         particles,
                         particleNumber,
                         timeDrivenParseMixin.n,
+                        timeDrivenParseMixin.k,
                         timeDrivenParseMixin.staticFile,
                         timeDrivenParseMixin.dynamicFile,
                         timeDrivenParseMixin.seed,
@@ -345,6 +358,10 @@ public class ParamsParser {
 
     public int getDeltaTimeScale() {
         return n;
+    }
+
+    public int getStateDeltaTimeScale() {
+        return k;
     }
 
     public String getStaticFile() {
