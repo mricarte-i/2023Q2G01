@@ -6,6 +6,7 @@ import org.example.integrators.Gear5Integrator;
 import org.example.integrators.Integrator;
 
 import java.util.Arrays;
+import org.example.integrators.VerletIntegrator;
 
 public class HarmonicOscillatorSystem {
 
@@ -80,6 +81,10 @@ public class HarmonicOscillatorSystem {
 
     private BeemanIntegrator setUpBeeman(double deltaT) {
         return new BeemanIntegrator(deltaT, R0, V0, MASS, HarmonicOscillatorSystem::getForce);
+    }
+
+    private VerletIntegrator setUpVerlet(double deltaT) {
+        return new VerletIntegrator(deltaT, R0, V0, MASS, HarmonicOscillatorSystem::getForce);
     }
 
     private AnalyticSolutionIntegrator setUpAnalytic(double deltaT){
