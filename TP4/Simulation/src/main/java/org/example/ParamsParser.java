@@ -34,6 +34,19 @@ public class ParamsParser {
 
     private final Long seed;
 
+    private ParamsParser(Simulation simulation) {
+        this.simulation = simulation;
+        this.particles = null;
+        this.L      = LENGTH;
+        this.N      = 0;
+        this.n      = 0;
+        this.k      = 0;
+        this.ordered = false;
+        this.staticFile  = null;
+        this.dynamicFile = null;
+        this.seed        = null;
+    }
+
     private ParamsParser(Simulation simulation, List/*<Particle>*/ particles, int N, int n, int k, String staticFile, String dynamicFile, boolean ordered, Long seed) {
         this.simulation = simulation;
         this.particles = particles;
@@ -82,15 +95,7 @@ public class ParamsParser {
             public ParamsParser call() throws Exception {
                 HarmonicOscillatorSystem hos = HarmonicOscillatorSystem.getInstance();
                 return new ParamsParser(
-                        hos::simulate,
-                        null,
-                        0,
-                        0,
-                        0,
-                        null,
-                        null,
-                        false,
-                        null
+                        hos::simulate
                 );
             }
         }
