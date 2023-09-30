@@ -388,6 +388,12 @@ public class ParamsParser {
         return seed;
     }
 
+    private static ParamsParser paramsParser = null;
+
+    public static ParamsParser getInstance() {
+        return paramsParser;
+    }
+
     public static ParamsParser parse(String[] args) {
         ParamsParser paramsParser = null;
 
@@ -405,6 +411,9 @@ public class ParamsParser {
         } catch (ParameterException e) {
             return null;
         }
+
+        ParamsParser.paramsParser = paramsParser;
+
         return paramsParser;
     }
 }
