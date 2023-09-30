@@ -105,8 +105,8 @@ public class HarmonicOscillatorSystem {
             beeman = setUpBeeman(currStep);
 
             //TODO: setUpVerlet
-            //Writer writerV = new Writer("../verlet-"+stepScale);
-            //verlet = setUpVerlet(currStep);
+            Writer writerV = new Writer("../verlet-"+stepScale);
+            verlet = setUpVerlet(currStep);
 
             Writer writerA = new Writer("../analytic-"+stepScale);
             analytic = setUpAnalytic(currStep);
@@ -115,13 +115,13 @@ public class HarmonicOscillatorSystem {
             int stepCounter = 0;
             writerG.writeState(time, gear5);
             writerB.writeState(time, beeman);
-            //writerV.writeState(time, verlet);
+            writerV.writeState(time, verlet);
             writerA.writeState(time, analytic);
 
             while (time < TF) {
                 gear5.advanceStep(HarmonicOscillatorSystem::getForce);
                 beeman.advanceStep(HarmonicOscillatorSystem::getForce);
-                //verlet.advanceStep(HarmonicOscillatorSystem::getForce);
+                verlet.advanceStep(HarmonicOscillatorSystem::getForce);
                 analytic.advanceStep(HarmonicOscillatorSystem::getForce);
                 time += currStep;
 
@@ -129,14 +129,14 @@ public class HarmonicOscillatorSystem {
                 if(stepCounter >= writeStep / currStep){
                     writerG.writeState(time, gear5);
                     writerB.writeState(time, beeman);
-                    //writerV.writeState(time, verlet);
+                    writerV.writeState(time, verlet);
                     writerA.writeState(time, analytic);
                     stepCounter = 0; //reset
                 }
             }
             writerG.close();
             writerB.close();
-            //writerV.close();
+            writerV.close();
             writerA.close();
         }
 
