@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.integrators.AnalyticSolutionIntegrator;
 import org.example.integrators.BeemanIntegrator;
 import org.example.integrators.Gear5Integrator;
 import org.example.integrators.Integrator;
@@ -81,8 +82,12 @@ public class HarmonicOscillatorSystem {
         return new BeemanIntegrator(deltaT, R0, V0, MASS, HarmonicOscillatorSystem::getForce);
     }
 
+    private AnalyticSolutionIntegrator setUpAnalytic(double deltaT){
+        return new AnalyticSolutionIntegrator(deltaT, AMPLITUDE, MASS, K, GAMMA);
+    }
+
     public void simulate() {
-        Integrator gear5, beeman, verlet; //TODO: add analytic too
+        Integrator gear5, beeman, verlet, analytic;
         double currStep;
         double writeStep = Math.pow(10, -1.0);
         for (double stepScale : STEP_SCALES) {
@@ -98,22 +103,21 @@ public class HarmonicOscillatorSystem {
             //Writer writerV = new Writer("../verlet-"+stepScale);
             //verlet = setUpVerlet(currStep);
 
-            //TODO: setUpAnalytic
-            //Writer writerA = new Writer("../analytic-"+stepScale);
-            //analytic = setUpAnalytic(currStep);
+            Writer writerA = new Writer("../analytic-"+stepScale);
+            analytic = setUpAnalytic(currStep);
 
             double time = 0;
             int stepCounter = 0;
             writerG.writeState(time, gear5);
             writerB.writeState(time, beeman);
             //writerV.writeState(time, verlet);
-            //writerA.writeState(time, analytic);
+            writerA.writeState(time, analytic);
 
             while (time < TF) {
                 gear5.advanceStep(HarmonicOscillatorSystem::getForce);
                 beeman.advanceStep(HarmonicOscillatorSystem::getForce);
                 //verlet.advanceStep(HarmonicOscillatorSystem::getForce);
-                //analytic.advanceStep(HarmonicOscillatorSystem::getForce);
+                analytic.advanceStep(HarmonicOscillatorSystem::getForce);
                 time += currStep;
 
                 stepCounter++;
@@ -121,14 +125,14 @@ public class HarmonicOscillatorSystem {
                     writerG.writeState(time, gear5);
                     writerB.writeState(time, beeman);
                     //writerV.writeState(time, verlet);
-                    //writerA.writeState(time, analytic);
+                    writerA.writeState(time, analytic);
                     stepCounter = 0; //reset
                 }
             }
             writerG.close();
             writerB.close();
             //writerV.close();
-            //writerA.close();
+            writerA.close();
         }
 
     }
