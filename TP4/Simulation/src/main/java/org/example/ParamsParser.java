@@ -404,6 +404,10 @@ public class ParamsParser {
         return dynamicFile;
     }
 
+    public boolean isOrdered() {
+        return ordered;
+    }
+
     public Long getSeed() {
         return seed;
     }
