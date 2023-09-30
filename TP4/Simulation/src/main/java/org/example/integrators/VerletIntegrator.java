@@ -2,7 +2,7 @@ package org.example.integrators;
 
 public class VerletIntegrator implements Integrator {
 
-    private double dT, MASS;
+    private final double dT, MASS;
     private double prevA, auxR, auxV, a, currR, currV;
 
     public VerletIntegrator(double deltaT, double position, double velocity, double mass,

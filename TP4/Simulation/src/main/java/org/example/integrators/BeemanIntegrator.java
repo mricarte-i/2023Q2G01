@@ -2,7 +2,7 @@ package org.example.integrators;
 
 public class BeemanIntegrator implements Integrator {
 
-    private double dT, MASS;
+    private final double dT, MASS;
     private double prevA, auxR, auxV, a, currR, currV;
 
     public BeemanIntegrator(double deltaT, double position, double velocity, double mass,

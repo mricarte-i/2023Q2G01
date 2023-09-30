@@ -5,6 +5,7 @@ import org.example.integrators.Gear5Integrator;
 import org.example.integrators.Integrator;
 
 import java.util.Arrays;
+import org.example.integrators.VerletIntegrator;
 
 public class HarmonicOscillatorSystem {
 
@@ -81,6 +82,10 @@ public class HarmonicOscillatorSystem {
         return new BeemanIntegrator(deltaT, R0, V0, MASS, HarmonicOscillatorSystem::getForce);
     }
 
+    private VerletIntegrator setUpVerlet(double deltaT) {
+        return new VerletIntegrator(deltaT, R0, V0, MASS, HarmonicOscillatorSystem::getForce);
+    }
+
     public void simulate() {
         Integrator gear5;
         double currStep;
@@ -88,7 +93,8 @@ public class HarmonicOscillatorSystem {
             currStep = Math.pow(10, -stepScale);
 
             // gear5 = setUpGear5(currStep);
-            gear5 = setUpBeeman(currStep);
+             // gear5 = setUpBeeman(currStep);
+            gear5 = setUpVerlet(currStep);
 
             double time = 0;
             System.out.println(time + " " + gear5.getPosition());
