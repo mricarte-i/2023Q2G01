@@ -27,31 +27,34 @@ public class ParamsParser {
     private final int N;
     private final int n;
     private final int k;
+    private final boolean ordered;
 
     private final String staticFile;
     private final String dynamicFile;
 
     private final Long seed;
 
-    private ParamsParser(Simulation simulation, List/*<Particle>*/ particles, int N, int n, int k, String staticFile, String dynamicFile, Long seed) {
+    private ParamsParser(Simulation simulation, List/*<Particle>*/ particles, int N, int n, int k, String staticFile, String dynamicFile, boolean ordered, Long seed) {
         this.simulation = simulation;
         this.particles = particles;
         this.L      = LENGTH;
         this.N      = N;
         this.n      = n;
         this.k      = k;
+        this.ordered = ordered;
         this.staticFile  = staticFile;
         this.dynamicFile = dynamicFile;
         this.seed        = seed;
     }
 
-    private ParamsParser(Simulation simulation, List/*<Particle>*/ particles, int N, int n, int k, String staticFile, String dynamicFile, Long seed, double L) {
+    private ParamsParser(Simulation simulation, List/*<Particle>*/ particles, int N, int n, int k, String staticFile, String dynamicFile, boolean ordered, Long seed, double L) {
         this.simulation = simulation;
         this.particles = particles;
         this.L      = L;
         this.N      = N;
         this.n      = n;
         this.k      = k;
+        this.ordered = ordered;
         this.staticFile  = staticFile;
         this.dynamicFile = dynamicFile;
         this.seed        = seed;
@@ -86,6 +89,7 @@ public class ParamsParser {
                         0,
                         null,
                         null,
+                        false,
                         null
                 );
             }
@@ -128,6 +132,15 @@ public class ParamsParser {
                     scope = ScopeType.INHERIT,
                     required = false)
             private Long seed;
+
+            @Option(names = "--ordered",
+                    description = "Whether particles should be ordered by u.",
+                    scope = ScopeType.INHERIT,
+                    negatable = true,
+                    defaultValue = "false",
+                    fallbackValue = "true",
+                    required = true)
+            private boolean ordered;
         }
 
         @Command(name       = "random",
@@ -154,6 +167,7 @@ public class ParamsParser {
                         timeDrivenParseMixin.k,
                         timeDrivenParseMixin.staticFile,
                         timeDrivenParseMixin.dynamicFile,
+                        timeDrivenParseMixin.ordered,
                         timeDrivenParseMixin.seed
                 );
             }
@@ -241,6 +255,7 @@ public class ParamsParser {
                         timeDrivenParseMixin.k,
                         timeDrivenParseMixin.staticFile,
                         timeDrivenParseMixin.dynamicFile,
+                        timeDrivenParseMixin.ordered,
                         timeDrivenParseMixin.seed,
                         lineLength
                 );
@@ -388,6 +403,12 @@ public class ParamsParser {
         return seed;
     }
 
+    private static ParamsParser paramsParser = null;
+
+    public static ParamsParser getInstance() {
+        return paramsParser;
+    }
+
     public static ParamsParser parse(String[] args) {
         ParamsParser paramsParser = null;
 
@@ -405,6 +426,9 @@ public class ParamsParser {
         } catch (ParameterException e) {
             return null;
         }
+
+        ParamsParser.paramsParser = paramsParser;
+
         return paramsParser;
     }
 }

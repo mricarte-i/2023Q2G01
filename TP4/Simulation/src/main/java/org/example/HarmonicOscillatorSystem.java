@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.integrators.AnalyticSolutionIntegrator;
 import org.example.integrators.BeemanIntegrator;
 import org.example.integrators.Gear5Integrator;
 import org.example.integrators.Integrator;
@@ -11,11 +12,11 @@ public class HarmonicOscillatorSystem {
 
     // Parametrized conditions
     private static final double[] STEP_SCALES = {
-            // 1.0d,
+            1.0d,
             2.0d,
-            // 3.0d,
-            // 4.0d,
-            // 5.0d
+            3.0d,
+            4.0d,
+            5.0d
     }; // TIME_STEP = 10^(-STEP_SCALE)
     private static final double AMPLITUDE = 1.0;
 
@@ -86,25 +87,57 @@ public class HarmonicOscillatorSystem {
         return new VerletIntegrator(deltaT, R0, V0, MASS, HarmonicOscillatorSystem::getForce);
     }
 
+    private AnalyticSolutionIntegrator setUpAnalytic(double deltaT){
+        return new AnalyticSolutionIntegrator(deltaT, AMPLITUDE, MASS, K, GAMMA);
+    }
+
     public void simulate() {
-        Integrator gear5;
+        Integrator gear5, beeman, verlet, analytic;
         double currStep;
+        double writeStep = Math.pow(10, -1.0);
         for (double stepScale : STEP_SCALES) {
             currStep = Math.pow(10, -stepScale);
+            //TODO: get filename from params...
+            Writer writerG = new Writer("../gear5-"+stepScale);
+            gear5 = setUpGear5(currStep);
 
-            // gear5 = setUpGear5(currStep);
-             // gear5 = setUpBeeman(currStep);
-            gear5 = setUpVerlet(currStep);
+            Writer writerB = new Writer("../beeman-"+stepScale);
+            beeman = setUpBeeman(currStep);
+
+            //TODO: setUpVerlet
+            //Writer writerV = new Writer("../verlet-"+stepScale);
+            //verlet = setUpVerlet(currStep);
+
+            Writer writerA = new Writer("../analytic-"+stepScale);
+            analytic = setUpAnalytic(currStep);
 
             double time = 0;
-            System.out.println(time + " " + gear5.getPosition());
+            int stepCounter = 0;
+            writerG.writeState(time, gear5);
+            writerB.writeState(time, beeman);
+            //writerV.writeState(time, verlet);
+            writerA.writeState(time, analytic);
 
             while (time < TF) {
                 gear5.advanceStep(HarmonicOscillatorSystem::getForce);
-                // print state
+                beeman.advanceStep(HarmonicOscillatorSystem::getForce);
+                //verlet.advanceStep(HarmonicOscillatorSystem::getForce);
+                analytic.advanceStep(HarmonicOscillatorSystem::getForce);
                 time += currStep;
-                System.out.println(time + " " + gear5.getPosition());
+
+                stepCounter++;
+                if(stepCounter >= writeStep / currStep){
+                    writerG.writeState(time, gear5);
+                    writerB.writeState(time, beeman);
+                    //writerV.writeState(time, verlet);
+                    writerA.writeState(time, analytic);
+                    stepCounter = 0; //reset
+                }
             }
+            writerG.close();
+            writerB.close();
+            //writerV.close();
+            writerA.close();
         }
 
     }
