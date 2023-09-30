@@ -5,6 +5,7 @@ import org.example.integrators.Integrator;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 public class Writer {
     private FileWriter fw;
@@ -26,11 +27,23 @@ public class Writer {
     public void writeState(double timestamp, Integrator integrator){
         try{
             this.fw.write(timestamp + "\n");
-            this.fw.write(integrator.getPosition() + " " + integrator.getVelocity() + "\n");
+            this.fw.write(integrator.getPosition() + " 0 " + integrator.getVelocity() + " 0\n");
         }catch (IOException e){
             throw new RuntimeException("Error writing to file " + fn);
         }
     }
+
+    public void writeState(double timestamp, List<Integrator> integratorList){
+        try{
+            this.fw.write(timestamp + "\n");
+            for(Integrator integrator: integratorList) {
+                this.fw.write(integrator.getPosition() + " 0 " + integrator.getVelocity() + " 0\n");
+            }
+        }catch (IOException e){
+            throw new RuntimeException("Error writing to file " + fn);
+        }
+    }
+
 
     public void close() {
         try{
