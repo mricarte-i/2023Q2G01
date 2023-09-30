@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>harmonicOscillator</artifactId>
+    <artifactId>timeDrivenSimulations</artifactId>
     <version>1.0</version>
 
     <properties>
@@ -42,7 +42,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        org.example.HarmonicOscillatorSystem
+                                        org.example.Main
                                     </mainClass>
                                 </manifest>
                             </archive>
