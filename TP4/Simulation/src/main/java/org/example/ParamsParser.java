@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.integrators.Integrator;
+import org.example.integrators.VerletIntegrator;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 
@@ -16,12 +18,16 @@ public class ParamsParser {
     private final static double MASS = 25d;      // in g
     private final static double LENGTH = 135d;   // in cm
 
+    private final static double MIN_U = 9;
+    private final static double MAX_U = 12;
+    private final static double U_RANGE = MAX_U - MIN_U;
+
 
     // TODO: Replace uncomment Particle
 
     private final Simulation simulation;
 
-    private final List/*<Particle>*/ particles;
+    private final List<Particle> particles;
 
     private final double L;
     private final int N;
@@ -146,6 +152,22 @@ public class ParamsParser {
                     fallbackValue = "true",
                     required = true)
             private boolean ordered;
+
+            public static Queue<Double> getUParameters(Random rand, int N, boolean ordered){
+                Queue<Double> uParameters;
+                if (ordered){
+                    uParameters = new PriorityQueue<>(N);
+                } else {
+                    uParameters = new ArrayDeque<>(N);
+                }
+
+                double u;
+                for (int id = 0; id < N; id++) {
+                    u = rand.nextDouble() * U_RANGE + MIN_U;
+                    uParameters.offer(u);
+                }
+                return uParameters;
+            }
         }
 
         @Command(name       = "random",
@@ -162,7 +184,7 @@ public class ParamsParser {
 
             @Override
             public ParamsParser call() throws Exception {
-                List/*<Particle>*/ particles = generateParticles();
+                List<Particle> particles = generateParticles();
 
                 return new ParamsParser(
                         () -> {}, // TODO: Replace with ParticleSystem simulate
@@ -177,7 +199,7 @@ public class ParamsParser {
                 );
             }
 
-            private boolean checkIfPositionIsOccupied(double x, List/*<Particle>*/ particles) {
+            private boolean checkIfPositionIsOccupied(double x, List<Particle> particles) {
                 double particleX;
                 double particleLeftBound;
                 double particleRightBound;
@@ -185,8 +207,8 @@ public class ParamsParser {
                 boolean particleNotWrapped;
                 boolean positionBetweenBounds;
 
-                for (Object particle : particles) {
-                    particleX = 0 /*particle.getPosition()*/;
+                for (Particle particle : particles) {
+                    particleX = particle.getPosition();
 
                     particleLeftBound  = particleX - RADIUS;
                     particleRightBound = particleX + RADIUS;
@@ -211,18 +233,49 @@ public class ParamsParser {
                 return false;
             }
 
-            private List/*<Particle>*/ generateParticles() {
-                List/*<Particle>*/ particles = new ArrayList<>(N);
+            private List<Particle> generateParticles() {
+                List<Particle> particles = new ArrayList<>(N);
                 Random rand = timeDrivenParseMixin.seed == null ? new Random() : new Random(timeDrivenParseMixin.seed);
                 boolean overlaps;
                 double x;
+
+                Queue<Double> uParameters = TimeDrivenParseMixin.getUParameters(rand, N, timeDrivenParseMixin.ordered);
+
+                Particle firstParticle = null;
+                Particle prevParticle;
+                Particle currParticle = null;
+
+                Integrator integrator;
+
+                double u;
+                double deltaT = Math.pow(10, -timeDrivenParseMixin.n);
                 for (int id = 0; id < N; id++) {
+                    prevParticle = currParticle;
+
                     do {
                         x = rand.nextDouble() * LENGTH;
                         overlaps = checkIfPositionIsOccupied(x, particles);
                     } while (overlaps);
-                    // particles.add(new Particle(id, x, y, vx, vy, MASS, RADIUS));
+
+                    u = uParameters.poll();
+                    //TODO: fix ForceCalculator
+                    integrator = new VerletIntegrator(deltaT, u, u / RADIUS, MASS, (pos, vel) -> 0);
+
+                    currParticle = new Particle(RADIUS, MASS, u, integrator, false, false, prevParticle, null);
+                    particles.add(currParticle);
+
+                    if (firstParticle == null)
+                        firstParticle = currParticle;
+
+                    if (prevParticle != null)
+                        prevParticle.setRightNeighbour(currParticle);
                 }
+
+                if (firstParticle != null && firstParticle != currParticle) {
+                    firstParticle.setLeftNeighbour(currParticle);
+                    currParticle.setRightNeighbour(firstParticle);
+                }
+
                 return particles;
             }
         }
@@ -236,13 +289,13 @@ public class ParamsParser {
 
             @Override
             public ParamsParser call() throws Exception {
-                List/*<Particle>*/ particles = null;
+                List<Particle> particles;
 
                 int particleNumber = parseParticleNumber();
                 double lineLength  = parseL();
 
                 if (particleNumber > 0) {
-                    particles = parseParticles();
+                    particles = parseParticles(particleNumber);
                     if (particles.size() != particleNumber) {
                         System.out.println("Error in input file \"" + timeDrivenParseMixin.staticFile + "\". Wrong number of particles: expected " + particleNumber + ", parsed " + particles.size());
                         return null;
@@ -315,10 +368,10 @@ public class ParamsParser {
                 return L;
             }
 
-            private List/*<Particle>*/ parseParticles(){
+            private List<Particle> parseParticles(int N){
                 Scanner staticInput  = null;
                 Scanner dynamicInput = null;
-                List/*<Particle>*/ particles = new ArrayList<>();
+                List<Particle> particles = new ArrayList<>(N);
                 try {
                     File staticFile  = new File(timeDrivenParseMixin.staticFile);
                     File dynamicFile = new File(timeDrivenParseMixin.dynamicFile);
@@ -334,7 +387,19 @@ public class ParamsParser {
                     // Ignore t=0 time-stamp
                     dynamicInput.nextLine();
 
+                    Random rand = timeDrivenParseMixin.seed == null ? new Random() : new Random(timeDrivenParseMixin.seed);
+                    Queue<Double> uParameters = TimeDrivenParseMixin.getUParameters(rand, N, false);
+
+                    Queue<Particle> particlesOrderedByPosition = new PriorityQueue<>(N, Comparator.comparingDouble(Particle::getPosition));
+
                     int id = 0;
+
+                    double mass, radius;
+                    double x, y, vx, vy;
+                    double u;
+                    double deltaT = Math.pow(10, -timeDrivenParseMixin.n);
+
+                    Integrator integrator;
 
                     while (staticInput.hasNext() && dynamicInput.hasNext()) {
                         String nextStaticLine  = staticInput.nextLine();
@@ -346,18 +411,39 @@ public class ParamsParser {
                         List<Double> dynamicProperties = Arrays.stream(nextDynamicLine.split("[\\s\\t]+")).filter(s -> !s.isEmpty())
                                 .map(Double::valueOf).collect(Collectors.toList());
 
-                        double mass   = staticProperties.get(0);
-                        double radius = staticProperties.get(1);
+                        mass   = staticProperties.get(0);
+                        radius = staticProperties.get(1);
 
-                        double x  = dynamicProperties.get(0);
-                        double y  = dynamicProperties.get(1);
-                        double vx = dynamicProperties.get(2);
-                        double vy = dynamicProperties.get(3);
+                        x  = dynamicProperties.get(0);
+                        vx = dynamicProperties.get(2);
 
-                        // particles.add(new Particle(id, x, y, vx, vy, mass, radius);
+                        u = uParameters.poll();
+                        //TODO: fix ForceCalculator
+                        integrator = new VerletIntegrator(deltaT, x, vx, mass, (pos, vel) -> 0);
+
+                        particlesOrderedByPosition.add(new Particle(radius, mass, u, integrator, false, false, null, null));
 
                         id++;
                     }
+
+                    Particle firstParticle = null, currParticle = null, prevParticle;
+                    while (!particlesOrderedByPosition.isEmpty()){
+                        prevParticle = currParticle;
+                        currParticle = particlesOrderedByPosition.poll();
+
+                        if (firstParticle == null)
+                            firstParticle = currParticle;
+
+                        if (prevParticle != null)
+                            prevParticle.setRightNeighbour(currParticle);
+
+                        currParticle.setLeftNeighbour(prevParticle);
+                    }
+                    if (firstParticle != null && firstParticle != currParticle) {
+                        currParticle.setRightNeighbour(firstParticle);
+                        firstParticle.setLeftNeighbour(currParticle);
+                    }
+
                     System.out.println("Particles in input file parsed sucessfully!");
                 } catch (Exception e) {
                     System.out.println("Error parsing particles in input files \"" + timeDrivenParseMixin.staticFile + "\" and \"" + timeDrivenParseMixin.dynamicFile + "\"");
@@ -378,6 +464,10 @@ public class ParamsParser {
 
     public Simulation getSimulation() {
         return simulation;
+    }
+
+    public List<Particle> getParticles() {
+        return particles;
     }
 
     public double getL() {
