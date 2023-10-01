@@ -3,13 +3,14 @@ package org.example.integrators;
 public class VerletIntegrator implements Integrator {
 
     private final double dT, MASS;
-    private double prevA, auxR, auxV, a, currR, currV;
+    private double prevA, auxR, auxV, a, currR, currV, prevR;
 
     public VerletIntegrator(double deltaT, double position, double velocity, double mass,
             ForceCalculator forceCalculator) {
         this.dT = deltaT;
         this.MASS = mass;
         this.auxR = this.currR = position;
+        this.prevR = position; //TODO: calculate step @ -0.1
         this.auxV = this.currV = velocity;
         this.a = forceCalculator.calculateForce(position, velocity) / MASS;
         this.prevA = forceCalculator.calculateForce(auxR - (deltaT * velocity), auxV - (deltaT * a)) / MASS;
@@ -28,8 +29,8 @@ public class VerletIntegrator implements Integrator {
 
     @Override
     public void advanceStep(ForceCalculator forceCalculator) {
-        double nextR = getNextPosition(auxR, forceCalculator);
-        double nextV = getNextVelocity(nextR, auxR);
+        double nextR = getNextPosition(prevR, forceCalculator);
+        double nextV = getNextVelocity(nextR, prevR);
 
         auxR = nextR;
         auxV = nextV;
@@ -37,6 +38,9 @@ public class VerletIntegrator implements Integrator {
         prevA = a;
 
         a = forceCalculator.calculateForce(auxR, auxV) / MASS;
+
+        prevR = currR;
+
         currR = nextR;
         currV = nextV;
     }
