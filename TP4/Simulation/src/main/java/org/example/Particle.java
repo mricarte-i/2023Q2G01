@@ -3,6 +3,7 @@ package org.example;
 import java.util.Objects;
 import org.example.integrators.ForceCalculator;
 import org.example.integrators.Integrator;
+import org.example.integrators.VerletIntegrator;
 
 public class Particle {
   private double radius, mass, u;
@@ -10,12 +11,12 @@ public class Particle {
   private boolean leftContact, rightContact;
   private Particle leftNeighbour, rightNeighbour;
 
-  public Particle(double radius, double mass, double u, Integrator integrator, boolean leftContact,
-      boolean rightContact, Particle leftNeighbour, Particle rightNeighbour) {
+  public Particle(double radius, double mass, double u, boolean leftContact,
+      boolean rightContact, Particle leftNeighbour, Particle rightNeighbour, double pos, double dT, double v) {
     this.radius = radius;
     this.mass = mass;
     this.u = u;
-    this.integrator = integrator;
+    this.integrator = new VerletIntegrator(dT, pos, v, mass, this::totalForce);
     this.leftContact = leftContact;
     this.rightContact = rightContact;
     this.leftNeighbour = leftNeighbour;
@@ -105,7 +106,8 @@ public class Particle {
 
   private double contactForceWithNeighbour(Particle neighbour) {
     double k = 2500.0; // Constant value 2500 g / s**2
-    return k * (Math.abs(neighbour.getPosition() - getPosition()) - 2.0 * radius) * Math.signum(neighbour.getPosition() - getPosition());
+    return k * (Math.abs(neighbour.getPosition() - getPosition()) - 2.0 * radius)
+        * Math.signum(neighbour.getPosition() - getPosition());
   }
 
   private double totalForce(double x, double v) {
@@ -124,7 +126,8 @@ public class Particle {
     return Double.compare(particle.radius, radius) == 0
         && Double.compare(particle.mass, mass) == 0 && leftContact == particle.leftContact
         && rightContact == particle.rightContact && Objects.equals(integrator,
-        particle.integrator) && Objects.equals(leftNeighbour, particle.leftNeighbour)
+            particle.integrator)
+        && Objects.equals(leftNeighbour, particle.leftNeighbour)
         && Objects.equals(rightNeighbour, particle.rightNeighbour);
   }
 
