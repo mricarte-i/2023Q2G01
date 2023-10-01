@@ -23,7 +23,7 @@ public class AnalyticSolutionIntegrator implements Integrator {
     @Override
     public void advanceStep(ForceCalculator forceCalculator) {
         //IGNORES FORCE CALCULATOR
-        this.r = A*Math.exp((-G*time)/(2*MASS))*Math.cos(Math.sqrt(K/MASS - Math.pow(G/(2*MASS), 2) )*time);
         this.time += dT;
+        this.r = A*Math.exp((-G*time)/(2*MASS))*Math.cos(Math.sqrt(K/MASS - Math.pow(G/(2*MASS), 2) )*time);
     }
 }
