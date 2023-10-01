@@ -5,15 +5,10 @@ import java.util.List;
 public class ParticleSystem implements Simulation{
     private ParamsParser paramsParser;
     private List<Particle> particles;
-    private double TF;
+    private double TF = 180;
     private Writer writer;
     private static ParticleSystem particleSystem = null;
     private ParticleSystem(){
-        this.paramsParser = ParamsParser.getInstance();
-        this.particles = paramsParser.getParticles();
-        this.TF = 180;
-        this.writer = new Writer(paramsParser.getDynamicFile());
-        this.writer.writeStatic(paramsParser.getStaticFile(), paramsParser.getL(), this.particles);
     }
 
     public static ParticleSystem getInstance() {
@@ -24,8 +19,13 @@ public class ParticleSystem implements Simulation{
     }
     @Override
     public void simulate() {
-        double currStep = Math.pow(10, paramsParser.getDeltaTimeScale());
-        double writeStep = Math.pow(10, paramsParser.getStateDeltaTimeScale());
+        this.paramsParser = ParamsParser.getInstance();
+        this.particles = paramsParser.getParticles();
+        this.writer = new Writer(paramsParser.getDynamicFile());
+        this.writer.writeStatic(paramsParser.getStaticFile(), paramsParser.getL(), this.particles);
+
+        double currStep = Math.pow(10, -paramsParser.getDeltaTimeScale());
+        double writeStep = Math.pow(10, -paramsParser.getStateDeltaTimeScale());
         double time = 0;
         int stepCounter = 0;
         //print dynamic state @t=0
@@ -43,6 +43,7 @@ public class ParticleSystem implements Simulation{
             stepCounter++;
             if(stepCounter >= writeStep / currStep){
                 this.writer.writeState(time, this.particles);
+                stepCounter = 0;
             }
         }
         this.writer.close();

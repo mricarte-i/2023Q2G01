@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class ParamsParser {
 
-    private final static double RADIUS = 21.49d; // in cm
+    private final static double RADIUS = 2.25d; // in cm
     private final static double MASS = 25d; // in g
     private final static double LENGTH = 135d; // in cm
 

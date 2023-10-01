@@ -6,7 +6,7 @@ import org.example.integrators.Integrator;
 import org.example.integrators.VerletIntegrator;
 
 public class Particle {
-  private double radius, mass, u;
+  private double radius, mass, u, initR, initV;
   private Integrator integrator;
   private boolean leftContact, rightContact;
   private Particle leftNeighbour, rightNeighbour;
@@ -16,6 +16,8 @@ public class Particle {
     this.radius = radius;
     this.mass = mass;
     this.u = u;
+    this.initR = pos;
+    this.initV = v;
     this.integrator = new VerletIntegrator(dT, pos, v, mass, this::totalForce);
     this.leftContact = leftContact;
     this.rightContact = rightContact;
@@ -145,10 +147,12 @@ public class Particle {
   }
 
   public double getPosition() {
+    if(integrator == null) return this.initR;
     return integrator.getPosition();
   }
 
   public double getVelocity() {
+    if(integrator == null) return this.initV;
     return integrator.getVelocity();
   }
 }

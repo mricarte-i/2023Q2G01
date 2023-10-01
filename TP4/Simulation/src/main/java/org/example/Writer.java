@@ -36,14 +36,14 @@ public class Writer {
     public void writeStatic(String staticFile, double L,  List<Particle> particles) {
         FileWriter staticFW;
         try {
-            File file = new File(staticFile);
+            File file = new File(staticFile + ".txt");
             if(file.exists()){
                 file.delete();
             }
             file.createNewFile();
-            staticFW = new FileWriter(staticFile, true);
+            staticFW = new FileWriter(staticFile + ".txt", true);
         }catch (IOException e) {
-            throw new RuntimeException("Error creating file " + staticFile);
+            throw new RuntimeException("Error creating file " + staticFile + ".txt");
         }
 
         try{
@@ -53,15 +53,15 @@ public class Writer {
                 staticFW.write(particle.getMass() + " " + particle.getRadius() + "\n");
             }
         }catch (IOException e){
-            throw new RuntimeException("Error writing to file " + staticFile);
+            throw new RuntimeException("Error writing to file " + staticFile + ".txt");
         }
 
         try{
             staticFW.close();
         }catch (IOException e){
-            throw new RuntimeException("Error closing file " + staticFile);
+            throw new RuntimeException("Error closing file " + staticFile + ".txt");
         }
-        System.out.println("Successfully written to " + staticFile);
+        System.out.println("Successfully written to " + staticFile + ".txt");
     }
 
     public void writeState(double timestamp, List<Particle> particles){
