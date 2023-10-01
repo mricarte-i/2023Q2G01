@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.Objects;
+import org.example.integrators.ForceCalculator;
 import org.example.integrators.Integrator;
 
 public class Particle {
@@ -78,43 +79,36 @@ public class Particle {
   }
 
   public void advanceStep() {
-    // TODO
+    integrator.advanceStep(this::totalForce);
   }
 
   private boolean checkLeftNeighbourContact() {
-    // TODO: is it ok to use getPosition() ?
     return Math.abs(getPosition() - leftNeighbour.getPosition()) < 2.0 * radius; // Assumes equal particle radius
   }
 
   private boolean checkRightNeighbourContact() {
-    // TODO: is it ok to use getPosition() ?
     return Math.abs(getPosition() - rightNeighbour.getPosition()) < 2.0 * radius; // Assumes equal particle radius
   }
 
-  private double propulsionForce(double v) {
+  private double propulsionForce() {
     double tao = 1.0; // Constant value = 1 second
-    // TODO: is it ok to use getVelocity() ?
     return (u - getVelocity()) / tao;
   }
 
-  private double leftContactForce(double x) {
-    // TODO: is x param needed ?
+  private double leftContactForce() {
     return contactForceWithNeighbour(leftNeighbour);
   }
 
-  private double rightContactForce(double x) {
-    // TODO: is x param needed ?
+  private double rightContactForce() {
     return contactForceWithNeighbour(rightNeighbour);
   }
 
   private double contactForceWithNeighbour(Particle neighbour) {
     double k = 2500.0; // Constant value 2500 g / s**2
-    // TODO: is it ok to use getPosition() ?
     return k * (Math.abs(neighbour.getPosition() - getPosition()) - 2.0 * radius) * Math.signum(neighbour.getPosition() - getPosition());
   }
 
   private double totalForce(double x, double v) {
-    // TODO: is it ok to use getPosition() ?
     return rightContactForce() + leftContactForce() + propulsionForce();
   }
 
