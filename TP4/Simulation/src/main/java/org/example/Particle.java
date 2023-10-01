@@ -91,16 +91,23 @@ public class Particle {
     return Math.abs(getPosition() - rightNeighbour.getPosition()) < 2.0 * radius; // Assumes equal particle radius
   }
 
+  public void checkNeighbourContacts() {
+    this.setLeftContact(checkLeftNeighbourContact());
+    this.setRightContact(checkRightNeighbourContact());
+  }
+
   private double propulsionForce() {
     double tao = 1.0; // Constant value = 1 second
     return (u - getVelocity()) / tao;
   }
 
   private double leftContactForce() {
+    if(!this.leftContact) return 0;
     return contactForceWithNeighbour(leftNeighbour);
   }
 
   private double rightContactForce() {
+    if(!this.rightContact) return 0;
     return contactForceWithNeighbour(rightNeighbour);
   }
 

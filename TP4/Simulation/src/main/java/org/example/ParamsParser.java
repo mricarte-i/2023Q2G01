@@ -21,8 +21,6 @@ public class ParamsParser {
     private final static double MAX_U = 12;
     private final static double U_RANGE = MAX_U - MIN_U;
 
-    // TODO: Replace uncomment Particle
-
     private final Simulation simulation;
 
     private final List<Particle> particles;
@@ -151,10 +149,10 @@ public class ParamsParser {
             @Override
             public ParamsParser call() throws Exception {
                 List<Particle> particles = generateParticles();
+                ParticleSystem ps = ParticleSystem.getInstance();
 
                 return new ParamsParser(
-                        () -> {
-                        }, // TODO: Replace with ParticleSystem simulate
+                        ps::simulate,
                         particles,
                         this.N,
                         timeDrivenParseMixin.n,
@@ -224,9 +222,6 @@ public class ParamsParser {
                     } while (overlaps);
 
                     u = uParameters.poll();
-                    // TODO: fix ForceCalculator
-                    // integrator = new VerletIntegrator(deltaT, u, u / RADIUS, MASS, (pos, vel) ->
-                    // 0);
 
                     currParticle = new Particle(RADIUS, MASS, u, false, false, prevParticle, null, x, deltaT, u);
                     particles.add(currParticle);
@@ -272,10 +267,10 @@ public class ParamsParser {
                     System.out.println("Error in input file. No particles found");
                     return null;
                 }
+                ParticleSystem ps = ParticleSystem.getInstance();
 
                 return new ParamsParser(
-                        () -> {
-                        }, // TODO: Replace with ParticleSystem simulate
+                        ps::simulate,
                         particles,
                         particleNumber,
                         timeDrivenParseMixin.n,
@@ -392,8 +387,7 @@ public class ParamsParser {
                         vx = dynamicProperties.get(2);
 
                         u = uParameters.poll();
-                        // TODO: fix ForceCalculator
-                        // integrator = new VerletIntegrator(deltaT, x, vx, mass, (pos, vel) -> 0);
+
                         Particle p = new Particle(radius, mass, u, false, false, null, null, x, deltaT, u);
                         particlesOrderedByPosition
                                 .add(p);
