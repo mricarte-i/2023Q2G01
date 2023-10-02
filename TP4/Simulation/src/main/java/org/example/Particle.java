@@ -29,8 +29,7 @@ public class Particle {
     this.leftNeighbour = leftNeighbour;
     this.rightNeighbour = rightNeighbour;
     this.evaluateForce();
-    //this.integrator = new VerletIntegrator(dT, pos, v, mass, (r, vel) -> calculatedForce , boundary);
-    this.integrator = new Gear5Integrator(pos, v, calculatedForce / mass, 0, 0, 0, dT, mass, true, boundary);
+    this.integrator = new VerletIntegrator(dT, pos, v, mass, (r, vel) -> calculatedForce , boundary);
   }
 
   public double getRadius() {
