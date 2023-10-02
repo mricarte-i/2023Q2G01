@@ -1,6 +1,5 @@
 package org.example;
 
-import org.example.integrators.Integrator;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 
@@ -222,6 +221,9 @@ public class ParamsParser {
 
             private List<Particle> generateParticles() {
                 List<Particle> particles = new ArrayList<>(N);
+                if (N <= 0)
+                    return particles;
+
                 Random rand = timeDrivenParseMixin.seed == null ? new Random() : new Random(timeDrivenParseMixin.seed);
                 boolean overlaps;
                 double x;
