@@ -86,11 +86,11 @@ public class Particle {
   }
 
   private boolean checkLeftNeighbourContact() {
-    return Math.abs(getPosition() - leftNeighbour.getPosition()) < 2.0 * radius; // Assumes equal particle radius
+    return Math.abs(getPosition() - leftNeighbour.getPosition()) <= (radius + leftNeighbour.radius); // Assumes equal particle radius
   }
 
   private boolean checkRightNeighbourContact() {
-    return Math.abs(getPosition() - rightNeighbour.getPosition()) < 2.0 * radius; // Assumes equal particle radius
+    return Math.abs(getPosition() - rightNeighbour.getPosition()) <= (radius + rightNeighbour.radius); // Assumes equal particle radius
   }
 
   public void checkNeighbourContacts() {
