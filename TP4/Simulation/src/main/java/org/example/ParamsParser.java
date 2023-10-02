@@ -219,7 +219,7 @@ public class ParamsParser {
 
                     u = uParameters.poll();
 
-                    currParticle = new Particle(RADIUS, MASS, u, false, false, prevParticle, null, x, deltaT, u, LENGTH);
+                    currParticle = new Particle(id, RADIUS, MASS, u, false, false, prevParticle, null, x, deltaT, u, LENGTH);
                     particles.add(currParticle);
 
                     if (firstParticle == null)
@@ -378,7 +378,7 @@ public class ParamsParser {
 
                         u = vx;
 
-                        Particle p = new Particle(radius, mass, u, false, false, null, null, x, deltaT, vx, LENGTH);
+                        Particle p = new Particle(id, radius, mass, u, false, false, null, null, x, deltaT, vx, LENGTH);
                         particlesOrderedByPosition
                                 .add(p);
 

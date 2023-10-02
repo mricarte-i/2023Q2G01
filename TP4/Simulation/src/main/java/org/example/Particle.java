@@ -2,10 +2,13 @@ package org.example;
 
 import java.util.Objects;
 import org.example.integrators.ForceCalculator;
+import org.example.integrators.Gear5Integrator;
 import org.example.integrators.Integrator;
 import org.example.integrators.VerletIntegrator;
 
 public class Particle {
+
+  private int id;
   private double radius, mass, u, initR, initV;
   private Integrator integrator;
   private boolean leftContact, rightContact;
@@ -13,19 +16,21 @@ public class Particle {
 
   private Double calculatedForce = null;
 
-  public Particle(double radius, double mass, double u, boolean leftContact,
+  public Particle(int id, double radius, double mass, double u, boolean leftContact,
       boolean rightContact, Particle leftNeighbour, Particle rightNeighbour, double pos, double dT, double v, double boundary) {
+    this.id = id;
     this.radius = radius;
     this.mass = mass;
     this.u = u;
     this.initR = pos;
     this.initV = v;
-    this.evaluateForce();
-    this.integrator = new VerletIntegrator(dT, pos, v, mass, (r, vel) -> calculatedForce , boundary);
     this.leftContact = leftContact;
     this.rightContact = rightContact;
     this.leftNeighbour = leftNeighbour;
     this.rightNeighbour = rightNeighbour;
+    this.evaluateForce();
+    //this.integrator = new VerletIntegrator(dT, pos, v, mass, (r, vel) -> calculatedForce , boundary);
+    this.integrator = new Gear5Integrator(pos, v, calculatedForce / mass, 0, 0, 0, dT, mass, true, boundary);
   }
 
   public double getRadius() {
@@ -144,18 +149,12 @@ public class Particle {
       return false;
     }
     Particle particle = (Particle) o;
-    return Double.compare(particle.radius, radius) == 0
-        && Double.compare(particle.mass, mass) == 0 && leftContact == particle.leftContact
-        && rightContact == particle.rightContact && Objects.equals(integrator,
-            particle.integrator)
-        && Objects.equals(leftNeighbour, particle.leftNeighbour)
-        && Objects.equals(rightNeighbour, particle.rightNeighbour);
+    return id == particle.id;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(radius, mass, integrator, leftContact, rightContact, leftNeighbour,
-        rightNeighbour);
+    return Integer.hashCode(id);
   }
 
   public double getPosition() {
