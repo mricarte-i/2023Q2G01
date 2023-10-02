@@ -11,6 +11,8 @@ public class Particle {
   private boolean leftContact, rightContact;
   private Particle leftNeighbour, rightNeighbour;
 
+  private Double calculatedForce = null;
+
   public Particle(double radius, double mass, double u, boolean leftContact,
       boolean rightContact, Particle leftNeighbour, Particle rightNeighbour, double pos, double dT, double v, double boundary) {
     this.radius = radius;
@@ -18,7 +20,8 @@ public class Particle {
     this.u = u;
     this.initR = pos;
     this.initV = v;
-    this.integrator = new VerletIntegrator(dT, pos, v, mass, this::totalForce, boundary);
+    this.evaluateForce();
+    this.integrator = new VerletIntegrator(dT, pos, v, mass, (r, vel) -> calculatedForce , boundary);
     this.leftContact = leftContact;
     this.rightContact = rightContact;
     this.leftNeighbour = leftNeighbour;
@@ -82,9 +85,16 @@ public class Particle {
   }
 
   public void advanceStep() {
-    integrator.advanceStep(this::totalForce);
+    if (calculatedForce == null)
+      throw new RuntimeException("advanceStep called before evaluateForce");
+    integrator.advanceStep((x, v) -> calculatedForce);
     this.setLeftContact(false);
     this.setRightContact(false);
+    calculatedForce = null;
+  }
+
+  public void evaluateForce() {
+    calculatedForce = totalForce();
   }
 
   private boolean checkLeftNeighbourContact() {
@@ -121,7 +131,7 @@ public class Particle {
         * Math.signum(neighbour.getPosition() - getPosition());
   }
 
-  private double totalForce(double x, double v) {
+  private double totalForce() {
     return rightContactForce() + leftContactForce() + propulsionForce();
   }
 

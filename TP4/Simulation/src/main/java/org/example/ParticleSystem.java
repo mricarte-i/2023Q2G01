@@ -33,6 +33,9 @@ public class ParticleSystem implements Simulation{
 
         while(time < this.TF) {
             for(Particle p : this.particles){
+                p.evaluateForce();
+            }
+            for(Particle p : this.particles){
                 p.advanceStep();
             }
             for(Particle p : this.particles){
