@@ -55,7 +55,7 @@ public class VerletIntegrator implements Integrator {
     }
 
     private double getNextPosition(double prevR, ForceCalculator forceCalculator) {
-        double nextR = 2.0 * currR - prevR + (Math.pow(dT, 2) / MASS) * forceCalculator.calculateForce(currR, currV);
+        double nextR = 2.0 * currR - prevR + (Math.pow(dT, 2) / MASS) * forceCalculator.calculateForce(prevR, currV);
         if (boundary != null) {
             nextR = nextR % boundary;
             if (nextR < 0) {
