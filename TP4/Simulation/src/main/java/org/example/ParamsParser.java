@@ -161,6 +161,13 @@ public class ParamsParser {
                         timeDrivenParseMixin.seed);
             }
 
+            private double wrapAroundValue(double value){
+                value = value % LENGTH;
+                if (value < 0)
+                    value += LENGTH;
+                return value;
+            }
+
             private boolean checkIfPositionIsOccupied(double x, List<Particle> particles) {
                 double particleX;
                 double particleLeftBound;
@@ -168,6 +175,15 @@ public class ParamsParser {
 
                 boolean particleNotWrapped;
                 boolean positionBetweenBounds;
+
+                double xLeftBound  = x - RADIUS;
+                double xRightBound = x + RADIUS;
+
+                boolean xNotWrapped = xLeftBound >= 0 && xRightBound <= LENGTH;
+                if (!xNotWrapped) {
+                    xLeftBound = wrapAroundValue(xLeftBound);
+                    xRightBound = wrapAroundValue(xRightBound);
+                }
 
                 for (Particle particle : particles) {
                     particleX = particle.getPosition();
@@ -177,17 +193,26 @@ public class ParamsParser {
 
                     particleNotWrapped = particleLeftBound >= 0 && particleRightBound <= LENGTH;
                     if (particleNotWrapped) {
-                        positionBetweenBounds = x >= particleLeftBound && x <= particleRightBound;
-                        if (positionBetweenBounds)
-                            return true;
+                        if (xNotWrapped) {
+                            positionBetweenBounds = x > particleX ?
+                                    xLeftBound <= particleRightBound :
+                                    xRightBound >= particleLeftBound;
+
+                            if (positionBetweenBounds)
+                                return true;
+                        } else {
+                            positionBetweenBounds = xRightBound >= particleLeftBound || xLeftBound <= particleRightBound;
+                            if (positionBetweenBounds)
+                                return true;
+                        }
                     } else {
-                        if (particleLeftBound < 0)
-                            particleLeftBound += LENGTH;
+                        if (!xNotWrapped)
+                            return true;
 
-                        if (particleRightBound > LENGTH)
-                            particleRightBound += LENGTH;
+                        particleLeftBound = wrapAroundValue(particleLeftBound);
+                        particleRightBound = wrapAroundValue(particleRightBound);
 
-                        positionBetweenBounds = x < particleRightBound || x > particleLeftBound;
+                        positionBetweenBounds = xLeftBound <= particleRightBound || xRightBound >= particleLeftBound;
                         if (positionBetweenBounds)
                             return true;
                     }
