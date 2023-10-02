@@ -1,6 +1,9 @@
 package org.example;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class ParticleSystem implements Simulation{
     private ParamsParser paramsParser;
@@ -17,6 +20,31 @@ public class ParticleSystem implements Simulation{
         }
         return particleSystem;
     }
+
+    private void updateNeighbours() {
+        Queue<Particle> particles = new PriorityQueue<>(Comparator.comparingDouble(Particle::getPosition));
+        particles.addAll(this.particles);
+
+        Particle firstParticle = null, prevParticle, currParticle = null;
+        while (!particles.isEmpty()) {
+            prevParticle = currParticle;
+            currParticle = particles.poll();
+
+            if (firstParticle == null)
+                firstParticle = currParticle;
+
+            if (prevParticle != null)
+                prevParticle.setRightNeighbour(currParticle);
+
+            currParticle.setLeftNeighbour(prevParticle);
+        }
+
+        if (firstParticle != null && firstParticle != currParticle) {
+            firstParticle.setLeftNeighbour(currParticle);
+            currParticle.setRightNeighbour(firstParticle);
+        }
+    }
+
     @Override
     public void simulate() {
         this.paramsParser = ParamsParser.getInstance();
@@ -38,6 +66,7 @@ public class ParticleSystem implements Simulation{
             for(Particle p : this.particles){
                 p.advanceStep();
             }
+            updateNeighbours();
             for(Particle p : this.particles){
                 p.checkNeighbourContacts();
             }
