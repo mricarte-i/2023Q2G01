@@ -98,16 +98,16 @@ public class HarmonicOscillatorSystem {
         for (double stepScale : STEP_SCALES) {
             double writeStep = Math.pow(10, -1.0);
             currStep = Math.pow(10, -stepScale);
-            Writer writerG = new Writer("../gear5-" + stepScale);
+            Writer writerG = new Writer("../gear5-" + stepScale + ".txt");
             gear5 = setUpGear5(currStep);
 
-            Writer writerB = new Writer("../beeman-" + stepScale);
+            Writer writerB = new Writer("../beeman-" + stepScale + ".txt");
             beeman = setUpBeeman(currStep);
 
-            Writer writerV = new Writer("../verlet-" + stepScale);
+            Writer writerV = new Writer("../verlet-" + stepScale + ".txt");
             verlet = setUpVerlet(currStep);
 
-            Writer writerA = new Writer("../analytic-" + stepScale);
+            Writer writerA = new Writer("../analytic-" + stepScale + ".txt");
             analytic = setUpAnalytic(currStep);
 
             double time = 0;

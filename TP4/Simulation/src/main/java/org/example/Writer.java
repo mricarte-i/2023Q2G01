@@ -11,7 +11,7 @@ public class Writer {
     private FileWriter fw;
     private String fn;
     public Writer(String filename) {
-        this.fn = filename + ".txt";
+        this.fn = filename;
         try {
             File file = new File(fn);
             if(file.exists()){
@@ -36,14 +36,14 @@ public class Writer {
     public void writeStatic(String staticFile, double L,  List<Particle> particles) {
         FileWriter staticFW;
         try {
-            File file = new File(staticFile + ".txt");
+            File file = new File(staticFile);
             if(file.exists()){
                 file.delete();
             }
             file.createNewFile();
-            staticFW = new FileWriter(staticFile + ".txt", true);
+            staticFW = new FileWriter(staticFile, true);
         }catch (IOException e) {
-            throw new RuntimeException("Error creating file " + staticFile + ".txt");
+            throw new RuntimeException("Error creating file " + staticFile);
         }
 
         try{
@@ -53,15 +53,15 @@ public class Writer {
                 staticFW.write(particle.getMass() + " " + particle.getRadius() + "\n");
             }
         }catch (IOException e){
-            throw new RuntimeException("Error writing to file " + staticFile + ".txt");
+            throw new RuntimeException("Error writing to file " + staticFile);
         }
 
         try{
             staticFW.close();
         }catch (IOException e){
-            throw new RuntimeException("Error closing file " + staticFile + ".txt");
+            throw new RuntimeException("Error closing file " + staticFile);
         }
-        System.out.println("Successfully written to " + staticFile + ".txt");
+        System.out.println("Successfully written to " + staticFile);
     }
 
     public void writeState(double timestamp, List<Particle> particles){

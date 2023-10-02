@@ -1,12 +1,10 @@
 package org.example;
 
 import org.example.integrators.Integrator;
-import org.example.integrators.VerletIntegrator;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -49,7 +47,7 @@ public class ParamsParser {
         this.seed = null;
     }
 
-    private ParamsParser(Simulation simulation, List/* <Particle> */ particles, int N, int n, int k, String staticFile,
+    private ParamsParser(Simulation simulation, List<Particle> particles, int N, int n, int k, String staticFile,
             String dynamicFile, boolean ordered, Long seed) {
         this.simulation = simulation;
         this.particles = particles;
@@ -63,7 +61,7 @@ public class ParamsParser {
         this.seed = seed;
     }
 
-    private ParamsParser(Simulation simulation, List/* <Particle> */ particles, int N, int n, int k, String staticFile,
+    private ParamsParser(Simulation simulation, List<Particle> particles, int N, int n, int k, String staticFile,
             String dynamicFile, boolean ordered, Long seed, double L) {
         this.simulation = simulation;
         this.particles = particles;
@@ -209,8 +207,6 @@ public class ParamsParser {
                 Particle prevParticle;
                 Particle currParticle = null;
 
-                Integrator integrator;
-
                 double u;
                 double deltaT = Math.pow(10, -timeDrivenParseMixin.n);
                 for (int id = 0; id < N; id++) {
@@ -293,7 +289,7 @@ public class ParamsParser {
                             .filter(s -> !s.isEmpty())
                             .map(Double::valueOf)
                             .collect(Collectors.toList()).get(0).intValue();
-                    System.out.println("Particle number in input file parsed sucessfully!");
+                    System.out.println("Particle number in input file parsed successfully!");
                 } catch (Exception e) {
                     System.out.println(
                             "Error parsing particle number in input file \"" + timeDrivenParseMixin.staticFile + "\"");
@@ -321,7 +317,7 @@ public class ParamsParser {
                             .map(Double::valueOf)
                             .collect(Collectors.toList()).get(0);
 
-                    System.out.println("Line length in input file parsed sucessfully!");
+                    System.out.println("Line length in input file parsed successfully!");
                 } catch (Exception e) {
                     System.out.println(
                             "Error parsing line length in input file \"" + timeDrivenParseMixin.staticFile + "\"");
@@ -352,10 +348,6 @@ public class ParamsParser {
                     // Ignore t=0 time-stamp
                     dynamicInput.nextLine();
 
-                    Random rand = timeDrivenParseMixin.seed == null ? new Random()
-                            : new Random(timeDrivenParseMixin.seed);
-                    Queue<Double> uParameters = TimeDrivenParseMixin.getUParameters(rand, N, false);
-
                     Queue<Particle> particlesOrderedByPosition = new PriorityQueue<>(N,
                             Comparator.comparingDouble(Particle::getPosition));
 
@@ -365,8 +357,6 @@ public class ParamsParser {
                     double x, y, vx, vy;
                     double u;
                     double deltaT = Math.pow(10, -timeDrivenParseMixin.n);
-
-                    Integrator integrator;
 
                     while (staticInput.hasNext() && dynamicInput.hasNext()) {
                         String nextStaticLine = staticInput.nextLine();
@@ -386,9 +376,9 @@ public class ParamsParser {
                         x = dynamicProperties.get(0);
                         vx = dynamicProperties.get(2);
 
-                        u = uParameters.poll();
+                        u = vx;
 
-                        Particle p = new Particle(radius, mass, u, false, false, null, null, x, deltaT, u);
+                        Particle p = new Particle(radius, mass, u, false, false, null, null, x, deltaT, vx);
                         particlesOrderedByPosition
                                 .add(p);
 
@@ -407,13 +397,14 @@ public class ParamsParser {
                             prevParticle.setRightNeighbour(currParticle);
 
                         currParticle.setLeftNeighbour(prevParticle);
+                        particles.add(currParticle);
                     }
                     if (firstParticle != null && firstParticle != currParticle) {
                         currParticle.setRightNeighbour(firstParticle);
                         firstParticle.setLeftNeighbour(currParticle);
                     }
 
-                    System.out.println("Particles in input file parsed sucessfully!");
+                    System.out.println("Particles in input file parsed successfully!");
                 } catch (Exception e) {
                     System.out.println("Error parsing particles in input files \"" + timeDrivenParseMixin.staticFile
                             + "\" and \"" + timeDrivenParseMixin.dynamicFile + "\"");
