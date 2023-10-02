@@ -12,13 +12,13 @@ public class Particle {
   private Particle leftNeighbour, rightNeighbour;
 
   public Particle(double radius, double mass, double u, boolean leftContact,
-      boolean rightContact, Particle leftNeighbour, Particle rightNeighbour, double pos, double dT, double v) {
+      boolean rightContact, Particle leftNeighbour, Particle rightNeighbour, double pos, double dT, double v, double boundary) {
     this.radius = radius;
     this.mass = mass;
     this.u = u;
     this.initR = pos;
     this.initV = v;
-    this.integrator = new VerletIntegrator(dT, pos, v, mass, this::totalForce);
+    this.integrator = new VerletIntegrator(dT, pos, v, mass, this::totalForce, boundary);
     this.leftContact = leftContact;
     this.rightContact = rightContact;
     this.leftNeighbour = leftNeighbour;

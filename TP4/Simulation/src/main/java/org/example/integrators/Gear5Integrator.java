@@ -56,6 +56,8 @@ public class Gear5Integrator implements Integrator {
     private Double previousForce;
     private double previousAcceleration;
 
+    private final Double boundary;
+
     public Gear5Integrator(
             double r0,
             double r1,
@@ -75,6 +77,33 @@ public class Gear5Integrator implements Integrator {
         this.deltaT = deltaT;
         this.previousForce = null;
         this.forceIsVDependent = forceIsVelocityDependent;
+        this.boundary = null;
+        this.correctedCoefficients = new double[DERIVATIVE_COUNT];
+        this.inverseCorrectedCoefficients = new double[DERIVATIVE_COUNT];
+        initCorrectedCoefficients();
+    }
+
+    public Gear5Integrator(
+            double r0,
+            double r1,
+            double r2,
+            double r3,
+            double r4,
+            double r5,
+            double deltaT,
+            double mass,
+            boolean forceIsVelocityDependent,
+            Double boundary
+    ){
+        this.correctedDerivatives = new double[] { r0, r1, r2, r3, r4, r5 };
+        this.deltaR2 = null;
+        this.predictedDerivatives = new double[DERIVATIVE_COUNT];
+        this.stage = Gear5Stage.CORRECTED;
+        this.mass = mass;
+        this.deltaT = deltaT;
+        this.previousForce = null;
+        this.forceIsVDependent = forceIsVelocityDependent;
+        this.boundary = boundary;
         this.correctedCoefficients = new double[DERIVATIVE_COUNT];
         this.inverseCorrectedCoefficients = new double[DERIVATIVE_COUNT];
         initCorrectedCoefficients();
@@ -119,6 +148,14 @@ public class Gear5Integrator implements Integrator {
         return previousAcceleration;
     }
 
+    private void applyBoundary(double[] derivativesArray) {
+        if (boundary == null) return;
+        derivativesArray[POSITION_DERIVATIVE] = derivativesArray[POSITION_DERIVATIVE] % boundary;
+        if (derivativesArray[POSITION_DERIVATIVE] < 0) {
+            derivativesArray[POSITION_DERIVATIVE] += boundary;
+        }
+    }
+
     public void predict() {
         if (this.stage == Gear5Stage.PREDICTED)
             throw new RuntimeException("Attempted prediction on already predicted stage. Call correct() before calling predict() again.");
@@ -132,6 +169,9 @@ public class Gear5Integrator implements Integrator {
                 currCoef += 1;
             }
         }
+
+        applyBoundary(predictedDerivatives);
+
         this.stage = Gear5Stage.PREDICTED;
     }
 
@@ -150,6 +190,9 @@ public class Gear5Integrator implements Integrator {
         for (int i = 0; i < DERIVATIVE_COUNT; i++) {
             correctedDerivatives[i] = predictedDerivatives[i] + getPredictorCoefficient(i) * deltaR2 * inverseCorrectedCoefficients[i];
         }
+
+        applyBoundary(correctedDerivatives);
+
         this.stage = Gear5Stage.CORRECTED;
     }
 
