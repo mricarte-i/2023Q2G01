@@ -83,6 +83,8 @@ public class Particle {
 
   public void advanceStep() {
     integrator.advanceStep(this::totalForce);
+    this.setLeftContact(false);
+    this.setRightContact(false);
   }
 
   private boolean checkLeftNeighbourContact() {
