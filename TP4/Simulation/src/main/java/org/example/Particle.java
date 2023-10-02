@@ -9,7 +9,7 @@ import org.example.integrators.VerletIntegrator;
 public class Particle {
 
   private int id;
-  private double radius, mass, u, initR, initV;
+  private double radius, mass, u, initR, initV, boundary;
   private Integrator integrator;
   private boolean leftContact, rightContact;
   private Particle leftNeighbour, rightNeighbour;
@@ -30,6 +30,7 @@ public class Particle {
     this.rightNeighbour = rightNeighbour;
     this.evaluateForce();
     this.integrator = new VerletIntegrator(dT, pos, v, mass, (r, vel) -> calculatedForce , boundary);
+    this.boundary = boundary;
   }
 
   public double getRadius() {
@@ -101,12 +102,22 @@ public class Particle {
     calculatedForce = totalForce();
   }
 
+  private double getMinDiffToParticle(Particle particle) {
+    double directDiff = particle.getPosition() - getPosition();
+    double wrapAroundDiff = getPosition() < particle.getPosition() ?
+            -(getPosition() + (this.boundary - particle.getPosition())) :
+            particle.getPosition() + (this.boundary - getPosition());
+    if (Math.abs(directDiff) > Math.abs(wrapAroundDiff))
+      return wrapAroundDiff;
+    return directDiff;
+  }
+
   private boolean checkLeftNeighbourContact() {
-    return Math.abs(getPosition() - leftNeighbour.getPosition()) <= (radius + leftNeighbour.radius); // Assumes equal particle radius
+    return Math.abs(getMinDiffToParticle(leftNeighbour)) <= (radius + leftNeighbour.radius); // Assumes equal particle radius
   }
 
   private boolean checkRightNeighbourContact() {
-    return Math.abs(getPosition() - rightNeighbour.getPosition()) <= (radius + rightNeighbour.radius); // Assumes equal particle radius
+    return Math.abs(getMinDiffToParticle(rightNeighbour)) <= (radius + rightNeighbour.radius); // Assumes equal particle radius
   }
 
   public void checkNeighbourContacts() {
@@ -131,8 +142,8 @@ public class Particle {
 
   private double contactForceWithNeighbour(Particle neighbour) {
     double k = 2500.0; // Constant value 2500 g / s**2
-    return k * (Math.abs(neighbour.getPosition() - getPosition()) - 2.0 * radius)
-        * Math.signum(neighbour.getPosition() - getPosition());
+    return k * (Math.abs(getMinDiffToParticle(neighbour)) - 2.0 * radius)
+        * Math.signum(getMinDiffToParticle(neighbour));
   }
 
   private double totalForce() {
