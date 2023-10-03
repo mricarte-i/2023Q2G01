@@ -69,18 +69,7 @@ public class Gear5Integrator implements Integrator {
             double mass,
             boolean forceIsVelocityDependent
     ){
-        this.correctedDerivatives = new double[] { r0, r1, r2, r3, r4, r5 };
-        this.deltaR2 = null;
-        this.predictedDerivatives = new double[DERIVATIVE_COUNT];
-        this.stage = Gear5Stage.CORRECTED;
-        this.mass = mass;
-        this.deltaT = deltaT;
-        this.previousForce = null;
-        this.forceIsVDependent = forceIsVelocityDependent;
-        this.boundary = null;
-        this.correctedCoefficients = new double[DERIVATIVE_COUNT];
-        this.inverseCorrectedCoefficients = new double[DERIVATIVE_COUNT];
-        initCorrectedCoefficients();
+        this(r0, r1, r2, r3, r4, r5, deltaT, mass, forceIsVelocityDependent, null);
     }
 
     public Gear5Integrator(
@@ -175,7 +164,11 @@ public class Gear5Integrator implements Integrator {
         this.stage = Gear5Stage.PREDICTED;
     }
 
+    @Override
     public void evaluateForce(ForceCalculator forceCalculator) {
+        if (this.stage == Gear5Stage.CORRECTED)
+            predict();
+
         double predictedA = predictedDerivatives[ACCELERATION_DERIVATIVE];
         double realA  = getNextStepRealAcceleration(forceCalculator);
         double deltaA = realA - predictedA;
@@ -219,10 +212,19 @@ public class Gear5Integrator implements Integrator {
     }
 
     @Override
+    public void advanceStep() {
+        if (this.deltaR2 == null)
+            throw new RuntimeException("Cannot advance step without evaluating force. Call advanceStep with a ForceCalculator or call evaluateForce first.");
+        correct();
+        this.deltaR2 = null;
+    }
+
+    @Override
     public void advanceStep(ForceCalculator forceCalculator) {
         if (this.stage == Gear5Stage.CORRECTED)
             predict();
         evaluateForce(forceCalculator);
         correct();
+        this.deltaR2 = null;
     }
 }

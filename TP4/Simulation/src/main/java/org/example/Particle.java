@@ -1,20 +1,19 @@
 package org.example;
 
+import java.lang.reflect.Method;
 import java.util.Objects;
-import org.example.integrators.ForceCalculator;
-import org.example.integrators.Gear5Integrator;
-import org.example.integrators.Integrator;
-import org.example.integrators.VerletIntegrator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import org.example.integrators.*;
 
 public class Particle {
 
   private int id;
   private double radius, mass, u, initR, initV, boundary;
-  private Integrator integrator;
+  private Gear5Integrator integrator;
   private boolean leftContact, rightContact;
   private Particle leftNeighbour, rightNeighbour;
-
-  private Double calculatedForce = null;
 
   public Particle(int id, double radius, double mass, double u, boolean leftContact,
       boolean rightContact, Particle leftNeighbour, Particle rightNeighbour, double pos, double dT, double v, double boundary) {
@@ -28,8 +27,9 @@ public class Particle {
     this.rightContact = rightContact;
     this.leftNeighbour = leftNeighbour;
     this.rightNeighbour = rightNeighbour;
-    this.evaluateForce();
-    this.integrator = new VerletIntegrator(dT, pos, v, mass, (r, vel) -> calculatedForce , boundary);
+    this.integrator = new Gear5Integrator(pos, v, totalForceCurrent(pos, v) / mass, 0, 0, 0, dT, mass, true, boundary);
+    //this.integrator = new BeemanIntegrator(dT, pos, v, mass, this::totalForceCurrent, boundary);
+    //this.integrator = new VerletIntegrator(dT, pos, v, mass, this::totalForceCurrent , boundary);
     this.boundary = boundary;
   }
 
@@ -47,14 +47,6 @@ public class Particle {
 
   public void setMass(double mass) {
     this.mass = mass;
-  }
-
-  public Integrator getIntegrator() {
-    return integrator;
-  }
-
-  public void setIntegrator(Integrator integrator) {
-    this.integrator = integrator;
   }
 
   public boolean isLeftContact() {
@@ -89,65 +81,81 @@ public class Particle {
     this.rightNeighbour = rightNeighbour;
   }
 
-  public void advanceStep() {
-    if (calculatedForce == null)
-      throw new RuntimeException("advanceStep called before evaluateForce");
-    integrator.advanceStep((x, v) -> calculatedForce);
-    this.setLeftContact(false);
-    this.setRightContact(false);
-    calculatedForce = null;
+  public void predict() {
+    integrator.predict();
   }
 
   public void evaluateForce() {
-    calculatedForce = totalForce();
+    integrator.evaluateForce(this::totalForceCurrent);
   }
 
-  private double getMinDiffToParticle(Particle particle) {
-    double directDiff = particle.getPosition() - getPosition();
-    double wrapAroundDiff = getPosition() < particle.getPosition() ?
-            -(getPosition() + (this.boundary - particle.getPosition())) :
-            particle.getPosition() + (this.boundary - getPosition());
+  public void advanceStep() {
+    integrator.advanceStep();
+    this.setLeftContact(false);
+    this.setRightContact(false);
+  }
+
+  private double getMinDiffToParticle(double x, Supplier<Double> getNeighbourX) {
+    double particleX = getNeighbourX.get();
+
+    double directDiff = particleX - x;
+    double wrapAroundDiff = x < particleX ?
+            -(x + (this.boundary - particleX)) :
+            particleX + (this.boundary - x);
+
     if (Math.abs(directDiff) > Math.abs(wrapAroundDiff))
       return wrapAroundDiff;
     return directDiff;
   }
 
-  private boolean checkLeftNeighbourContact() {
-    return Math.abs(getMinDiffToParticle(leftNeighbour)) <= (radius + leftNeighbour.radius); // Assumes equal particle radius
+  private boolean checkLeftNeighbourContact(double x) {
+    return Math.abs(getMinDiffToParticle(x, leftNeighbour.integrator::getPosition)) <= (radius + leftNeighbour.radius); // Assumes equal particle radius
   }
 
-  private boolean checkRightNeighbourContact() {
-    return Math.abs(getMinDiffToParticle(rightNeighbour)) <= (radius + rightNeighbour.radius); // Assumes equal particle radius
+  private boolean checkRightNeighbourContact(double x) {
+    return Math.abs(getMinDiffToParticle(x, rightNeighbour.integrator::getPosition)) <= (radius + rightNeighbour.radius); // Assumes equal particle radius
   }
 
   public void checkNeighbourContacts() {
-    this.setLeftContact(checkLeftNeighbourContact());
-    this.setRightContact(checkRightNeighbourContact());
+    double nextPosition = integrator.getPosition();
+    this.setLeftContact(checkLeftNeighbourContact(nextPosition));
+    this.setRightContact(checkRightNeighbourContact(nextPosition));
   }
 
-  private double propulsionForce() {
+  private double propulsionForce(double v) {
     double tao = 1.0; // Constant value = 1 second
-    return (u - getVelocity()) / tao;
+    return (u - v) / tao;
   }
 
-  private double leftContactForce() {
+  private double leftContactForce(double x, Supplier<Double> leftNeighbour) {
     if(!this.leftContact) return 0;
-    return contactForceWithNeighbour(leftNeighbour);
+    return contactForceWithNeighbour(x, leftNeighbour);
   }
 
-  private double rightContactForce() {
+  private double rightContactForce(double x, Supplier<Double> rightNeighbour) {
     if(!this.rightContact) return 0;
-    return contactForceWithNeighbour(rightNeighbour);
+    return contactForceWithNeighbour(x, rightNeighbour);
   }
 
-  private double contactForceWithNeighbour(Particle neighbour) {
+  private double contactForceWithNeighbour(double x, Supplier<Double> neighbour) {
     double k = 2500.0; // Constant value 2500 g / s**2
-    return k * (Math.abs(getMinDiffToParticle(neighbour)) - 2.0 * radius)
-        * Math.signum(getMinDiffToParticle(neighbour));
+    return k * (Math.abs(getMinDiffToParticle(x, neighbour)) - 2.0 * radius)
+        * Math.signum(getMinDiffToParticle(x, neighbour));
   }
 
-  private double totalForce() {
-    return rightContactForce() + leftContactForce() + propulsionForce();
+  private double totalForceCurrent(double x, double v) {
+    Supplier<Double> leftNeighbourGetPosition = leftNeighbour != null ? leftNeighbour::getPosition : null;
+    Supplier<Double> rightNeighbourGetPosition = rightNeighbour != null ? rightNeighbour::getPosition : null;
+    return totalForce(x, v, leftNeighbourGetPosition, rightNeighbourGetPosition);
+  }
+
+  /*
+  private double totalForceNext(double x, double v) {
+    return totalForce(x, v, leftNeighbour.integrator::getNextPosition, rightNeighbour.integrator::getNextPosition);
+  }*/
+
+  private double totalForce(double x, double v, Supplier<Double> leftNeighbour, Supplier<Double> rightNeighbour) {
+    return rightContactForce(x, rightNeighbour) + leftContactForce(x, leftNeighbour) + propulsionForce(v);
   }
 
   @Override
