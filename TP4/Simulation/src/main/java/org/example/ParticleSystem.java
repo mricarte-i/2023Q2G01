@@ -52,10 +52,19 @@ public class ParticleSystem implements Simulation{
         this.writer = new Writer(paramsParser.getDynamicFile());
         this.writer.writeStatic(paramsParser.getStaticFile(), paramsParser.getL(), this.particles);
 
-        double currStep = Math.pow(10, -paramsParser.getDeltaTimeScale());
-        double writeStep = Math.pow(10, -paramsParser.getStateDeltaTimeScale());
-        double time = 0;
+        double simStep = Math.pow(10, -paramsParser.getDeltaTimeScale()); //n
+        double writeStep = Math.pow(10, -paramsParser.getStateDeltaTimeScale()); //k
+
+        double writeScale = Math.pow(10, paramsParser.getStateDeltaTimeScale());
+        double stepRatio = writeStep / simStep; //(k/n)
+
+        int iter = 0;
         int stepCounter = 0;
+        //as a separate variable, we add up the step counter
+        //when its equal to the step ratio (k/n) that means we are in a printing step
+        //ex: n=10^-2, k=10^-1, every 10 steps we should print the state
+
+        double time = 0;
         //print dynamic state @t=0
         this.writer.writeState(time, this.particles);
 
@@ -71,10 +80,16 @@ public class ParticleSystem implements Simulation{
                 p.checkNeighbourContacts();
             }
 
-            time += currStep;
+            iter++;
+            time = iter*simStep; //sim time is the number of iterations times n (iter*simStep)
+
             stepCounter++;
-            if(stepCounter >= writeStep / currStep){
-                this.writer.writeState(time, this.particles);
+            if(stepCounter == stepRatio){
+                double printTime = (iter/stepRatio)*writeStep;
+                printTime = Math.round(printTime * writeScale) / writeScale;
+                //(number of steps / n)*k gives us the number of steps if we were working with k
+                //that times writeStep gives us a nice round number for the print time
+                this.writer.writeState(printTime, this.particles);
                 stepCounter = 0;
             }
         }
