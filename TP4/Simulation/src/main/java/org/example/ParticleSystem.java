@@ -70,15 +70,18 @@ public class ParticleSystem implements Simulation{
 
         while(time < this.TF) {
             for(Particle p : this.particles){
+                p.checkNeighbourContacts();
+            }
+            for(Particle p : this.particles) {
+                p.predict();
+            }
+            for(Particle p : this.particles){
                 p.evaluateForce();
             }
             for(Particle p : this.particles){
                 p.advanceStep();
             }
             updateNeighbours();
-            for(Particle p : this.particles){
-                p.checkNeighbourContacts();
-            }
 
             iter++;
             time = iter*simStep; //sim time is the number of iterations times n (iter*simStep)

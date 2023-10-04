@@ -3,8 +3,7 @@ package org.example.integrators;
 public class VerletIntegrator implements Integrator {
 
     private final double dT, MASS;
-    private double currR, currV, prevR;
-    private double nextR;
+    private double nextR, currR, currV, prevR;
 
     private final Double boundary;
 
@@ -17,11 +16,16 @@ public class VerletIntegrator implements Integrator {
                             ForceCalculator forceCalculator, Double boundary) {
         this.dT = deltaT;
         this.MASS = mass;
-        this.nextR = position;
-        this.currR = this.prevR = eulerPosition(position, velocity, -deltaT, mass, forceCalculator.calculateForce(position, velocity)); //TODO: calculate step @ -0.1
+
+        this.force = forceCalculator.calculateForce(position, velocity);
+
+        this.prevR = eulerPosition(position, velocity, -deltaT, mass, this.force);
+        this.currR = position;
+        this.nextR = getNextR(); // Depends on prevR, currR and force
+
         this.currV = velocity;
+
         this.boundary = boundary;
-        this.advanceStep(forceCalculator);
     }
 
     private static double eulerPosition(double r, double v, double dT, double m, double f) {
@@ -37,25 +41,38 @@ public class VerletIntegrator implements Integrator {
         return this.currR;
     }
 
+    public double getNextPosition() { return this.nextR; }
+
     @Override
     public double getVelocity() {
         return this.currV;
     }
 
+    private Double force;
+
     @Override
-    public void advanceStep(ForceCalculator forceCalculator) {
+    public void evaluateForce(ForceCalculator forceCalculator) {
+        force = forceCalculator.calculateForce(nextR, currV); // nextR is currR and currV is prevV in nextStep
+    }
+
+    @Override
+    public void advanceStep() {
         this.prevR = this.currR;
         this.currR = this.nextR;
 
-        double nextR = getNextPosition(prevR, forceCalculator);
-        double currV = getNextVelocity(nextR, prevR);
-
-        this.nextR = nextR;
-        this.currV = currV;
+        this.nextR = getNextR();
+        this.currV = getCurrV();
+        this.force = null;
     }
 
-    private double getNextPosition(double prevR, ForceCalculator forceCalculator) {
-        double nextR = 2.0 * currR - prevR + (Math.pow(dT, 2) / MASS) * forceCalculator.calculateForce(prevR, currV);
+    @Override
+    public void advanceStep(ForceCalculator forceCalculator) {
+        evaluateForce(forceCalculator);
+        advanceStep();
+    }
+
+    private double getNextR() {
+        double nextR = 2.0 * currR - prevR + (Math.pow(dT, 2) / MASS) * force;
         if (boundary != null) {
             nextR = nextR % boundary;
             if (nextR < 0) {
@@ -65,7 +82,7 @@ public class VerletIntegrator implements Integrator {
         return nextR;
     }
 
-    private double getNextVelocity(double nextR, double prevR) {
+    private double getCurrV() {
         return (nextR - prevR) / (2.0 * dT);
     }
 }
