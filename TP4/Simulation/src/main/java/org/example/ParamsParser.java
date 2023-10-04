@@ -143,6 +143,9 @@ public class ParamsParser {
                     "--particle-amount" }, description = "Amount of particles to be created on top of the line.", paramLabel = "[N]", required = true)
             private int N;
 
+            @Option(names = "--equidistant", description = "Initialize particles equidistantly along the line.", negatable = true, defaultValue = "false", fallbackValue = "true", required = true)
+            private boolean equidistant;
+
             @Override
             public ParamsParser call() throws Exception {
                 List<Particle> particles = generateParticles();
@@ -167,8 +170,7 @@ public class ParamsParser {
                 return value;
             }
 
-            private boolean checkIfPositionIsOccupied(double x, List<Particle> particles) {
-                double particleX;
+            private boolean checkIfPositionIsOccupied(double x, Collection<Double> particlesXs) {
                 double particleLeftBound;
                 double particleRightBound;
 
@@ -184,8 +186,7 @@ public class ParamsParser {
                     xRightBound = wrapAroundValue(xRightBound);
                 }
 
-                for (Particle particle : particles) {
-                    particleX = particle.getPosition();
+                for (Double particleX : particlesXs) {
 
                     particleLeftBound = particleX - RADIUS;
                     particleRightBound = particleX + RADIUS;
@@ -194,13 +195,13 @@ public class ParamsParser {
                     if (particleNotWrapped) {
                         if (xNotWrapped) {
                             positionBetweenBounds = x > particleX ?
-                                    xLeftBound <= particleRightBound :
-                                    xRightBound >= particleLeftBound;
+                                    xLeftBound < particleRightBound :
+                                    xRightBound > particleLeftBound;
 
                             if (positionBetweenBounds)
                                 return true;
                         } else {
-                            positionBetweenBounds = xRightBound >= particleLeftBound || xLeftBound <= particleRightBound;
+                            positionBetweenBounds = xRightBound > particleLeftBound || xLeftBound < particleRightBound;
                             if (positionBetweenBounds)
                                 return true;
                         }
@@ -211,12 +212,44 @@ public class ParamsParser {
                         particleLeftBound = wrapAroundValue(particleLeftBound);
                         particleRightBound = wrapAroundValue(particleRightBound);
 
-                        positionBetweenBounds = xLeftBound <= particleRightBound || xRightBound >= particleLeftBound;
+                        positionBetweenBounds = xLeftBound < particleRightBound || xRightBound > particleLeftBound;
                         if (positionBetweenBounds)
                             return true;
                     }
                 }
                 return false;
+            }
+
+            private Queue<Double> uniformRandomPositionsForParticles(Random rand) {
+                double x;
+                boolean overlaps;
+                Queue<Double> positions = new ArrayDeque<>(N);
+
+                for (int id = 0; id < N; id++) {
+                    do {
+                        x = rand.nextDouble() * LENGTH;
+                        overlaps = checkIfPositionIsOccupied(x, positions);
+                    } while (overlaps);
+                    positions.add(x);
+                }
+
+                return positions;
+            }
+
+            private Queue<Double> equidistantPositionsForParticles() {
+                double particleZoneSize, currZoneMiddle;
+                Queue<Double> positions = new ArrayDeque<>(N);
+
+                particleZoneSize  = LENGTH / N;
+                currZoneMiddle = particleZoneSize / 2;
+                for (int id = 0; id < N; id++) {
+                    if(checkIfPositionIsOccupied(currZoneMiddle, positions)) {
+                        throw new RuntimeException("Too many particles");
+                    }
+                    positions.add(currZoneMiddle);
+                    currZoneMiddle += particleZoneSize;
+                }
+                return positions;
             }
 
             private List<Particle> generateParticles() {
@@ -225,10 +258,16 @@ public class ParamsParser {
                     return particles;
 
                 Random rand = timeDrivenParseMixin.seed == null ? new Random() : new Random(timeDrivenParseMixin.seed);
-                boolean overlaps;
                 double x;
 
                 Queue<Double> uParameters = TimeDrivenParseMixin.getUParameters(rand, N, timeDrivenParseMixin.ordered);
+
+                Queue<Double> particlePositions;
+                if (equidistant) {
+                    particlePositions = equidistantPositionsForParticles();
+                } else {
+                    particlePositions = uniformRandomPositionsForParticles(rand);
+                }
 
                 Particle firstParticle = null;
                 Particle prevParticle;
@@ -239,11 +278,7 @@ public class ParamsParser {
                 for (int id = 0; id < N; id++) {
                     prevParticle = currParticle;
 
-                    do {
-                        x = rand.nextDouble() * LENGTH;
-                        overlaps = checkIfPositionIsOccupied(x, particles);
-                    } while (overlaps);
-
+                    x = particlePositions.poll();
                     u = uParameters.poll();
 
                     currParticle = new Particle(id, RADIUS, MASS, u, false, false, prevParticle, null, x, deltaT, u, LENGTH);
