@@ -69,11 +69,11 @@ public class ParticleSystem implements Simulation{
         this.writer.writeState(time, this.particles);
 
         while(time < this.TF) {
-            for(Particle p : this.particles){
-                p.checkNeighbourContacts();
-            }
             for(Particle p : this.particles) {
                 p.predict();
+            }
+            for(Particle p : this.particles){
+                p.checkNeighbourContacts();
             }
             for(Particle p : this.particles){
                 p.evaluateForce();
