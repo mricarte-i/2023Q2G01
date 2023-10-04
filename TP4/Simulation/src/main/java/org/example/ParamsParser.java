@@ -238,7 +238,11 @@ public class ParamsParser {
 
             private Queue<Double> equidistantPositionsForParticles() {
                 double particleZoneSize, currZoneMiddle;
-                Queue<Double> positions = new ArrayDeque<>(N);
+                Queue<Double> positions;
+                if (timeDrivenParseMixin.ordered)
+                    positions = new PriorityQueue<>(N);
+                else
+                    positions = new ArrayDeque<>(N);
 
                 particleZoneSize  = LENGTH / N;
                 currZoneMiddle = particleZoneSize / 2;
