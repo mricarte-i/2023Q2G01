@@ -28,11 +28,11 @@ def add_poly(L : float, flask_width : float = 1):
 
     half_flask_width = flask_width / 2
 
-    coordinates[0,0] = 0
+    coordinates[0,0] = 0 + half_flask_width
     coordinates[0,1] = 0
     coordinates[0,2] = 0
 
-    coordinates[1,0] = L
+    coordinates[1,0] = L - half_flask_width
     coordinates[1,1] = 0
     coordinates[1,2] = 0
 
@@ -58,12 +58,12 @@ def save_animation_state_file(ovito_file : str) -> None:
 def render_animation(animation_file : str, h_res : int = 1920, v_res : int = 1080) -> None:
     vp = Viewport()
     vp.type = Viewport.Type.Top
-    vp.zoom_all()
+    vp.zoom_all(size=(h_res,v_res))
 
     animation_file_split = animation_file.rsplit('/', 1)
     if len(animation_file_split) > 1:
         os.makedirs(animation_file_split[0], exist_ok=True)
-    vp.render_anim(animation_file, size=(h_res,v_res))
+    vp.render_anim(animation_file, size=(h_res,v_res), fps=15)
 
 def generate_visualization(sim_info : SimulationInfo, xyz_file : str, ovito_file : str, animation_file : str) -> None:
 
