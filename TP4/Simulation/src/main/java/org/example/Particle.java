@@ -11,7 +11,7 @@ public class Particle {
 
   private int id;
   private double radius, mass, u, initR, initV, boundary;
-  private Gear5Integrator integrator;
+  private BeemanIntegrator integrator;
   private boolean leftContact, rightContact;
   private Particle leftNeighbour, rightNeighbour;
 
@@ -27,8 +27,8 @@ public class Particle {
     this.rightContact = rightContact;
     this.leftNeighbour = leftNeighbour;
     this.rightNeighbour = rightNeighbour;
-    this.integrator = new Gear5Integrator(pos, v, totalForceCurrent(pos, v) / mass, - (totalForceCurrent(pos, v) / mass) / mass, ((totalForceCurrent(pos, v) / mass) / mass) / mass, - (((totalForceCurrent(pos, v) / mass) / mass) / mass) / mass, dT, mass, true, boundary);
-    //this.integrator = new BeemanIntegrator(dT, pos, v, mass, this::totalForceCurrent, boundary);
+    //this.integrator = new Gear5Integrator(pos, v, totalForceCurrent(pos, v) / mass, - (totalForceCurrent(pos, v) / mass) / mass, ((totalForceCurrent(pos, v) / mass) / mass) / mass, - (((totalForceCurrent(pos, v) / mass) / mass) / mass) / mass, dT, mass, true, boundary);
+    this.integrator = new BeemanIntegrator(dT, pos, v, mass, this::totalForceCurrent, boundary);
     //this.integrator = new VerletIntegrator(dT, pos, v, mass, this::totalForceCurrent , boundary);
     this.boundary = boundary;
   }
@@ -81,12 +81,12 @@ public class Particle {
     this.rightNeighbour = rightNeighbour;
   }
 
-  public void predict() {
+  /*public void predict() {
     integrator.predict();
-  }
+  }*/
 
   public void evaluateForce() {
-    integrator.evaluateForce(this::totalForceCurrent);
+    integrator.evaluateForce(this::totalForceNext);
   }
 
   public void advanceStep() {
@@ -109,15 +109,15 @@ public class Particle {
   }
 
   private boolean checkLeftNeighbourContact(double x) {
-    return Math.abs(getMinDiffToParticle(x, leftNeighbour.integrator::getPosition)) <= (radius + leftNeighbour.radius); // Assumes equal particle radius
+    return Math.abs(getMinDiffToParticle(x, leftNeighbour.integrator::getNextPosition)) <= (radius + leftNeighbour.radius); // Assumes equal particle radius
   }
 
   private boolean checkRightNeighbourContact(double x) {
-    return Math.abs(getMinDiffToParticle(x, rightNeighbour.integrator::getPosition)) <= (radius + rightNeighbour.radius); // Assumes equal particle radius
+    return Math.abs(getMinDiffToParticle(x, rightNeighbour.integrator::getNextPosition)) <= (radius + rightNeighbour.radius); // Assumes equal particle radius
   }
 
   public void checkNeighbourContacts() {
-    double nextPosition = integrator.getPosition();
+    double nextPosition = integrator.getNextPosition();
     this.setLeftContact(checkLeftNeighbourContact(nextPosition));
     this.setRightContact(checkRightNeighbourContact(nextPosition));
   }
@@ -149,10 +149,10 @@ public class Particle {
     return totalForce(x, v, leftNeighbourGetPosition, rightNeighbourGetPosition);
   }
 
-  /*
+
   private double totalForceNext(double x, double v) {
     return totalForce(x, v, leftNeighbour.integrator::getNextPosition, rightNeighbour.integrator::getNextPosition);
-  }*/
+  }
 
   private double totalForce(double x, double v, Supplier<Double> leftNeighbour, Supplier<Double> rightNeighbour) {
     return rightContactForce(x, rightNeighbour) + leftContactForce(x, leftNeighbour) + propulsionForce(v);

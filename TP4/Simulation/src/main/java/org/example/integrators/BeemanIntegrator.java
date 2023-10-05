@@ -43,7 +43,6 @@ public class BeemanIntegrator implements Integrator {
 
     @Override
     public void evaluateForce(ForceCalculator forceCalculator) {
-        a = forceCalculator.calculateForce(currR, currV) / MASS;
         nextR = getNextPosition();
         predictedV = getPredictedVelocity();
 
@@ -65,7 +64,7 @@ public class BeemanIntegrator implements Integrator {
         advanceStep();
     }
 
-    private double getNextPosition() {
+    public double getNextPosition() {
         double nextR = currR + currV * dT + ((2.0 / 3.0) * a - (1.0 / 6.0) * prevA) * Math.pow(dT, 2);
         if (boundary != null) {
             nextR = nextR % boundary;
