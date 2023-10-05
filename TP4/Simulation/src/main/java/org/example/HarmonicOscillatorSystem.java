@@ -16,7 +16,8 @@ public class HarmonicOscillatorSystem {
             2.0d,
             3.0d,
             4.0d,
-            5.0d
+            5.0d,
+            6.0d
     }; // TIME_STEP = 10^(-STEP_SCALE)
     private static final double AMPLITUDE = 1.0;
 
