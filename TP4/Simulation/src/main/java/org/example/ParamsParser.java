@@ -223,7 +223,7 @@ public class ParamsParser {
             private Queue<Double> uniformRandomPositionsForParticles(Random rand) {
                 double x;
                 boolean overlaps;
-                Queue<Double> positions = new ArrayDeque<>(N);
+                Queue<Double> positions = new PriorityQueue<>(N);
 
                 for (int id = 0; id < N; id++) {
                     do {
@@ -238,11 +238,7 @@ public class ParamsParser {
 
             private Queue<Double> equidistantPositionsForParticles() {
                 double particleZoneSize, currZoneMiddle;
-                Queue<Double> positions;
-                if (timeDrivenParseMixin.ordered)
-                    positions = new PriorityQueue<>(N);
-                else
-                    positions = new ArrayDeque<>(N);
+                Queue<Double> positions = new PriorityQueue<>(N);
 
                 particleZoneSize  = LENGTH / N;
                 currZoneMiddle = particleZoneSize / 2;
