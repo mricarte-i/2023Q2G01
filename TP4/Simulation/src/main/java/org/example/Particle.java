@@ -95,9 +95,7 @@ public class Particle {
     this.setRightContact(false);
   }
 
-  private double getMinDiffToParticle(double x, Supplier<Double> getNeighbourX) {
-    double particleX = getNeighbourX.get();
-
+  private double getMinDiffToParticle(double x, double particleX) {
     double directDiff = particleX - x;
     double wrapAroundDiff = x < particleX ?
             -(x + (this.boundary - particleX)) :
@@ -109,11 +107,11 @@ public class Particle {
   }
 
   private boolean checkLeftNeighbourContact(double x) {
-    return Math.abs(getMinDiffToParticle(x, leftNeighbour.integrator::getNextPosition)) <= (radius + leftNeighbour.radius); // Assumes equal particle radius
+    return Math.abs(getMinDiffToParticle(x, leftNeighbour.integrator.getNextPosition())) <= (radius + leftNeighbour.radius); // Assumes equal particle radius
   }
 
   private boolean checkRightNeighbourContact(double x) {
-    return Math.abs(getMinDiffToParticle(x, rightNeighbour.integrator::getNextPosition)) <= (radius + rightNeighbour.radius); // Assumes equal particle radius
+    return Math.abs(getMinDiffToParticle(x, rightNeighbour.integrator.getNextPosition())) <= (radius + rightNeighbour.radius); // Assumes equal particle radius
   }
 
   public void checkNeighbourContacts() {
@@ -127,34 +125,36 @@ public class Particle {
     return (u - v) / tao;
   }
 
-  private double leftContactForce(double x, Supplier<Double> leftNeighbour) {
+  private double leftContactForce(double x, double leftNeighbour) {
     if(!this.leftContact) return 0;
     return contactForceWithNeighbour(x, leftNeighbour);
   }
 
-  private double rightContactForce(double x, Supplier<Double> rightNeighbour) {
+  private double rightContactForce(double x, double rightNeighbour) {
     if(!this.rightContact) return 0;
     return contactForceWithNeighbour(x, rightNeighbour);
   }
 
-  private double contactForceWithNeighbour(double x, Supplier<Double> neighbour) {
+  private double contactForceWithNeighbour(double x, double neighbour) {
     double k = 2500.0; // Constant value 2500 g / s**2
-    return k * (Math.abs(getMinDiffToParticle(x, neighbour)) - 2.0 * radius)
-        * Math.signum(getMinDiffToParticle(x, neighbour));
+    double diff = getMinDiffToParticle(x, neighbour);
+    double distance = Math.abs(diff);
+    return k * (distance - 2.0 * radius)
+        * Math.signum(diff);
   }
 
   private double totalForceCurrent(double x, double v) {
-    Supplier<Double> leftNeighbourGetPosition = leftNeighbour != null ? leftNeighbour::getPosition : null;
-    Supplier<Double> rightNeighbourGetPosition = rightNeighbour != null ? rightNeighbour::getPosition : null;
+    double leftNeighbourGetPosition = leftNeighbour == null ? Double.NaN : leftNeighbour.getPosition();
+    double rightNeighbourGetPosition = rightNeighbour == null ? Double.NaN : rightNeighbour.getPosition();
     return totalForce(x, v, leftNeighbourGetPosition, rightNeighbourGetPosition);
   }
 
 
   private double totalForceNext(double x, double v) {
-    return totalForce(x, v, leftNeighbour.integrator::getNextPosition, rightNeighbour.integrator::getNextPosition);
+    return totalForce(x, v, leftNeighbour.integrator.getNextPosition(), rightNeighbour.integrator.getNextPosition());
   }
 
-  private double totalForce(double x, double v, Supplier<Double> leftNeighbour, Supplier<Double> rightNeighbour) {
+  private double totalForce(double x, double v, double leftNeighbour, double rightNeighbour) {
     return rightContactForce(x, rightNeighbour) + leftContactForce(x, leftNeighbour) + propulsionForce(v);
   }
 
