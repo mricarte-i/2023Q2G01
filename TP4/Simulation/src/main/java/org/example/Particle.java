@@ -27,7 +27,7 @@ public class Particle {
     this.rightContact = rightContact;
     this.leftNeighbour = leftNeighbour;
     this.rightNeighbour = rightNeighbour;
-    this.integrator = new Gear5Integrator(pos, v, totalForceCurrent(pos, v) / mass, 0, 0, 0, dT, mass, true, boundary);
+    this.integrator = new Gear5Integrator(pos, v, totalForceCurrent(pos, v) / mass, - (totalForceCurrent(pos, v) / mass) / mass, ((totalForceCurrent(pos, v) / mass) / mass) / mass, - (((totalForceCurrent(pos, v) / mass) / mass) / mass) / mass, dT, mass, true, boundary);
     //this.integrator = new BeemanIntegrator(dT, pos, v, mass, this::totalForceCurrent, boundary);
     //this.integrator = new VerletIntegrator(dT, pos, v, mass, this::totalForceCurrent , boundary);
     this.boundary = boundary;
