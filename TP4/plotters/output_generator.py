@@ -108,3 +108,28 @@ def calculate_sqr_err_df_from_files_w_same_static_file(static_file : str, steps:
     numerical_static_files_list = __multiple_same_length_list_of_lists_const__(static_file, numerical_dynamic_files_list)
 
     return calculate_sqr_err_df_from_files(steps, analytical_static_files, analytical_dynamic_files, numerical_static_files_list, numerical_dynamic_files_list, numerical_labels)
+
+def get_velocities(sim_info : SimulationInfo, limits : tuple[int, int] = None) -> np.ndarray:
+    instant_count = len(sim_info.instants)
+
+    velocities = np.zeros((instant_count, sim_info.N))
+    for inst_idx in range(instant_count):
+        for p_idx in range(sim_info.N):
+            velocities[inst_idx, p_idx] = sim_info.particles[p_idx].velocity[inst_idx][0]
+
+    if limits != None:
+        lower_limit = limits[0]
+        upper_limit = limits[1]
+
+        if lower_limit is None and upper_limit is None:
+            return velocities
+
+        if upper_limit is None:
+            return velocities[lower_limit:]
+        
+        if lower_limit is None:
+            return velocities[:upper_limit]
+        
+        return velocities[lower_limit:upper_limit]
+
+    return velocities
