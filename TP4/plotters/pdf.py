@@ -44,10 +44,10 @@ def data_to_pdf(data : np.ndarray, bounds : tuple[float, float]) -> tuple[np.nda
     left_bound  = bounds[0]
     right_bound = bounds[1]
 
-    pdf = np.insert(pdf, 0, 0)
-    pdf = np.insert(pdf, pdf.size, 0)
+    #pdf = np.insert(pdf, 0, 0)
+    #pdf = np.insert(pdf, pdf.size, 0)
 
-    values = np.insert(values, 0, left_bound)
-    values = np.insert(values, values.size, right_bound)
+    #values = np.insert(values, 0, left_bound)
+    #values = np.insert(values, values.size, right_bound)
 
     return (pdf, values, class_width)
