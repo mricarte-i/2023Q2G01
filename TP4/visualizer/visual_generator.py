@@ -55,7 +55,7 @@ def save_animation_state_file(ovito_file : str) -> None:
         os.makedirs(ovito_file_split[0], exist_ok=True)
     ovito.scene.save(ovito_file)
 
-def render_animation(animation_file : str, h_res : int = 1920, v_res : int = 1080) -> None:
+def render_animation(animation_file : str, h_res : int = 1600, v_res : int = 1200) -> None:
     vp = Viewport()
     vp.type = Viewport.Type.Top
     vp.zoom_all(size=(h_res,v_res))
@@ -63,7 +63,7 @@ def render_animation(animation_file : str, h_res : int = 1920, v_res : int = 108
     animation_file_split = animation_file.rsplit('/', 1)
     if len(animation_file_split) > 1:
         os.makedirs(animation_file_split[0], exist_ok=True)
-    vp.render_anim(animation_file, size=(h_res,v_res), fps=15)
+    vp.render_anim(animation_file, size=(h_res,v_res), fps=25)
 
 def generate_visualization(sim_info : SimulationInfo, xyz_file : str, ovito_file : str, animation_file : str) -> None:
 
