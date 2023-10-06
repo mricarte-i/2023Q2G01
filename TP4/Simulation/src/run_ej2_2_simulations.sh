@@ -15,9 +15,9 @@ do
   echo "Running with N=$N"
   if [ $N -gt 20 ]
   then
-    java -jar "$JAR_FILE" random --static-file="../../plotters/ej2_2/static-N${N}.txt" --dynamic-file="../../plotters/ej2_2/dynamic-N${N}.txt" -n=2 -k=1 -N="$N" --equidistant
+    java -jar "$JAR_FILE" random --static-file="../../plotters/ej2_2/static-N${N}.txt" --dynamic-file="../../plotters/ej2_2/dynamic-N${N}.txt" -n=5 -k=1 -N="$N" --equidistant --seed=42
   else
-    java -jar "$JAR_FILE" random --static-file="../../plotters/ej2_2/static-N${N}.txt" --dynamic-file="../../plotters/ej2_2/dynamic-N${N}.txt" -n=2 -k=1 -N="$N"
+    java -jar "$JAR_FILE" random --static-file="../../plotters/ej2_2/static-N${N}.txt" --dynamic-file="../../plotters/ej2_2/dynamic-N${N}.txt" -n=5 -k=1 -N="$N" --seed=42
   fi
   echo "---------------------------------"
 done

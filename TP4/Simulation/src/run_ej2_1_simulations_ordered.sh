@@ -12,9 +12,9 @@ do
   echo "Running with N=$N"
   if [ $N -gt 20 ]
   then
-    java -jar "$JAR_FILE" random --static-file="static-N${N}.txt" --dynamic-file="dynamic-N${N}.txt" -n=5 -k=1 -N="$N" --equidistant --seed=42
+    java -jar "$JAR_FILE" random --static-file="static-N${N}-ordered.txt" --dynamic-file="dynamic-N${N}-ordered.txt" -n=5 -k=1 -N="$N" --equidistant --seed=42 --ordered
   else
-    java -jar "$JAR_FILE" random --static-file="static-N${N}.txt" --dynamic-file="dynamic-N${N}.txt" -n=5 -k=1 -N="$N" --seed=42
+    java -jar "$JAR_FILE" random --static-file="static-N${N}-ordered.txt" --dynamic-file="dynamic-N${N}-ordered.txt" -n=5 -k=1 -N="$N" --seed=42 --ordered
   fi
   echo "---------------------------------"
 done
