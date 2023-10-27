@@ -74,6 +74,10 @@ public class BeemanIntegrator implements Integrator {
         advanceStep();
     }
 
+    public double getPreviousPosition() {
+        return prevR;
+    }
+
     public double getNextPosition() {
         double nextR = currR + currV * dT + ((2.0 / 3.0) * a - (1.0 / 6.0) * prevA) * Math.pow(dT, 2);
         if (boundary != null) {
@@ -83,6 +87,10 @@ public class BeemanIntegrator implements Integrator {
             }
         }
         return nextR;
+    }
+
+    public double getPreviousVelocity() {
+        return prevV;
     }
 
     private double getPredictedVelocity() {
