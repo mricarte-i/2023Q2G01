@@ -196,8 +196,9 @@ public class Particle {
     throw new NotImplementedException();
   }
 
-  public void evaluateForce() {
-    throw new NotImplementedException();
+  public void evaluateNextForces() {
+    xIntegrator.evaluateForce((nextX, predVx) -> 0);
+    yIntegrator.evaluateForce((nextY, predVy) -> 0);
   }
 
   public void advanceStep() {
