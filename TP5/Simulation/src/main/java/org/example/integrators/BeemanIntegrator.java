@@ -5,7 +5,7 @@ public class BeemanIntegrator implements Integrator {
     private final double dT, MASS;
     private double prevA, a, prevR, currR, prevV, currV, predictedV, nextR, futureA;
 
-    private final Double lowerBoundary;
+    private final Double boundary;
 
     public BeemanIntegrator(double deltaT, double position, double velocity, double mass,
             ForceCalculator forceCalc) {
@@ -13,7 +13,7 @@ public class BeemanIntegrator implements Integrator {
     }
 
     public BeemanIntegrator(double deltaT, double position, double velocity, double mass,
-                            ForceCalculator forceCalc, Double lowerBoundary) {
+                            ForceCalculator forceCalc, Double boundary) {
         double initForce = forceCalc.calculateForce(position, velocity);
 
         this.dT = deltaT;
@@ -23,7 +23,7 @@ public class BeemanIntegrator implements Integrator {
         this.a = initForce / MASS;
         this.prevR = eulerPosition(position, velocity, -deltaT, mass, initForce);
         this.prevV = eulerVelocity(velocity, -deltaT, mass, initForce);
-        this.lowerBoundary = lowerBoundary;
+        this.boundary = boundary;
     }
 
     private static double eulerPosition(double r, double v, double dT, double m, double f) {
@@ -76,10 +76,10 @@ public class BeemanIntegrator implements Integrator {
 
     public double getNextPosition() {
         double nextR = currR + currV * dT + ((2.0 / 3.0) * a - (1.0 / 6.0) * prevA) * Math.pow(dT, 2);
-        if (lowerBoundary != null) {
-            nextR = nextR % lowerBoundary;
+        if (boundary != null) {
+            nextR = nextR % boundary;
             if (nextR < 0) {
-                nextR += lowerBoundary;
+                nextR += boundary;
             }
         }
         return nextR;
