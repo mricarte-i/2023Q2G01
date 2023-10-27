@@ -184,7 +184,7 @@ public class Particle {
     double prevY = this.yIntegrator.getPreviousPosition();
 
     if (checkContactObstacle(prevX, prevY, radius, rightVertexX, rightVertexY)){
-      prevRightWallContact = true;
+      prevRightVertexContact = true;
     }
   }
 
