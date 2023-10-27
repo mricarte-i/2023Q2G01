@@ -202,7 +202,18 @@ public class Particle {
   }
 
   public void advanceStep() {
-    throw new NotImplementedException();
+    xIntegrator.advanceStep();
+    yIntegrator.advanceStep();
+
+    nextContacts.clear();
+
+    nextLeftWallContact    = false;
+    nextRightWallContact   = false;
+    nextTopWallContact     = false;
+
+    nextLeftVertexContact  = false;
+    nextBaseContact        = false;
+    nextRightVertexContact = false;
   }
 
   @Override
