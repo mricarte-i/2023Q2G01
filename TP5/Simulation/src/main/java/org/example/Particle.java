@@ -57,6 +57,10 @@ public class Particle {
     return checkContactWall(y, r, wallY);
   }
 
+  private static boolean checkContactObstacle(double x, double y, double r, double obsX, double obsY) {
+    return checkContactParticle(x, y, r, obsX, obsY, 0);
+  }
+
   public double getRadius() {
     throw new NotImplementedException();
   }
