@@ -6,8 +6,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.util.*;
 
 public class Particle {
-  private static final float LOAD_FACTOR = 1.0f;
-
   private final int id;
   private BeemanIntegrator xIntegrator;
   private BeemanIntegrator yIntegrator;
