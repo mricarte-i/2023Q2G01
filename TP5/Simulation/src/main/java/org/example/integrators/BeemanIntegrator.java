@@ -93,8 +93,16 @@ public class BeemanIntegrator implements Integrator {
         return currV + (1.0 / 3.0) * futureA * dT + (5.0 / 6.0) * a * dT - (1.0 / 6.0) * prevA * dT;
     }
 
-    public void reinsert(double position) {
-        currR = position;
-        nextR = getNextPosition();
+    public void reinsert(double position, double velocity, ForceCalculator reinsertForceCalc) {
+        double reinsertForce = reinsertForceCalc.calculateForce(position, velocity);
+
+        this.currR = position;
+        this.currV = velocity;
+        this.a = reinsertForce / MASS;
+
+        this.prevR = eulerPosition(position, velocity, -dT, MASS, reinsertForce);
+        this.prevV = eulerVelocity(velocity, -dT, MASS, reinsertForce);
+
+        this.nextR = getNextPosition();
     }
 }
