@@ -39,8 +39,8 @@ public class Particle {
   }
 
   public void initialize() {
-    xIntegrator.initPrevForce((x, vx) -> 0);
-    yIntegrator.initPrevForce((y, vy) -> 0);
+    xIntegrator.initPrevForce((prevX, prevVx) -> 0);
+    yIntegrator.initPrevForce((prevY, prevVy) -> 0);
   }
 
   private static boolean checkContactParticle(double x, double y, double r, double otherX, double otherY, double otherR) {
