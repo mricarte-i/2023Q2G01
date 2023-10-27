@@ -123,7 +123,7 @@ public class Particle {
     double nextY = this.yIntegrator.getNextPosition();
 
     if (checkContactObstacle(nextX, nextY, radius, rightVertexX, rightVertexY)){
-      nextRightWallContact = true;
+      nextRightVertexContact = true;
     }
   }
 
