@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Particle {
+  private static final float LOAD_FACTOR = 1.0f;
 
   private final int id;
   private BeemanIntegrator xIntegrator;
@@ -30,8 +31,8 @@ public class Particle {
   public Particle(int id, double radius, double mass, double pos, double dT, double v, Integer totalParticles) {
     this(id, radius, mass, pos, dT, v);
     if (totalParticles != null) {
-      this.prevContacts = new HashSet<>(totalParticles);
-      this.nextContacts = new HashSet<>(totalParticles);
+      this.prevContacts = new HashSet<>(totalParticles, LOAD_FACTOR);
+      this.nextContacts = new HashSet<>(totalParticles, LOAD_FACTOR);
     } else {
       this.prevContacts = new HashSet<>();
       this.nextContacts = new HashSet<>();
