@@ -41,6 +41,16 @@ public class Particle {
   public void initialize() {
     xIntegrator.initPrevForce((prevX, prevVx) -> 0);
     yIntegrator.initPrevForce((prevY, prevVy) -> 0);
+
+    prevContacts.clear();
+
+    prevLeftWallContact    = false;
+    prevRightWallContact   = false;
+    prevTopWallContact     = false;
+
+    prevLeftVertexContact  = false;
+    prevBaseContact        = false;
+    prevRightVertexContact = false;
   }
 
   private static boolean checkContactParticle(double x, double y, double r, double otherX, double otherY, double otherR) {
