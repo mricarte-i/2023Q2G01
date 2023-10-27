@@ -38,6 +38,11 @@ public class Particle {
     }
   }
 
+  public void initialize() {
+    xIntegrator.initPrevForce((x, vx) -> 0);
+    yIntegrator.initPrevForce((y, vy) -> 0);
+  }
+
   private static boolean checkContactParticle(double x, double y, double r, double otherX, double otherY, double otherR) {
     double euclideanDistance = Math.sqrt(Math.pow(x - otherX, 2) + Math.pow(y - otherY, 2));
     return euclideanDistance <= r + otherR;
