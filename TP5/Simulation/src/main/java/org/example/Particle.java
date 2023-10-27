@@ -40,15 +40,7 @@ public class Particle {
     throw new NotImplementedException();
   }
 
-  public void setRadius(double radius) {
-    throw new NotImplementedException();
-  }
-
   public double getMass() {
-    throw new NotImplementedException();
-  }
-
-  public void setMass(double mass) {
     throw new NotImplementedException();
   }
 
