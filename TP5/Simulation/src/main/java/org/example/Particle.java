@@ -43,6 +43,20 @@ public class Particle {
     return euclideanDistance <= r + otherR;
   }
 
+  private static boolean checkContactWall(double position, double r, double wallPosition) {
+    if (position < wallPosition)
+      return wallPosition - position <= r;
+    return position - wallPosition <= r;
+  }
+
+  private static boolean checkContactVerticalWall(double x, double r, double wallX) {
+    return checkContactWall(x, r, wallX);
+  }
+
+  private static boolean checkContactHorizontalWall(double y, double r, double wallY) {
+    return checkContactWall(y, r, wallY);
+  }
+
   public double getRadius() {
     throw new NotImplementedException();
   }
