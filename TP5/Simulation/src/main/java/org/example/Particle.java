@@ -14,12 +14,10 @@ public class Particle {
   private final double mass, radius;
   private Set<Particle> prevContacts, nextContacts;
 
-  /*
-  private double radius, mass, u, initR, initV, boundary;
-  private BeemanIntegrator integrator;
-  private boolean leftContact, rightContact;
-  private Particle leftNeighbour, rightNeighbour;
-   */
+  private boolean prevLeftWallContact, prevRightWallContact, prevTopWallContact;
+  private boolean prevLeftVertexContact, prevBaseContact, prevRightVertexContact;
+  private boolean nextLeftWallContact, nextRightWallContact, nextTopWallContact;
+  private boolean nextLeftVertexContact, nextBaseContact, nextRightVertexContact;
 
   private Particle(int id, double radius, double mass, double pos, double dT, double v) {
     this.id = id;
