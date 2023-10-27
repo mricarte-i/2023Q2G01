@@ -3,12 +3,16 @@ package org.example;
 import org.example.integrators.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Particle {
 
   private final int id;
   private BeemanIntegrator xIntegrator;
   private BeemanIntegrator yIntegrator;
   private final double mass, radius;
+  private Set<Particle> prevContacts, nextContacts;
 
   /*
   private double radius, mass, u, initR, initV, boundary;
@@ -17,12 +21,23 @@ public class Particle {
   private Particle leftNeighbour, rightNeighbour;
    */
 
-  public Particle(int id, double radius, double mass, double pos, double dT, double v, double boundary) {
+  private Particle(int id, double radius, double mass, double pos, double dT, double v) {
     this.id = id;
     this.xIntegrator = new BeemanIntegrator(dT, pos, v, mass, (x, y) -> 0);
     this.yIntegrator = new BeemanIntegrator(dT, pos, v, mass, (x, y) -> 0);
     this.radius = radius;
     this.mass = mass;
+  }
+
+  public Particle(int id, double radius, double mass, double pos, double dT, double v, Integer totalParticles) {
+    this(id, radius, mass, pos, dT, v);
+    if (totalParticles != null) {
+      this.prevContacts = new HashSet<>(totalParticles);
+      this.nextContacts = new HashSet<>(totalParticles);
+    } else {
+      this.prevContacts = new HashSet<>();
+      this.nextContacts = new HashSet<>();
+    }
   }
 
   public double getRadius() {
