@@ -7,8 +7,8 @@ import java.util.*;
 
 public class Particle {
   private final int id;
-  private BeemanIntegrator xIntegrator;
-  private BeemanIntegrator yIntegrator;
+  private final BeemanIntegrator xIntegrator;
+  private final BeemanIntegrator yIntegrator;
   private final double mass, radius;
   private List<Particle> prevContacts, nextContacts;
 
