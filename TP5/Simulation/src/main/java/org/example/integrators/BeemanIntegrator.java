@@ -34,7 +34,7 @@ public class BeemanIntegrator implements Integrator {
         return v + (dT / m) * f;
     }
 
-    public void init(ForceCalculator prevForceCalc) {
+    public void initPrevForce(ForceCalculator prevForceCalc) {
         this.prevA = prevForceCalc.calculateForce(prevR, prevV) / MASS;
     }
 
