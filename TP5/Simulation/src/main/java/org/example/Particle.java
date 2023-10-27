@@ -21,8 +21,8 @@ public class Particle {
 
   private Particle(int id, double radius, double mass, double pos, double dT, double v) {
     this.id = id;
-    this.xIntegrator = new BeemanIntegrator(dT, pos, v, mass, (x, y) -> 0);
-    this.yIntegrator = new BeemanIntegrator(dT, pos, v, mass, (x, y) -> 0);
+    this.xIntegrator = new BeemanIntegrator(dT, pos, v, mass, (x, vx) -> 0);
+    this.yIntegrator = new BeemanIntegrator(dT, pos, v, mass, (y, vy) -> 0);
     this.radius = radius;
     this.mass = mass;
   }
