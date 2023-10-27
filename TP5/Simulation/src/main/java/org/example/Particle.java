@@ -122,6 +122,67 @@ public class Particle {
     }
   }
 
+  public void checkPrevStepContact(Particle p) {
+    double prevX = this.xIntegrator.getPreviousPosition();
+    double prevY = this.yIntegrator.getPreviousPosition();
+
+    double prevOtherX = p.xIntegrator.getPreviousPosition();
+    double prevOtherY = p.yIntegrator.getPreviousPosition();
+
+    if (checkContactParticle(prevX, prevY, radius, prevOtherX, prevOtherY, p.radius))
+      prevContacts.add(p);
+  }
+
+  public void checkPrevStepContactLeftWall(double leftWallX) {
+    double prevX = this.xIntegrator.getPreviousPosition();
+
+    if (checkContactVerticalWall(prevX, radius, leftWallX)) {
+      prevLeftWallContact = true;
+    }
+  }
+
+  public void checkPrevStepContactRightWall(double rightWallX) {
+    double prevX = this.xIntegrator.getPreviousPosition();
+
+    if (checkContactVerticalWall(prevX, radius, rightWallX)) {
+      prevRightWallContact = true;
+    }
+  }
+
+  public void checkPrevStepContactTopWall(double topWallY) {
+    double prevY = this.yIntegrator.getPreviousPosition();
+
+    if (checkContactHorizontalWall(prevY, radius, topWallY)) {
+      prevTopWallContact = true;
+    }
+  }
+
+  public void checkPrevStepContactBase(double baseY) {
+    double prevY = this.yIntegrator.getPreviousPosition();
+
+    if (checkContactHorizontalWall(prevY, radius, baseY)) {
+      prevBaseContact = true;
+    }
+  }
+
+  public void checkPrevStepContactLeftVertex(double leftVertexX, double leftVertexY) {
+    double prevX = this.xIntegrator.getPreviousPosition();
+    double prevY = this.yIntegrator.getPreviousPosition();
+
+    if (checkContactObstacle(prevX, prevY, radius, leftVertexX, leftVertexY)) {
+      prevLeftVertexContact = true;
+    }
+  }
+
+  public void checkPrevStepContactRightVertex(double rightVertexX, double rightVertexY) {
+    double prevX = this.xIntegrator.getPreviousPosition();
+    double prevY = this.yIntegrator.getPreviousPosition();
+
+    if (checkContactObstacle(prevX, prevY, radius, rightVertexX, rightVertexY)){
+      prevRightWallContact = true;
+    }
+  }
+
   public double getRadius() {
     throw new NotImplementedException();
   }
