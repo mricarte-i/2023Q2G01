@@ -3,8 +3,7 @@ package org.example;
 import org.example.integrators.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Particle {
   private static final float LOAD_FACTOR = 1.0f;
@@ -13,7 +12,7 @@ public class Particle {
   private BeemanIntegrator xIntegrator;
   private BeemanIntegrator yIntegrator;
   private final double mass, radius;
-  private Set<Particle> prevContacts, nextContacts;
+  private List<Particle> prevContacts, nextContacts;
 
   private boolean prevLeftWallContact, prevRightWallContact, prevTopWallContact;
   private boolean prevLeftVertexContact, prevBaseContact, prevRightVertexContact;
@@ -31,11 +30,11 @@ public class Particle {
   public Particle(int id, double radius, double mass, double pos, double dT, double v, Integer totalParticles) {
     this(id, radius, mass, pos, dT, v);
     if (totalParticles != null) {
-      this.prevContacts = new HashSet<>(totalParticles, LOAD_FACTOR);
-      this.nextContacts = new HashSet<>(totalParticles, LOAD_FACTOR);
+      this.prevContacts = new ArrayList<>(totalParticles);
+      this.nextContacts = new ArrayList<>(totalParticles);
     } else {
-      this.prevContacts = new HashSet<>();
-      this.nextContacts = new HashSet<>();
+      this.prevContacts = new LinkedList<>();
+      this.nextContacts = new LinkedList<>();
     }
   }
 
