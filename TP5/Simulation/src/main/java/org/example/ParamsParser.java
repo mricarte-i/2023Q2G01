@@ -316,9 +316,8 @@ public class ParamsParser {
                 Iterator<Double> radiiIter = radii.iterator();
 
                 for (int id = 0; id < N; id++) {
+                    radius = radiiIter.next();
                     do {
-                        radius = radiiIter.next();
-
                         particleXLower = xLower + radius;
                         particleXUpper = xUpper - radius;
                         particleXRange = particleXUpper - particleXLower;
