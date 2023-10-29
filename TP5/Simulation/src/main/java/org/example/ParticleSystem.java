@@ -3,6 +3,7 @@ package org.example;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
+import java.util.Random;
 
 public class ParticleSystem {
     private ParamsParser paramsParser;
@@ -10,8 +11,19 @@ public class ParticleSystem {
     private Writer writer;
     private double TF = 1000;
     private double GRAVITY = 0.098; //en la consulta dijieron usar 9.8 cm/s^2 para la gravedad
-
+    private Random random;
     private double baseY = 0;
+    private double W, L, D;
+
+    public ParticleSystem() {
+        this.paramsParser = ParamsParser.getInstance();
+        this.writer = new Writer();
+        //set up writer and paramsparser
+        random = paramsParser.getRandom();
+        W = paramsParser.getW();
+        L = paramsParser.getL();
+        D = paramsParser.getD();
+    }
     private void calculateNextNeighbors(){
         throw new NotImplementedException();
         //use cell index to get a map of all neighbors for each particle
@@ -33,23 +45,47 @@ public class ParticleSystem {
         }
     }
 
+    private void reinsertParticle(Particle p) {
+        double x, y;
+        double r = p.getRadius();
+        double heightRange = 30; //todo: assumes L = 70, y in [40,70]
+        boolean overlaps = false;
+        do {
+            x = random.nextDouble() * (W - 2*r) + r;
+            y = random.nextDouble() * (heightRange - 2*r) + r + 40;
+            overlaps = false;
+
+            for(Particle other: particles) {
+                if(!other.equals(p)){
+                    double dx = x - other.getPositionX();
+                    double dy = y - other.getPositionY();
+                    double minDist = r + other.getRadius();
+
+                    if((dx*dx) + (dy*dy) <= (minDist*minDist)){
+                        overlaps = true;
+                        break; //overlapped with another particle, retry
+                    }
+                }
+            }
+        } while(overlaps);
+
+        p.reinsert(x, y);
+    }
+
     private void reinsertParticles() {
         double lowerBound = paramsParser.getLowerBound();
         for(Particle p : this.particles){
             if(p.needsReinsertion(lowerBound)) {
-                /*TODO:
-                    - reset velocity and acceleration
-                    - get random x,y (40< y <70) without overlapping
-                */
+                reinsertParticle(p);
             }
         }
     }
 
-    private void checkNextContacts(double time) {
+    private void checkNextContacts() {
         double lwx = 0;
-        double rwx = paramsParser.getW();
-        double lvx = (paramsParser.getW() - paramsParser.getD())/2, rvx = (paramsParser.getW() + paramsParser.getD())/2;
-        double twy = baseY + paramsParser.getL();
+        double rwx = W;
+        double lvx = (W - D)/2, rvx = (W + D)/2;
+        double twy = baseY + L;
 
         for (Particle pi: this.particles) {
             // 1 - check for particle-particle interactions
@@ -69,24 +105,24 @@ public class ParticleSystem {
         }
     }
     public void simulate() {
-        this.paramsParser = ParamsParser.getInstance();
         this.particles = paramsParser.getParticles();
-        this.writer = new Writer();
         this.writer.writeStatic();
 
-        double simStep = Math.pow(10, -paramsParser.getDeltaT());
+        double simStep = Math.pow(10, -paramsParser.getDeltaT()); //deltaT should be 3
         double time = 0;
         int iter = 0;
+
         this.writer.writeState(time, this.particles);
 
         while(time < TF) {
             advanceBase(time);
             //TODO cell index
             //calculateNextNeighbors();
-            checkNextContacts(time);
+            checkNextContacts();
             evaluateParticleForces();
             advanceParticles();
             reinsertParticles();
+
             iter++;
             time = iter*simStep;
 
