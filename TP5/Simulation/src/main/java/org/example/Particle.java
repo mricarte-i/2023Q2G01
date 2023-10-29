@@ -23,16 +23,16 @@ public class Particle {
   private double sumRelVel = 0;
    */
 
-  private Particle(int id, double radius, double mass, double pos, double dT, double v) {
+  private Particle(int id, double radius, double mass, double x, double y, double dT, double vx, double vy) {
     this.id = id;
-    this.xIntegrator = new BeemanIntegrator(dT, pos, v, mass, (x, vx) -> 0);
-    this.yIntegrator = new BeemanIntegrator(dT, pos, v, mass, (y, vy) -> 0);
+    this.xIntegrator = new BeemanIntegrator(dT, x, vx, mass, (pos, vel) -> 0);
+    this.yIntegrator = new BeemanIntegrator(dT, y, vy, mass, (pos, vel) -> 0);
     this.radius = radius;
     this.mass = mass;
   }
 
-  public Particle(int id, double radius, double mass, double pos, double dT, double v, Integer totalParticles) {
-    this(id, radius, mass, pos, dT, v);
+  public Particle(int id, double radius, double mass, double x, double y, double dT, double vx, double vy, Integer totalParticles) {
+    this(id, radius, mass, x, y, dT, vx, vy);
     if (totalParticles != null) {
       this.prevContacts = new ArrayList<>(totalParticles);
       this.nextContacts = new ArrayList<>(totalParticles);
