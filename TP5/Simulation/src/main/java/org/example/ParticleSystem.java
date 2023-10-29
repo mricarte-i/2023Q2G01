@@ -5,7 +5,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.util.List;
 import java.util.Random;
 
-public class ParticleSystem {
+public class ParticleSystem implements SimulationSystem {
     private ParamsParser paramsParser;
     private List<Particle> particles;
     private Writer writer;
