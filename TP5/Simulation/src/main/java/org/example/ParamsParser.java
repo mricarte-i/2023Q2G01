@@ -50,7 +50,7 @@ public class ParamsParser {
     private final String staticFile;
     private final String dynamicFile;
 
-    private final Long seed;
+    private final Random random;
 
     public List<Particle> getParticles() {
         return particles;
@@ -249,7 +249,6 @@ public class ParamsParser {
 
                 String staticFile = this.granularSimParserMixin.staticFile;
                 String dynamicFile = this.granularSimParserMixin.dynamicFile;
-                Long seed = this.granularSimParserMixin.seed;
 
                 Random rand = granularSimParserMixin.seed == null ? new Random() : new Random(granularSimParserMixin.seed);
 
@@ -340,12 +339,11 @@ public class ParamsParser {
 
             private List<Particle> generateParticles(int N, double lowerX, double upperX, double lowerY, double upperY,
                                                      double lowerRadius, double upperRadius, double particleMass,
-                                                     double integrationStepExp) {
+                                                     double integrationStepExp, Random rand) {
                 List<Particle> particles = new ArrayList<>(N);
                 if (N <= 0)
                     return particles;
 
-                Random rand = granularSimParserMixin.seed == null ? new Random() : new Random(granularSimParserMixin.seed);
                 double x;
                 double y;
                 double radius;
