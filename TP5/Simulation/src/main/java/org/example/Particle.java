@@ -17,6 +17,11 @@ public class Particle {
   private boolean nextLeftWallContact, nextRightWallContact, nextTopWallContact;
   private boolean nextLeftVertexContact, nextBaseContact, nextRightVertexContact;
 
+  private static final int K = 250;
+  private static final double GAMMA = 2.50;
+  private static final int L = 70; // TODO: ver si se puede obtener el parametro de otro lado aunque valga siempre lo mismo
+  private static final int W = 20; // TODO: ver si se puede obtener el parametro de otro lado aunque valga siempre lo mismo
+
   /*
   TODO
     for use in tangential force t1_2
@@ -230,17 +235,17 @@ public class Particle {
     nextRightVertexContact = false;
   }
 
-  private static double[] calculateNormalVersor(double x, double y, double r, double oX, double oY, double oR) {
-    double rDiff = Math.abs(oR-r);
-    double enx = (oY-y)/rDiff;
-    double eny = (oX-x)/rDiff;
+  private static double[] calculateNormalVersor(double x, double y, double oX, double oY) {
+    double rDiff = Math.abs(Math.sqrt(oX*oX + oY*oY) - Math.sqrt(x*x + y*y));
+    double enx = (oX-x)/rDiff;
+    double eny = (oY-y)/rDiff;
     double[] out = {enx, eny};
 
     return out;
   }
 
-  private static double[] calculateTangentialVersor(double x, double y, double r, double oX, double oY, double oR) {
-    double[] normalVersor = calculateNormalVersor(x,y,r,oX,oY,oR);
+  private static double[] calculateTangentialVersor(double x, double y, double oX, double oY) {
+    double[] normalVersor = calculateNormalVersor(x,y,oX,oY);
     double[] out = {-normalVersor[1], normalVersor[0]};
 
     return out;
@@ -262,7 +267,7 @@ public class Particle {
   */
 
   private static double calculateTangentialForce(double x, double y, double r, double[] v, double oX, double oY, double oR, double[] oV, double MU, double KT) {
-    double[] tangentialVersor = calculateTangentialVersor(x,y,r,oX,oY,oR);
+    double[] tangentialVersor = calculateTangentialVersor(x,y,oX,oY);
     double[] relativeVelocity = {v[0]-oV[0], v[1] -oV[1]};
     //dot product of v_rel on t
     double dotProduct = relativeVelocity[0] * tangentialVersor[0] + relativeVelocity[1] * tangentialVersor[1];
@@ -271,7 +276,7 @@ public class Particle {
     //magnitude of the projection of v_rel on t
     double v_rel_t = dotProduct / magT;
 
-    double normalForce = calculateNormalForce(x,y,r,oX,oY,oR);
+    double normalForce = calculateNormalForce(x,y,v,oX,oY,oV);
     double t1_1 = -MU * Math.abs(normalForce) * sign(v_rel_t);
     //TODO WHY STATIC???
     //sumRelativeVelocities needs a way to add up these velocities throughout the duration of the overlap
@@ -333,4 +338,172 @@ public class Particle {
   private double getVelocityY() {
     return this.yIntegrator.getVelocity();
   }
+
+
+  private double calculateNormalForce(double x, double y) {
+
+  }
+
+  private double calculateNormalForce(double x, double y, double[] v, double otherX, double otherY, double[] otherV) {
+    double[] normalVersor = calculateNormalVersor(x, y, otherX, otherY);
+    double[] relativeVelocity = {v[0]-otherV[0], v[1] -otherV[1]};
+    //dot product of relativeVelocity on normal direction
+    double dotProduct = relativeVelocity[0] * normalVersor[0] + relativeVelocity[1] * normalVersor[1];
+    //magnitude of normal
+    double magN = Math.sqrt(normalVersor[0] * normalVersor[0] + normalVersor[1] * normalVersor[1]);
+    //magnitude of the projection of relativeVelocity on normal direction
+    double relativeSpeed = dotProduct / magN;
+
+
+    double overlap = 2 * radius - Math.abs(Math.sqrt(x*x + y*y) - Math.sqrt(otherX*otherX + otherY*otherY));
+
+    if (overlap < 0)
+      return 0;
+
+    return -K * overlap - GAMMA * relativeSpeed;
+  }
+
+  private double calculateNormalForceVerticalWall(double x, double y, double[] v, double wallX) {
+    double[] normalVersor = calculateNormalVersor(x, y, wallX, y);
+    double[] relativeVelocity = {v[0] - 0, v[1] - 0};
+    //dot product of relativeVelocity on normal direction
+    double dotProduct = relativeVelocity[0] * normalVersor[0] + relativeVelocity[1] * normalVersor[1];
+    //magnitude of normal
+    double magN = Math.sqrt(normalVersor[0] * normalVersor[0] + normalVersor[1] * normalVersor[1]);
+    //magnitude of the projection of relativeVelocity on normal direction
+    double relativeSpeed = dotProduct / magN;
+
+    double overlap = 0;
+    if (x > wallX && x < wallX + radius)
+      overlap = wallX - (x - radius);
+    else if (x < wallX && x > wallX - radius)
+      overlap = -wallX + x + radius;
+
+    return -K * overlap - GAMMA * relativeSpeed;
+  }
+
+  private double calculateNormalForceHorizontalWall(double x, double y, double[] v, double wallY) {
+    double[] normalVersor = calculateNormalVersor(x, y, x, wallY);
+    double[] relativeVelocity = {v[0] - 0, v[1] - 0};
+    //dot product of relativeVelocity on normal direction
+    double dotProduct = relativeVelocity[0] * normalVersor[0] + relativeVelocity[1] * normalVersor[1];
+    //magnitude of normal
+    double magN = Math.sqrt(normalVersor[0] * normalVersor[0] + normalVersor[1] * normalVersor[1]);
+    //magnitude of the projection of relativeVelocity on normal direction
+    double relativeSpeed = dotProduct / magN;
+
+    double overlap = 0;
+    if (y > wallY && y < wallY + radius)
+      overlap = wallY - (y - radius);
+    else if (y < wallY && y > wallY - radius)
+      overlap = -wallY + y + radius;
+
+    return -K * overlap - GAMMA * relativeSpeed;
+  }
+
+  private double calculateNormalForceObstacle(double x, double y, double[] v, double obstacleX, double obstacleY) {
+    double[] obstacleV = {0, 0};
+
+    return calculateNormalForce(x, y, v, obstacleX, obstacleY, obstacleV);
+  }
+
+  private double calculatePrevNormalForce(Particle p) {
+
+  }
+
+  private double calculatePrevNormalForceVerticalWall(double wallX) {
+
+  }
+
+  private double calculatePrevNormalForceHorizontalWall(double wallY) {
+
+  }
+
+  private double calculatePrevNormalForceObstacle(double obstacleX, double obstacleY) {
+
+  }
+
+  private double calculateNextNormalForce(Particle p) {
+
+  }
+
+  private double calculateNextNormalForceVerticalWall(double wallX) {
+
+  }
+
+  private double calculateNextNormalForceHorizontalWall(double wallY) {
+
+  }
+
+  private double calculateNextNormalForceObstacle(double obstacleX, double obstacleY) {
+
+  }
+
+  private double proyectX(double normalForce, double tangencialForce) {
+
+  }
+
+  private double proyectY(double normalForce, double tangencialForce) {
+
+  }
+
+  private double calculatePrevXForce() {
+
+  }
+
+  private double calculatePrevYForce() {
+
+  }
+
+  private double calculateNextXForce() {
+
+  }
+
+  private double calculateNextYForce() {
+
+  }
+
+  public boolean needsReinsertion(double lowerBound) {
+    return yIntegrator.getPosition() < lowerBound - L / 10;
+  }
+
+  public void reinsert() {
+    xIntegrator.reinsert(Math.random() * W, 0, (x, vx) -> 0 );
+    xIntegrator.reinsert(Math.random() * 30 + 40, 0, (y, vy) -> 0 );
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
