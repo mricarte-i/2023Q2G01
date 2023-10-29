@@ -113,8 +113,8 @@ public class ParamsParser {
     public String getDynamicFile() {
         return dynamicFile;
     }
-    public Long getSeed() {
-        return seed;
+    public Random getRandom() {
+        return random;
     }
 
     private ParamsParser(SimulationSystem simulationSystem, List<Particle> particles,
@@ -122,7 +122,7 @@ public class ParamsParser {
                          Double reinjectionUpperBound, Double reinjectionLowerBound,
                          Double w, Double A, Double Kn, Double Kt, Double gamma, Double mu,
                          Integer N, Integer n, Integer k,
-                         String staticFile, String dynamicFile, Long seed) {
+                         String staticFile, String dynamicFile, Random random) {
         this.simulationSystem = simulationSystem;
         this.particles  = particles;
 
@@ -152,7 +152,7 @@ public class ParamsParser {
 
         this.staticFile  = staticFile;
         this.dynamicFile = dynamicFile;
-        this.seed = seed;
+        this.random = random;
     }
 
     @Command(name = "granularSim", description = SYSTEM_DESCRIPTION,
@@ -251,7 +251,9 @@ public class ParamsParser {
                 String dynamicFile = this.granularSimParserMixin.dynamicFile;
                 Long seed = this.granularSimParserMixin.seed;
 
-                List<Particle> particles = generateParticles(N, 0, W, 0, L, radiiLowerBound, radiiUpperBound, particleMass, n);
+                Random rand = granularSimParserMixin.seed == null ? new Random() : new Random(granularSimParserMixin.seed);
+
+                List<Particle> particles = generateParticles(N, 0, W, 0, L, radiiLowerBound, radiiUpperBound, particleMass, n, rand);
                 ParticleSystem ps = new ParticleSystem();
 
                 return new ParamsParser(
@@ -262,7 +264,7 @@ public class ParamsParser {
                         w, A, Kn, Kt, gamma, mu,
                         N, n, k,
                         staticFile, dynamicFile,
-                        seed
+                        rand
                 );
             }
 
