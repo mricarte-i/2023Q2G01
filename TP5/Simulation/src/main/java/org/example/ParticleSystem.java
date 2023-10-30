@@ -69,7 +69,7 @@ public class ParticleSystem implements SimulationSystem {
             }
         } while(overlaps);
 
-        p.reinsert(x, y);
+        p.reinsert();
     }
 
     private void reinsertParticles() {
