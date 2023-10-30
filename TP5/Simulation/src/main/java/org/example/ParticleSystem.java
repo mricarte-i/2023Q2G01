@@ -17,7 +17,7 @@ public class ParticleSystem implements SimulationSystem {
 
     public ParticleSystem() {
         this.paramsParser = ParamsParser.getInstance();
-        this.writer = new Writer();
+        this.writer = new Writer(paramsParser.getDynamicFile());
         //set up writer and paramsparser
         random = paramsParser.getRandom();
         W = paramsParser.getW();
@@ -73,7 +73,7 @@ public class ParticleSystem implements SimulationSystem {
     }
 
     private void reinsertParticles() {
-        double lowerBound = paramsParser.getLowerBound();
+        double lowerBound = paramsParser.getLowerOutOfBoundsPosition();
         for(Particle p : this.particles){
             if(p.needsReinsertion(lowerBound)) {
                 reinsertParticle(p);
@@ -106,9 +106,9 @@ public class ParticleSystem implements SimulationSystem {
     }
     public void simulate() {
         this.particles = paramsParser.getParticles();
-        this.writer.writeStatic();
+        this.writer.writeStatic(paramsParser.getStaticFile(), paramsParser.getL(), paramsParser.getW(), particles);
 
-        double simStep = Math.pow(10, -paramsParser.getDeltaT()); //deltaT should be 3
+        double simStep = Math.pow(10, -paramsParser.getStateWritingDeltaTimeExp()); //deltaT should be 3
         double time = 0;
         int iter = 0;
 
@@ -129,7 +129,7 @@ public class ParticleSystem implements SimulationSystem {
             this.writer.writeState(time, particles);
         }
 
-        this.writer.closeState();
+        this.writer.close();
     }
 
 }
