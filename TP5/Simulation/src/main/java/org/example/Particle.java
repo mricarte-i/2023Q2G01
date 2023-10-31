@@ -236,7 +236,7 @@ public class Particle {
   }
 
   private static double[] calculateNormalVersor(double x, double y, double oX, double oY) {
-    double rDiff = Math.abs(Math.sqrt(oX*oX + oY*oY) - Math.sqrt(x*x + y*y));
+    double rDiff = Math.sqrt(Math.pow(oX-x, 2) + Math.pow(oY-y, 2));
     double enx = (oX-x)/rDiff;
     double eny = (oY-y)/rDiff;
     double[] out = {enx, eny};
