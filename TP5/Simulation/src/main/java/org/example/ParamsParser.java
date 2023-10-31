@@ -26,7 +26,7 @@ public class ParamsParser {
     private final static int DEFAULT_PARTICLE_COUNT = 200;
     private final static int INTEGRATION_EXP = 3;
 
-    private final SimulationSystem simulationSystem;
+    private final Supplier<SimulationSystem> simulationSystem;
     private final List<Particle> particles;
 
     private final double L;
@@ -56,7 +56,7 @@ public class ParamsParser {
         return particles;
     }
     public SimulationSystem getSimulationSystem() {
-        return simulationSystem;
+        return simulationSystem.get();
     }
 
     public double getL() {
@@ -117,7 +117,7 @@ public class ParamsParser {
         return random;
     }
 
-    private ParamsParser(SimulationSystem simulationSystem, List<Particle> particles,
+    private ParamsParser(Supplier<SimulationSystem> simulationSystem, List<Particle> particles,
                          Double L, Double W, Double D,
                          Double reinjectionUpperBound, Double reinjectionLowerBound,
                          Double w, Double A, Double Kn, Double Kt, Double gamma, Double mu,
@@ -253,10 +253,9 @@ public class ParamsParser {
                 Random rand = granularSimParserMixin.seed == null ? new Random() : new Random(granularSimParserMixin.seed);
 
                 List<Particle> particles = generateParticles(N, 0, W, 0, L, radiiLowerBound, radiiUpperBound, particleMass, n, rand);
-                ParticleSystem ps = new ParticleSystem();
 
                 return new ParamsParser(
-                        ps, particles,
+                        ParticleSystem::new, particles,
                         L, W, D,
                         reinjectionUpperBound,
                         reinjectionLowerBound,
