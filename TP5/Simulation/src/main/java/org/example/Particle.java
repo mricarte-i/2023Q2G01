@@ -332,10 +332,10 @@ public class Particle {
     throw new NotImplementedException();
   }
 
-  private double getVelocityX() {
+  public double getVelocityX() {
     return this.xIntegrator.getVelocity();
   }
-  private double getVelocityY() {
+  public double getVelocityY() {
     return this.yIntegrator.getVelocity();
   }
 
