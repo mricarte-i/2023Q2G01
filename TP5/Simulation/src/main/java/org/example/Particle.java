@@ -251,11 +251,6 @@ public class Particle {
     return out;
   }
 
-
-  private static double sign(double value) {
-    return value < 0 ? -1 : value == 0 ? 0 : 1;
-  }
-
   /*
   TODO tangential force is static (probably because of how integrators work)
     but using t1_2 would need to have a way to keep in memory previous v_rel_t*DT to sum up
@@ -266,34 +261,61 @@ public class Particle {
   }
   */
 
-  private static double calculateTangentialForce(double x, double y, double r, double[] v, double oX, double oY, double oR, double[] oV, double MU, double KT) {
-    double[] tangentialVersor = calculateTangentialVersor(x,y,oX,oY);
-    double[] relativeVelocity = {v[0]-oV[0], v[1] -oV[1]};
-    //dot product of v_rel on t
-    double dotProduct = relativeVelocity[0] * tangentialVersor[0] + relativeVelocity[1] * tangentialVersor[1];
-    //magnitude of t
-    double magT = Math.sqrt(tangentialVersor[0] * tangentialVersor[0] + tangentialVersor[1] * tangentialVersor[1]);
-    //magnitude of the projection of v_rel on t
-    double v_rel_t = dotProduct / magT;
+  private static double calculateT1_1(double normalForce, double relVt, double MU){
+    double signRelVt = Math.signum(relVt);
+    //double normalForce = calculateNormalForce(x,y,v,oX,oY,oV);
+    return -MU * Math.abs(normalForce) * signRelVt;
+  }
 
-    double normalForce = calculateNormalForce(x,y,v,oX,oY,oV);
-    double t1_1 = -MU * Math.abs(normalForce) * sign(v_rel_t);
+  private static double calculateT1_2(double relVt, double deltaT, double KT, List<Double> forceMemory) {
+    double relVtMag = Math.abs(relVt);
+
+    double currS = deltaT * relVtMag;
+    forceMemory.add(currS);
+
+    double sumS = 0;
+    for (Double force : forceMemory){
+      sumS += force;
+    }
+
+    return -KT * sumS;
+  }
+
+  private static double calculateT3(double r, double oR, double x, double oX, double y, double oY, double relVt, double KT){
+    double relVtMag = Math.abs(relVt);
+
+    double[] relativePos = {x-oX, y-oY};
+    double s = r + oR - Math.sqrt(Math.pow(relativePos[0], 2) + Math.pow(relativePos[1], 2));
+
+      return -KT * s / relVtMag;
+  }
+
+  private static double calculateTangentialForce(double normalForce, double x, double y, double r, double[] v, double oX, double oY, double oR, double[] oV,
+                                                 double MU, double KT, double deltaT, List<Double> forceMemory) {
+    double[] tangentialVersor = calculateTangentialVersor(x,y,oX,oY);
+    double[] relV = {v[0]-oV[0], v[1]-oV[1]};
+
+    //dot product of v_rel on t
+    double relVt = relV[0] * tangentialVersor[0] + relV[1] * tangentialVersor[1];
+
+    double t1_1 = calculateT1_1(relVt, normalForce, MU);
+
     //TODO WHY STATIC???
     //sumRelativeVelocities needs a way to add up these velocities throughout the duration of the overlap
     //that value cannot be shared between all instances
     //double t1_2 = -KT * sumRelativeVelocities(DT*v_rel_t);
+    double t1_2 = calculateT1_2(relVt, deltaT, KT, forceMemory);
 
     //WORKAROUND: dijieron en clase que si t1_2 suponia problemas, podia usarse t_3
-    double[] s = {r + oR - Math.abs(oX - x), r + oR - Math.abs(oY - y)};
-    double dotProductSonT = s[0] * tangentialVersor[0] + s[1] * tangentialVersor[1];
-    double t3 = -KT * (dotProductSonT / magT) * v_rel_t;
+    //double t3 = calculateT3(r, oR, x, oX, y, oY, relVt, KT);
 
-    return Math.min(t1_1, t3);// t1_2);
+    return Math.min(t1_1, t1_2);// t3);
   }
 
-  private static double calculateTangentialForceObstacle(double x, double y, double r, double[] v, double obsX, double obsY, double MU, double KT) {
+  private static double calculateTangentialForceObstacle(double normalForce, double x, double y, double r, double[] v,
+                                                         double obsX, double obsY, double MU, double KT, double deltaT, List<Double> forceMemory) {
     double[] obsV = {0, 0};
-    return calculateTangentialForce(x, y, r, v, obsX, obsY, 0, obsV, MU, KT);
+    return calculateTangentialForce(normalForce, x, y, r, v, obsX, obsY, 0, obsV, MU, KT, deltaT, forceMemory);
   }
 
   private static double calculateTangentialForceHorizontalWall(double x, double y, double MU, double KT) {
