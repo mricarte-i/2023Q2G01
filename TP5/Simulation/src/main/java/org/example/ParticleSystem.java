@@ -24,6 +24,13 @@ public class ParticleSystem implements SimulationSystem {
         L = paramsParser.getL();
         D = paramsParser.getD();
     }
+
+    private void initParticles(){
+        for (Particle particle : this.particles) {
+            particle.initialize();
+        }
+    }
+
     private void calculateNextNeighbors(){
         throw new NotImplementedException();
         //use cell index to get a map of all neighbors for each particle
@@ -113,6 +120,8 @@ public class ParticleSystem implements SimulationSystem {
         int iter = 0;
 
         this.writer.writeState(time, this.particles);
+
+        initParticles();
 
         while(time < TF) {
             advanceBase(time);
