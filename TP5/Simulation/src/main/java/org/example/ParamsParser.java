@@ -6,6 +6,7 @@ import picocli.CommandLine.*;
 
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 public class ParamsParser {
     private static final String SYSTEM_DESCRIPTION = "Simulate a granular system of particles with vibrating base.";
