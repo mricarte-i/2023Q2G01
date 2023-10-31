@@ -61,7 +61,7 @@ public class Writer {
         try{
             this.fileWriter.write(timestamp + "\n");
             for(Particle particle: particles) {
-                this.fileWriter.write(particle.getPosition() + " " + particle.getVelocity() + "\n");
+                this.fileWriter.write(particle.getPositionX() + " " + particle.getPositionY() + " " + particle.getVelocityX() + " " + particle.getVelocityY() + "\n");
             }
         }catch (IOException e){
             throw new RuntimeException("Error writing to file " + fileName);
