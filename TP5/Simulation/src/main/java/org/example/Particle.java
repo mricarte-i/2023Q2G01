@@ -771,29 +771,209 @@ public class Particle {
     return calculateNormalForceObstacle(x, y, v, obstacleX, obstacleY, obsVelX, obsVelY);
   }
 
-  private double proyectX(double normalForce, double tangencialForce, double[] normalVersor) {
-    return normalForce * normalVersor[0] - tangencialForce * normalVersor[1];
+  private double proyectX(double normalForce, double tangencialForce, double normalVersorX, double normalVersorY) {
+    return normalForce * normalVersorX - tangencialForce * normalVersorY;
   }
 
-  private double proyectY(double normalForce, double tangencialForce, double[] normalVersor) {
-    return normalForce * normalVersor[1] + tangencialForce * normalVersor[0];
-
-  }
-
-  private double calculatePrevXForce() {
+  private double proyectY(double normalForce, double tangencialForce, double normalVersorX, double normalVersorY) {
+    return normalForce * normalVersorY + tangencialForce * normalVersorX;
 
   }
 
-  private double calculatePrevYForce() {
+  private double calculatePrevXForce(double topWallY, double leftWallX, double rightWallX, double baseY, double leftVertexX, double rightVertexX, double baseVelY,
+                                     double gravity, double MU, double KT) {
+    double xForce = 0;
+    for (Particle p : prevContacts){
+      double[] resN = calculatePrevNormalForce(p);
+      double[] resT = calculatePrevTangentialForce(resN[0], p, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
 
+    if (prevTopWallContact) {
+      double[] resN = calculatePrevNormalForceHorizontalWall(topWallY, 0);
+      double[] resT = calculatePrevTangentialForceTopWall(resN[0], topWallY, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (prevLeftWallContact) {
+      double[] resN = calculatePrevNormalForceVerticalWall(leftWallX);
+      double[] resT = calculatePrevTangentialForceLeftWall(resN[0], leftWallX, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (prevRightWallContact) {
+      double[] resN = calculatePrevNormalForceVerticalWall(rightWallX);
+      double[] resT = calculatePrevTangentialForceRightWall(resN[0], rightWallX, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+
+    if (prevLeftBaseContact) {
+      double[] resN = calculatePrevNormalForceHorizontalWall(baseY, baseVelY);
+      double[] resT = calculatePrevTangentialForceLeftBase(resN[0], baseY, baseVelY, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (prevRightBaseContact) {
+      double[] resN = calculatePrevNormalForceHorizontalWall(baseY, baseVelY);
+      double[] resT = calculatePrevTangentialForceRightBase(resN[0], baseY, baseVelY, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (prevLeftVertexContact) {
+      double[] resN = calculatePrevNormalForceObstacle(leftVertexX, baseY, 0, baseVelY);
+      double[] resT = calculatePrevTangentialForceLeftVertex(resN[0], leftVertexX, baseY, baseVelY, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (prevRightVertexContact) {
+      double[] resN = calculatePrevNormalForceObstacle(rightVertexX, baseY, 0, baseVelY);
+      double[] resT = calculatePrevTangentialForceRightVertex(resN[0], rightVertexX, baseY, baseVelY, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+
+    return xForce;
   }
 
-  private double calculateNextXForce() {
+  private double calculatePrevYForce(double topWallY, double leftWallX, double rightWallX, double baseY, double leftVertexX, double rightVertexX, double baseVelY,
+                                     double gravity, double MU, double KT) {
+    double yForce = mass * gravity;
+    for (Particle p : prevContacts){
+      double[] resN = calculatePrevNormalForce(p);
+      double[] resT = calculatePrevTangentialForce(resN[0], p, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
 
+    if (prevTopWallContact) {
+      double[] resN = calculatePrevNormalForceHorizontalWall(topWallY, 0);
+      double[] resT = calculatePrevTangentialForceTopWall(resN[0], topWallY, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (prevLeftWallContact) {
+      double[] resN = calculatePrevNormalForceVerticalWall(leftWallX);
+      double[] resT = calculatePrevTangentialForceLeftWall(resN[0], leftWallX, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (prevRightWallContact) {
+      double[] resN = calculatePrevNormalForceVerticalWall(rightWallX);
+      double[] resT = calculatePrevTangentialForceRightWall(resN[0], rightWallX, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+
+    if (prevLeftBaseContact) {
+      double[] resN = calculatePrevNormalForceHorizontalWall(baseY, baseVelY);
+      double[] resT = calculatePrevTangentialForceLeftBase(resN[0], baseY, baseVelY, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (prevRightBaseContact) {
+      double[] resN = calculatePrevNormalForceHorizontalWall(baseY, baseVelY);
+      double[] resT = calculatePrevTangentialForceRightBase(resN[0], baseY, baseVelY, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (prevLeftVertexContact) {
+      double[] resN = calculatePrevNormalForceObstacle(leftVertexX, baseY, 0, baseVelY);
+      double[] resT = calculatePrevTangentialForceLeftVertex(resN[0], leftVertexX, baseY, baseVelY, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (prevRightVertexContact) {
+      double[] resN = calculatePrevNormalForceObstacle(rightVertexX, baseY, 0, baseVelY);
+      double[] resT = calculatePrevTangentialForceRightVertex(resN[0], rightVertexX, baseY, baseVelY, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+
+    return yForce;
   }
 
-  private double calculateNextYForce() {
+  private double calculateNextXForce(double topWallY, double leftWallX, double rightWallX, double baseY, double leftVertexX, double rightVertexX, double baseVelY,
+                                     double gravity, double MU, double KT)  {
+    double xForce = 0;
+    for (Particle p : nextContacts){
+      double[] resN = calculateNextNormalForce(p);
+      double[] resT = calculateNextTangentialForce(resN[0], p, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
 
+    if (nextTopWallContact) {
+      double[] resN = calculateNextNormalForceHorizontalWall(topWallY, 0);
+      double[] resT = calculateNextTangentialForceTopWall(resN[0], topWallY, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (nextLeftWallContact) {
+      double[] resN = calculateNextNormalForceVerticalWall(leftWallX);
+      double[] resT = calculateNextTangentialForceLeftWall(resN[0], leftWallX, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (nextRightWallContact) {
+      double[] resN = calculateNextNormalForceVerticalWall(rightWallX);
+      double[] resT = calculateNextTangentialForceRightWall(resN[0], rightWallX, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+
+    if (nextLeftBaseContact) {
+      double[] resN = calculateNextNormalForceHorizontalWall(baseY, baseVelY);
+      double[] resT = calculateNextTangentialForceLeftBase(resN[0], baseY, baseVelY, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (nextRightBaseContact) {
+      double[] resN = calculateNextNormalForceHorizontalWall(baseY, baseVelY);
+      double[] resT = calculateNextTangentialForceRightBase(resN[0], baseY, baseVelY, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (nextLeftVertexContact) {
+      double[] resN = calculateNextNormalForceObstacle(leftVertexX, baseY, 0, baseVelY);
+      double[] resT = calculateNextTangentialForceLeftVertex(resN[0], leftVertexX, baseY, baseVelY, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (nextRightVertexContact) {
+      double[] resN = calculateNextNormalForceObstacle(rightVertexX, baseY, 0, baseVelY);
+      double[] resT = calculateNextTangentialForceRightVertex(resN[0], rightVertexX, baseY, baseVelY, MU, KT);
+      xForce += proyectX(resN[0], resT[0], resN[1], resN[2]);
+    }
+
+    return xForce;
+  }
+
+  private double calculateNextYForce(double topWallY, double leftWallX, double rightWallX, double baseY, double leftVertexX, double rightVertexX, double baseVelY,
+                                     double gravity, double MU, double KT) {
+    double yForce = mass * gravity;
+    for (Particle p : nextContacts){
+      double[] resN = calculateNextNormalForce(p);
+      double[] resT = calculateNextTangentialForce(resN[0], p, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+
+    if (nextTopWallContact) {
+      double[] resN = calculateNextNormalForceHorizontalWall(topWallY, 0);
+      double[] resT = calculateNextTangentialForceTopWall(resN[0], topWallY, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (nextLeftWallContact) {
+      double[] resN = calculateNextNormalForceVerticalWall(leftWallX);
+      double[] resT = calculateNextTangentialForceLeftWall(resN[0], leftWallX, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (nextRightWallContact) {
+      double[] resN = calculateNextNormalForceVerticalWall(rightWallX);
+      double[] resT = calculateNextTangentialForceRightWall(resN[0], rightWallX, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+
+    if (nextLeftBaseContact) {
+      double[] resN = calculateNextNormalForceHorizontalWall(baseY, baseVelY);
+      double[] resT = calculateNextTangentialForceLeftBase(resN[0], baseY, baseVelY, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (nextRightBaseContact) {
+      double[] resN = calculateNextNormalForceHorizontalWall(baseY, baseVelY);
+      double[] resT = calculateNextTangentialForceRightBase(resN[0], baseY, baseVelY, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (nextLeftVertexContact) {
+      double[] resN = calculateNextNormalForceObstacle(leftVertexX, baseY, 0, baseVelY);
+      double[] resT = calculateNextTangentialForceLeftVertex(resN[0], leftVertexX, baseY, baseVelY, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+    if (nextRightVertexContact) {
+      double[] resN = calculateNextNormalForceObstacle(rightVertexX, baseY, 0, baseVelY);
+      double[] resT = calculateNextTangentialForceRightVertex(resN[0], rightVertexX, baseY, baseVelY, MU, KT);
+      yForce += proyectY(resN[0], resT[0], resN[1], resN[2]);
+    }
+
+    return yForce;
   }
 
   public boolean needsReinsertion(double lowerBound) {
