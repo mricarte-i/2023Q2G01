@@ -224,6 +224,16 @@ public class Particle {
   public void evaluateNextForces() {
     xIntegrator.evaluateForce((nextX, predVx) -> 0);
     yIntegrator.evaluateForce((nextY, predVy) -> 0);
+
+    prevLeftWallContact    = nextLeftWallContact;
+    prevRightWallContact   = nextRightWallContact;
+    prevTopWallContact     = nextTopWallContact;
+
+    prevLeftVertexContact  = nextLeftVertexContact;
+    prevRightVertexContact = nextRightVertexContact;
+
+    prevLeftBaseContact    = nextLeftBaseContact;
+    prevRightBaseContact   = nextRightBaseContact;
   }
 
   public void advanceStep() {
