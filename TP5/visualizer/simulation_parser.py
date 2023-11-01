@@ -5,6 +5,8 @@ class StaticInfo:
     N        : int
     L        : float
     W        : float
+    D        : float
+    w        : float
     masses   : list[float]
     radii    : list[float]
 
@@ -26,6 +28,8 @@ class SimulationInfo:
     N         : int
     L         : float
     W         : float
+    D         : float
+    w         : float
     instants  : list[float]
     particles : list[ParticleInfo]
     
@@ -35,6 +39,8 @@ def parse_static_file(static_file : str) -> StaticInfo:
         N       = int(file.readline())
         W       = float(file.readline())
         L       = float(file.readline())
+        D       = float(file.readline())
+        w       = float(file.readline())
         masses  = []
         radii   = []
         for row in file:
@@ -42,7 +48,7 @@ def parse_static_file(static_file : str) -> StaticInfo:
             particle_info = list(filter(lambda x : x != '', particle_info))
             masses.append(float(particle_info[0]))
             radii.append(float(particle_info[1]))
-        return StaticInfo(N, L, W, masses, radii)
+        return StaticInfo(N, L, W, D, w, masses, radii)
 
 def parse_dynamic_file(static_info : StaticInfo, dynamic_file : str) -> DynamicInfo:
     with open(dynamic_file) as file:
@@ -75,7 +81,7 @@ def get_simulation_info(static_info : StaticInfo, dynamic_info : DynamicInfo) ->
             [positions_for_t[i]  for positions_for_t in dynamic_info.positions],
             [velocities_for_t[i] for velocities_for_t in dynamic_info.velocities]
         ))
-    return SimulationInfo(static_info.N, static_info.L, static_info.W, dynamic_info.instants, particles)
+    return SimulationInfo(static_info.N, static_info.L, static_info.W, static_info.D, static_info.w, dynamic_info.instants, particles)
 
 def parse_simulation_files(static_file : str, dynamic_file : str) -> SimulationInfo:
     static_info         = parse_static_file(static_file)

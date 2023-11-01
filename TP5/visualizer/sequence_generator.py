@@ -28,6 +28,8 @@ def convert_to_sequence(simulation_info : SimulationInfo, dt : float) -> Simulat
     N         = simulation_info.N
     L         = simulation_info.L
     W         = simulation_info.W
+    D         = simulation_info.D
+    w         = simulation_info.w
     instants  = []
     particles = __init_particles__(simulation_info)
 
@@ -60,7 +62,7 @@ def convert_to_sequence(simulation_info : SimulationInfo, dt : float) -> Simulat
         
         current_time += dt
 
-    sequence = SimulationInfo(N, L, W, instants, particles)
+    sequence = SimulationInfo(N, L, W, D, w, instants, particles)
 
     # __log_sequence__(sequence)
 
