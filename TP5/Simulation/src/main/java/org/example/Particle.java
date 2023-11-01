@@ -544,21 +544,21 @@ public class Particle {
   }
 
 
-  private double[] calculatePrevTangentialForceLeftBase(double normalForce, double wallY, double MU, double KT) {
+  private double[] calculatePrevTangentialForceLeftBase(double normalForce, double wallY, double wallVy, double MU, double KT) {
     double x = xIntegrator.getPreviousPosition();
     double y = yIntegrator.getPreviousPosition();
     double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
 
-    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, 0, MU, KT, deltaT, new LinkedList<>());
+    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, wallVy, MU, KT, deltaT, new LinkedList<>());
   }
 
 
-  private double[] calculatePrevTangentialForceRightBase(double normalForce, double wallY, double MU, double KT) {
+  private double[] calculatePrevTangentialForceRightBase(double normalForce, double wallY, double wallVy, double MU, double KT) {
     double x = xIntegrator.getPreviousPosition();
     double y = yIntegrator.getPreviousPosition();
     double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
 
-    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, 0, MU, KT, deltaT, new LinkedList<>());
+    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, wallVy, MU, KT, deltaT, new LinkedList<>());
   }
 
 
@@ -673,9 +673,9 @@ public class Particle {
     return new double[]{-K * overlap - GAMMA * relativeSpeed, normalVersor[0], normalVersor[1]};
   }
 
-  private double[] calculateNormalForceHorizontalWall(double x, double y, double[] v, double wallY) {
+  private double[] calculateNormalForceHorizontalWall(double x, double y, double[] v, double wallY, double wallVy) {
     double[] normalVersor = calculateNormalVersor(x, y, x, wallY);
-    double[] relativeVelocity = {v[0] - 0, v[1] - 0};
+    double[] relativeVelocity = {v[0] - 0, v[1] - wallVy};
     //dot product of relativeVelocity on normal direction
     double dotProduct = relativeVelocity[0] * normalVersor[0] + relativeVelocity[1] * normalVersor[1];
     //magnitude of normal
@@ -692,8 +692,8 @@ public class Particle {
     return new double[]{-K * overlap - GAMMA * relativeSpeed, normalVersor[0], normalVersor[1]};
   }
 
-  private double[] calculateNormalForceObstacle(double x, double y, double[] v, double obstacleX, double obstacleY) {
-    double[] obstacleV = {0, 0};
+  private double[] calculateNormalForceObstacle(double x, double y, double[] v, double obstacleX, double obstacleY, double obsVelX, double obsVelY) {
+    double[] obstacleV = {obsVelX, obsVelY};
 
     return calculateNormalForce(x, y, v, obstacleX, obstacleY, obstacleV);
   }
@@ -718,20 +718,20 @@ public class Particle {
     return calculateNormalForceVerticalWall(x, y, v, wallX);
   }
 
-  private double[] calculatePrevNormalForceHorizontalWall(double wallY) {
+  private double[] calculatePrevNormalForceHorizontalWall(double wallY, double wallVy) {
     double x = xIntegrator.getPreviousPosition();
     double y = yIntegrator.getPreviousPosition();
     double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
 
-    return calculateNormalForceHorizontalWall(x, y, v, wallY);
+    return calculateNormalForceHorizontalWall(x, y, v, wallY, wallVy);
   }
 
-  private double[] calculatePrevNormalForceObstacle(double obstacleX, double obstacleY) {
+  private double[] calculatePrevNormalForceObstacle(double obstacleX, double obstacleY, double obsVelX, double obsVelY) {
     double x = xIntegrator.getPreviousPosition();
     double y = yIntegrator.getPreviousPosition();
     double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
 
-    return calculateNormalForceObstacle(x, y, v, obstacleX, obstacleY);
+    return calculateNormalForceObstacle(x, y, v, obstacleX, obstacleY, obsVelX, obsVelY);
   }
 
   private double[] calculateNextNormalForce(Particle p) {
@@ -755,20 +755,20 @@ public class Particle {
     return calculateNormalForceVerticalWall(x, y, v, wallX);
   }
 
-  private double[] calculateNextNormalForceHorizontalWall(double wallY) {
+  private double[] calculateNextNormalForceHorizontalWall(double wallY, double wallVy) {
     double x = xIntegrator.getNextPosition();
     double y = yIntegrator.getNextPosition();
     double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
 
-    return calculateNormalForceHorizontalWall(x, y, v, wallY);
+    return calculateNormalForceHorizontalWall(x, y, v, wallY, wallVy);
   }
 
-  private double[] calculateNextNormalForceObstacle(double obstacleX, double obstacleY) {
+  private double[] calculateNextNormalForceObstacle(double obstacleX, double obstacleY, double obsVelX, double obsVelY) {
     double x = xIntegrator.getNextPosition();
     double y = yIntegrator.getNextPosition();
     double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
 
-    return calculateNormalForceObstacle(x, y, v, obstacleX, obstacleY);
+    return calculateNormalForceObstacle(x, y, v, obstacleX, obstacleY, obsVelX, obsVelY);
   }
 
   private double proyectX(double normalForce, double tangencialForce, double[] normalVersor) {
