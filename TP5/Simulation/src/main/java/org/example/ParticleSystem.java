@@ -88,6 +88,15 @@ public class ParticleSystem implements SimulationSystem {
         }
     }
 
+    private void checkExitedParticles(double time) {
+        for (Particle p: particles) {
+            if (!p.hasExited() && p.getPositionY() + p.getRadius() < baseY) {
+                p.setHasExited(true);
+                writer.writeExitingParticle(time);
+            }
+        }
+    }
+
     private void checkNextContacts() {
         double lwx = 0;
         double rwx = W;
@@ -127,6 +136,7 @@ public class ParticleSystem implements SimulationSystem {
             advanceBase(time);
             //TODO cell index
             //calculateNextNeighbors();
+            checkExitedParticles(time);
             checkNextContacts();
             evaluateParticleForces();
             advanceParticles();

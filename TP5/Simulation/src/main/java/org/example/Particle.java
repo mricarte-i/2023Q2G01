@@ -12,6 +12,8 @@ public class Particle {
   private final BeemanIntegrator xIntegrator;
   private final BeemanIntegrator yIntegrator;
   private final double mass, radius;
+  private boolean hasExited;
+
   private List<Particle> prevContacts, nextContacts;
   private Set<Integer> nextContactsIds;
 
@@ -45,6 +47,7 @@ public class Particle {
     this.deltaT = dT;
     this.nextParticlesContact = new HashMap<>();
     this.prevParticlesContact = new HashMap<>();
+    this.hasExited = false;
   }
 
   public Particle(int id, double radius, double mass, double x, double y, double dT, double vx, double vy, Integer totalParticles) {
@@ -271,6 +274,14 @@ public class Particle {
 
   public double getMass() {
     return mass;
+  }
+
+  public boolean hasExited() {
+    return hasExited;
+  }
+
+  public void setHasExited(boolean hasExited) {
+    this.hasExited = hasExited;
   }
 
   public void evaluateNextForces() {
@@ -793,6 +804,7 @@ public class Particle {
   public void reinsert(double newX, double newY) {
     xIntegrator.reinsert(newX, 0, (x, vx) -> 0 );
     xIntegrator.reinsert(newY, 0, (y, vy) -> 0 );
+    hasExited = false;
   }
 }
 
