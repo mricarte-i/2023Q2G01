@@ -210,11 +210,11 @@ public class Particle {
   }
 
   public double getRadius() {
-    throw new NotImplementedException();
+    return radius;
   }
 
   public double getMass() {
-    throw new NotImplementedException();
+    return mass;
   }
 
   public void evaluateNextForces() {
