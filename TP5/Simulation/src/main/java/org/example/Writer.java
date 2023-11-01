@@ -8,18 +8,26 @@ import java.io.IOException;
 import java.util.List;
 
 public class Writer {
-    private final FileWriter fileWriter;
-    private final String fileName;
-    public Writer(String filename) {
+    private final FileWriter fileWriter, exitingParticlesFileWriter;
+    private final String fileName, exitingParticlesFileName;
+    public Writer(String filename, String exitingParticlesFileName) {
         this.fileName = filename;
+        this.exitingParticlesFileName = exitingParticlesFileName;
+
         try {
             File file = new File(fileName);
             if(file.exists())
                 file.delete();
             file.createNewFile();
             this.fileWriter = new FileWriter(fileName, true);
+
+            File exitingParticlesFile = new File(exitingParticlesFileName);
+            if(exitingParticlesFile.exists())
+                exitingParticlesFile.delete();
+            file.createNewFile();
+            this.exitingParticlesFileWriter = new FileWriter(exitingParticlesFileName, true);
         } catch (IOException e) {
-            throw new RuntimeException("Error creating file " + fileName);
+            throw new RuntimeException("Error creating file " + fileName + " or " + exitingParticlesFileName);
         }
     }
 
@@ -70,12 +78,21 @@ public class Writer {
         }
     }
 
+    public void writeExitingParticle(double timestamp){
+        try{
+            this.exitingParticlesFileWriter.write(timestamp + "\n");
+        }catch (IOException e){
+            throw new RuntimeException("Error writing to file " + exitingParticlesFileWriter);
+        }
+    }
+
     public void close() {
         try{
             this.fileWriter.close();
+            this.exitingParticlesFileWriter.close();
         }catch (IOException e){
-            throw new RuntimeException("Error closing file " + fileName);
+            throw new RuntimeException("Error closing files");
         }
-        System.out.println("Successfully written to " + fileName);
+        System.out.println("Successfully written files");
     }
 }
