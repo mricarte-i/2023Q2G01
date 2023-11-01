@@ -17,7 +17,7 @@ public class ParticleSystem implements SimulationSystem {
 
     public ParticleSystem() {
         this.paramsParser = ParamsParser.getInstance();
-        this.writer = new Writer(paramsParser.getDynamicFile());
+        this.writer = new Writer(paramsParser.getDynamicFile(), "exitingParticles.txt");
         //set up writer and paramsparser
         random = paramsParser.getRandom();
         W = paramsParser.getW();
@@ -83,7 +83,7 @@ public class ParticleSystem implements SimulationSystem {
         double lowerBound = paramsParser.getLowerOutOfBoundsPosition();
         for(Particle p : this.particles){
             if(p.needsReinsertion(lowerBound)) {
-                p.reinsert();
+                reinsertParticle(p);
             }
         }
     }
