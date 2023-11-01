@@ -279,6 +279,13 @@ public class Particle {
         nextParticlesContact.remove(particle.id);
       }
     }
+    if(!nextLeftBaseContact) nextLeftBaseMemory.clear();
+    if(!nextRightBaseContact) nextRightBaseMemory.clear();
+    if(!nextLeftVertexContact) nextLeftVertexMemory.clear();
+    if(!nextRightVertexContact) nextRightVertexMemory.clear();
+    if(!nextLeftWallContact) nextLeftWallMemory.clear();
+    if(!nextRightWallContact) nextRightWallMemory.clear();
+    if(!nextTopWallContact) nextTopWallMemory.clear();
 
     xIntegrator.evaluateForce((nextX, predVx) -> 0);
     yIntegrator.evaluateForce((nextY, predVy) -> 0);
