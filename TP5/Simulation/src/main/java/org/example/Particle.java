@@ -12,6 +12,7 @@ public class Particle {
   private final BeemanIntegrator yIntegrator;
   private final double mass, radius;
   private List<Particle> prevContacts, nextContacts;
+  private Set<Integer> nextContactsIds;
 
   private boolean prevLeftWallContact, prevRightWallContact, prevTopWallContact;
   private boolean prevLeftVertexContact, prevBaseContact, prevRightVertexContact;
@@ -45,9 +46,11 @@ public class Particle {
     if (totalParticles != null) {
       this.prevContacts = new ArrayList<>(totalParticles);
       this.nextContacts = new ArrayList<>(totalParticles);
+      this.nextContactsIds = new HashSet<>(totalParticles, 1.0f);
     } else {
       this.prevContacts = new LinkedList<>();
       this.nextContacts = new LinkedList<>();
+      this.nextContactsIds = new HashSet<>();
     }
   }
 
@@ -98,8 +101,10 @@ public class Particle {
     double nextOtherX = p.xIntegrator.getNextPosition();
     double nextOtherY = p.yIntegrator.getNextPosition();
 
-    if (checkContactParticle(nextX, nextY, radius, nextOtherX, nextOtherY, p.radius))
+    if (checkContactParticle(nextX, nextY, radius, nextOtherX, nextOtherY, p.radius)) {
       nextContacts.add(p);
+      nextContactsIds.add(p.id);
+    }
   }
 
   public void checkNextStepContactLeftWall(double leftWallX) {
@@ -260,6 +265,12 @@ public class Particle {
   }
 
   public void evaluateNextForces() {
+    for (Particle particle : prevContacts) {
+      if (!nextContactsIds.contains(particle.id)) {
+        // TODO: clear memory forces for id
+      }
+    }
+
     xIntegrator.evaluateForce((nextX, predVx) -> 0);
     yIntegrator.evaluateForce((nextY, predVy) -> 0);
 
@@ -272,11 +283,16 @@ public class Particle {
 
     prevLeftBaseContact    = nextLeftBaseContact;
     prevRightBaseContact   = nextRightBaseContact;
+
+    nextContactsIds.clear();
   }
 
   public void advanceStep() {
     xIntegrator.advanceStep();
     yIntegrator.advanceStep();
+
+    prevContacts.clear();
+    prevContacts.addAll(nextContacts);
 
     nextContacts.clear();
 
