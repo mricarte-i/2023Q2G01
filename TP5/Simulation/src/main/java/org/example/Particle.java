@@ -317,8 +317,16 @@ public class Particle {
     return calculateTangentialForce(normalForce, x, y, r, v, obsX, obsY, 0, obsV, MU, KT, deltaT, forceMemory);
   }
 
-  private static double calculateTangentialForceHorizontalWall(double x, double y, double MU, double KT) {
-    throw new NotImplementedException();
+  private static double calculateTangentialForceHorizontalWall(double normalForce, double x, double y, double r, double[] v,
+                                                               double wallY, double wallVy, double MU, double KT, double deltaT, List<Double> forceMemory) {
+    double[] obsV = {0, wallVy};
+    return calculateTangentialForce(normalForce, x, y, r, v, x, wallY, 0, obsV, MU, KT, deltaT, forceMemory);
+  }
+
+  private static double calculateTangentialForceVerticalWall(double normalForce, double x, double y, double r, double[] v,
+                                                               double wallX, double wallVx, double MU, double KT, double deltaT, List<Double> forceMemory) {
+    double[] obsV = {wallVx, 0};
+    return calculateTangentialForce(normalForce, x, y, r, v, wallX, y, 0, obsV, MU, KT, deltaT, forceMemory);
   }
 
   @Override
