@@ -76,14 +76,14 @@ public class ParticleSystem implements SimulationSystem {
             }
         } while(overlaps);
 
-        p.reinsert();
+        p.reinsert(x, y);
     }
 
     private void reinsertParticles() {
         double lowerBound = paramsParser.getLowerOutOfBoundsPosition();
         for(Particle p : this.particles){
             if(p.needsReinsertion(lowerBound)) {
-                reinsertParticle(p);
+                p.reinsert();
             }
         }
     }

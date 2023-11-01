@@ -385,7 +385,7 @@ public class Particle {
 
   }
 
-  private double calculateNormalForce(double x, double y, double[] v, double otherX, double otherY, double[] otherV) {
+  private double[] calculateNormalForce(double x, double y, double[] v, double otherX, double otherY, double[] otherV) {
     double[] normalVersor = calculateNormalVersor(x, y, otherX, otherY);
     double[] relativeVelocity = {v[0]-otherV[0], v[1] -otherV[1]};
     //dot product of relativeVelocity on normal direction
@@ -399,12 +399,12 @@ public class Particle {
     double overlap = 2 * radius - Math.abs(Math.sqrt(x*x + y*y) - Math.sqrt(otherX*otherX + otherY*otherY));
 
     if (overlap < 0)
-      return 0;
+      return new double[]{0, normalVersor[0], normalVersor[1]};
 
-    return -K * overlap - GAMMA * relativeSpeed;
+    return new double[]{-K * overlap - GAMMA * relativeSpeed, normalVersor[0], normalVersor[1]};
   }
 
-  private double calculateNormalForceVerticalWall(double x, double y, double[] v, double wallX) {
+  private double[] calculateNormalForceVerticalWall(double x, double y, double[] v, double wallX) {
     double[] normalVersor = calculateNormalVersor(x, y, wallX, y);
     double[] relativeVelocity = {v[0] - 0, v[1] - 0};
     //dot product of relativeVelocity on normal direction
@@ -420,10 +420,10 @@ public class Particle {
     else if (x < wallX && x > wallX - radius)
       overlap = -wallX + x + radius;
 
-    return -K * overlap - GAMMA * relativeSpeed;
+    return new double[]{-K * overlap - GAMMA * relativeSpeed, normalVersor[0], normalVersor[1]};
   }
 
-  private double calculateNormalForceHorizontalWall(double x, double y, double[] v, double wallY) {
+  private double[] calculateNormalForceHorizontalWall(double x, double y, double[] v, double wallY) {
     double[] normalVersor = calculateNormalVersor(x, y, x, wallY);
     double[] relativeVelocity = {v[0] - 0, v[1] - 0};
     //dot product of relativeVelocity on normal direction
@@ -439,52 +439,53 @@ public class Particle {
     else if (y < wallY && y > wallY - radius)
       overlap = -wallY + y + radius;
 
-    return -K * overlap - GAMMA * relativeSpeed;
+    return new double[]{-K * overlap - GAMMA * relativeSpeed, normalVersor[0], normalVersor[1]};
   }
 
-  private double calculateNormalForceObstacle(double x, double y, double[] v, double obstacleX, double obstacleY) {
+  private double[] calculateNormalForceObstacle(double x, double y, double[] v, double obstacleX, double obstacleY) {
     double[] obstacleV = {0, 0};
 
     return calculateNormalForce(x, y, v, obstacleX, obstacleY, obstacleV);
   }
 
-  private double calculatePrevNormalForce(Particle p) {
+  private double[] calculatePrevNormalForce(Particle p) {
 
   }
 
-  private double calculatePrevNormalForceVerticalWall(double wallX) {
+  private double[] calculatePrevNormalForceVerticalWall(double wallX) {
 
   }
 
-  private double calculatePrevNormalForceHorizontalWall(double wallY) {
+  private double[] calculatePrevNormalForceHorizontalWall(double wallY) {
 
   }
 
-  private double calculatePrevNormalForceObstacle(double obstacleX, double obstacleY) {
+  private double[] calculatePrevNormalForceObstacle(double obstacleX, double obstacleY) {
 
   }
 
-  private double calculateNextNormalForce(Particle p) {
+  private double[] calculateNextNormalForce(Particle p) {
 
   }
 
-  private double calculateNextNormalForceVerticalWall(double wallX) {
+  private double[] calculateNextNormalForceVerticalWall(double wallX) {
 
   }
 
-  private double calculateNextNormalForceHorizontalWall(double wallY) {
+  private double[] calculateNextNormalForceHorizontalWall(double wallY) {
 
   }
 
-  private double calculateNextNormalForceObstacle(double obstacleX, double obstacleY) {
+  private double[] calculateNextNormalForceObstacle(double obstacleX, double obstacleY) {
 
   }
 
-  private double proyectX(double normalForce, double tangencialForce) {
-
+  private double proyectX(double normalForce, double tangencialForce, double[] normalVersor) {
+    return normalForce * normalVersor[0] - tangencialForce * normalVersor[1];
   }
 
-  private double proyectY(double normalForce, double tangencialForce) {
+  private double proyectY(double normalForce, double tangencialForce, double[] normalVersor) {
+    return normalForce * normalVersor[1] + tangencialForce * normalVersor[0];
 
   }
 
@@ -505,12 +506,12 @@ public class Particle {
   }
 
   public boolean needsReinsertion(double lowerBound) {
-    return yIntegrator.getPosition() < lowerBound - L / 10;
+    return yIntegrator.getPosition() < lowerBound - L / 10.0;
   }
 
-  public void reinsert() {
-    xIntegrator.reinsert(Math.random() * W, 0, (x, vx) -> 0 );
-    xIntegrator.reinsert(Math.random() * 30 + 40, 0, (y, vy) -> 0 );
+  public void reinsert(double newX, double newY) {
+    xIntegrator.reinsert(newX, 0, (x, vx) -> 0 );
+    xIntegrator.reinsert(newY, 0, (y, vy) -> 0 );
   }
 }
 
