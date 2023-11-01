@@ -38,10 +38,10 @@ public class Particle {
   private double sumRelVel = 0;
    */
 
-  private Particle(int id, double radius, double mass, double x, double y, double dT, double vx, double vy) {
+  private Particle(int id, double radius, double mass, double gravity, double x, double y, double dT, double vx, double vy) {
     this.id = id;
     this.xIntegrator = new BeemanIntegrator(dT, x, vx, mass, (pos, vel) -> 0);
-    this.yIntegrator = new BeemanIntegrator(dT, y, vy, mass, (pos, vel) -> 0);
+    this.yIntegrator = new BeemanIntegrator(dT, y, vy, mass, (pos, vel) -> mass * gravity);
     this.radius = radius;
     this.mass = mass;
     this.deltaT = dT;
@@ -50,8 +50,8 @@ public class Particle {
     this.hasExited = false;
   }
 
-  public Particle(int id, double radius, double mass, double x, double y, double dT, double vx, double vy, Integer totalParticles) {
-    this(id, radius, mass, x, y, dT, vx, vy);
+  public Particle(int id, double radius, double mass, double gravity, double x, double y, double dT, double vx, double vy, Integer totalParticles) {
+    this(id, radius, mass, gravity, x, y, dT, vx, vy);
     if (totalParticles != null) {
       this.prevContacts = new ArrayList<>(totalParticles);
       this.nextContacts = new ArrayList<>(totalParticles);
@@ -63,9 +63,9 @@ public class Particle {
     }
   }
 
-  public void initialize() {
+  public void initialize(double gravity) {
     xIntegrator.initPrevForce((prevX, prevVx) -> 0);
-    yIntegrator.initPrevForce((prevY, prevVy) -> 0);
+    yIntegrator.initPrevForce((prevY, prevVy) -> mass * gravity);
 
     prevContacts.clear();
 

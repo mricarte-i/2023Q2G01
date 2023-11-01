@@ -360,7 +360,7 @@ public class ParamsParser {
                     y = position.getValue1();
                     radius = particleRadii.poll();
 
-                    currParticle = new Particle(id, radius, particleMass, x, y, deltaT, 0, 0, N);
+                    currParticle = new Particle(id, radius, particleMass, ParticleSystem.GRAVITY, x, y, deltaT, 0, 0, N);
                     particles.add(currParticle);
                 }
 
