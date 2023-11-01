@@ -113,7 +113,7 @@ public class ParticleSystem implements SimulationSystem {
     }
     public void simulate() {
         this.particles = paramsParser.getParticles();
-        this.writer.writeStatic(paramsParser.getStaticFile(), paramsParser.getL(), paramsParser.getW(), particles);
+        this.writer.writeStatic(paramsParser.getStaticFile(), paramsParser.getL(), paramsParser.getW(), paramsParser.getD(), paramsParser.getAngularVelocity(), particles);
 
         double simStep = Math.pow(10, -paramsParser.getStateWritingDeltaTimeExp()); //deltaT should be 3
         double time = 0;
