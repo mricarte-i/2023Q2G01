@@ -983,31 +983,43 @@ public class Particle {
   public void reinsert(double newX, double newY, double gravity) {
     xIntegrator.reinsert(newX, 0, (x, vx) -> 0 );
     yIntegrator.reinsert(newY, 0, (y, vy) -> -mass*gravity);
+
+    prevLeftWallContact = false;
+    prevRightWallContact = false;
+    prevTopWallContact = false;
+
+    prevLeftVertexContact = false;
+    prevRightVertexContact = false;
+
+    prevLeftBaseContact = false;
+    prevRightBaseContact = false;
+
+    nextLeftWallContact = false;
+    nextRightWallContact = false;
+    nextTopWallContact = false;
+
+    nextLeftVertexContact = false;
+    nextRightVertexContact = false;
+
+    nextLeftBaseContact = false;
+    nextRightBaseContact = false;
+
     hasExited = false;
+
+    prevContacts.clear();
+    nextContacts.clear();
 
     nextContactsIds.clear();
 
-    prevContacts.clear();
-
-    prevLeftWallContact    = false;
-    prevRightWallContact   = false;
-    prevTopWallContact     = false;
-
-    prevLeftVertexContact  = false;
-    prevRightVertexContact = false;
-
-    prevLeftBaseContact    = false;
-    prevRightBaseContact   = false;
-
     nextParticlesContact.clear();
 
+    nextTopWallMemory.clear();
     nextLeftBaseMemory.clear();
     nextRightBaseMemory.clear();
-    nextLeftVertexMemory.clear();
-    nextRightVertexMemory.clear();
     nextLeftWallMemory.clear();
     nextRightWallMemory.clear();
-    nextTopWallMemory.clear();
+    nextRightVertexMemory.clear();
+    nextLeftVertexMemory.clear();
   }
 }
 
