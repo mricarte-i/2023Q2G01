@@ -418,6 +418,46 @@ public class Particle {
     return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, 0, MU, KT, deltaT, nextTopWallMemory);
   }
 
+  private List<Double> nextLeftBaseMemory = new LinkedList<>();
+
+  private double[] calculateNextTangentialForceLeftBase(double normalForce, double wallY, double MU, double KT) {
+    double x = xIntegrator.getNextPosition();
+    double y = yIntegrator.getNextPosition();
+    double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
+
+    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, 0, MU, KT, deltaT, nextLeftBaseMemory);
+  }
+
+  private List<Double> nextRightBaseMemory = new LinkedList<>();
+
+  private double[] calculateNextTangentialForceRightBase(double normalForce, double wallY, double MU, double KT) {
+    double x = xIntegrator.getNextPosition();
+    double y = yIntegrator.getNextPosition();
+    double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
+
+    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, 0, MU, KT, deltaT, nextRightBaseMemory);
+  }
+
+  private List<Double> nextLeftWallMemory = new LinkedList<>();
+
+  private double[] calculateNextTangentialForceLeftWall(double normalForce, double wallX, double MU, double KT) {
+    double x = xIntegrator.getNextPosition();
+    double y = yIntegrator.getNextPosition();
+    double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
+
+    return calculateTangentialForceVerticalWall(normalForce, x, y, radius, v, wallX, 0, MU, KT, deltaT, nextLeftWallMemory);
+  }
+
+  private List<Double> nextRightWallMemory = new LinkedList<>();
+
+  private double[] calculateNextTangentialForceRightWall(double normalForce, double wallX, double MU, double KT) {
+    double x = xIntegrator.getNextPosition();
+    double y = yIntegrator.getNextPosition();
+    double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
+
+    return calculateTangentialForceVerticalWall(normalForce, x, y, radius, v, wallX, 0, MU, KT, deltaT, nextRightWallMemory);
+  }
+
   private double[] calculateNextTangentialForce(double normalForce, Particle p, double MU, double KT) {
     double x = xIntegrator.getNextPosition();
     double y = yIntegrator.getNextPosition();
@@ -475,7 +515,8 @@ public class Particle {
 
 
   private double calculateNormalForce(double x, double y) {
-
+    //TODO DELETE ?
+    return 0.0;
   }
 
   private double[] calculateNormalForce(double x, double y, double[] v, double otherX, double otherY, double[] otherV) {
