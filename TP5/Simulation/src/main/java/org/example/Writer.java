@@ -24,7 +24,7 @@ public class Writer {
     }
 
 
-    public void writeStatic(String staticFile, double L,  double W,  List<Particle> particles) {
+    public void writeStatic(String staticFile, double L,  double W, double D, double omega, List<Particle> particles) {
         FileWriter staticfileWriter;
         try {
             File file = new File(staticFile);
@@ -41,6 +41,8 @@ public class Writer {
             staticfileWriter.write(particles.size() + "\n");
             staticfileWriter.write(W + "\n");
             staticfileWriter.write(L + "\n");
+            staticfileWriter.write(D + "\n");
+            staticfileWriter.write(omega + "\n");
             for(Particle particle: particles) {
                 staticfileWriter.write(particle.getMass() + " " + particle.getRadius() + "\n");
             }
