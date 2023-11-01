@@ -7,6 +7,7 @@ import java.util.*;
 
 public class Particle {
   private final int id;
+  private final double deltaT;
   private final BeemanIntegrator xIntegrator;
   private final BeemanIntegrator yIntegrator;
   private final double mass, radius;
@@ -34,6 +35,7 @@ public class Particle {
     this.yIntegrator = new BeemanIntegrator(dT, y, vy, mass, (pos, vel) -> 0);
     this.radius = radius;
     this.mass = mass;
+    this.deltaT = dT;
   }
 
   public Particle(int id, double radius, double mass, double x, double y, double dT, double vx, double vy, Integer totalParticles) {
