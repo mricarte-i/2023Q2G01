@@ -474,6 +474,71 @@ public class Particle {
     return calculateTangentialForce(normalForce, x, y, radius, v, oX, oY, p.getRadius(), oV, MU, KT, deltaT, nextParticlesContact.get(p.id));
   }
 
+  private double[] calculatePrevTangentialForce(double normalForce, Particle p, double MU, double KT) {
+    double x = xIntegrator.getPreviousPosition();
+    double y = yIntegrator.getPreviousPosition();
+    double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
+
+    double oX = p.xIntegrator.getPreviousPosition();
+    double oY = p.yIntegrator.getPreviousPosition();
+    double[] oV = {p.xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
+
+    /* TODO PrevParticlesContact exists for memory, not for this,
+     * Uhm, actually, prevForces don't go further than 1 instant, so no memory is necessary
+     * instead, we pass a new list and call it a day.
+    if(!this.prevParticlesContact.containsKey(p.id)){
+      this.prevParticlesContact.put(p.id, new LinkedList<>());
+    }
+     */
+
+    return calculateTangentialForce(normalForce, x, y, radius, v, oX, oY, p.getRadius(), oV, MU, KT, deltaT, new LinkedList<>()); //prevParticlesContact.get(p.id));
+  }
+
+
+  private double[] calculatePrevTangentialForceTopWall(double normalForce, double wallY, double MU, double KT) {
+    double x = xIntegrator.getPreviousPosition();
+    double y = yIntegrator.getPreviousPosition();
+    double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
+
+    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, 0, MU, KT, deltaT, new LinkedList<>());
+  }
+
+
+  private double[] calculatePrevTangentialForceLeftBase(double normalForce, double wallY, double MU, double KT) {
+    double x = xIntegrator.getPreviousPosition();
+    double y = yIntegrator.getPreviousPosition();
+    double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
+
+    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, 0, MU, KT, deltaT, new LinkedList<>());
+  }
+
+
+  private double[] calculatePrevTangentialForceRightBase(double normalForce, double wallY, double MU, double KT) {
+    double x = xIntegrator.getPreviousPosition();
+    double y = yIntegrator.getPreviousPosition();
+    double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
+
+    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, 0, MU, KT, deltaT, new LinkedList<>());
+  }
+
+
+  private double[] calculatePrevTangentialForceLeftWall(double normalForce, double wallX, double MU, double KT) {
+    double x = xIntegrator.getPreviousPosition();
+    double y = yIntegrator.getPreviousPosition();
+    double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
+
+    return calculateTangentialForceVerticalWall(normalForce, x, y, radius, v, wallX, 0, MU, KT, deltaT, new LinkedList<>());
+  }
+
+
+  private double[] calculatePrevTangentialForceRightWall(double normalForce, double wallX, double MU, double KT) {
+    double x = xIntegrator.getPreviousPosition();
+    double y = yIntegrator.getPreviousPosition();
+    double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
+
+    return calculateTangentialForceVerticalWall(normalForce, x, y, radius, v, wallX, 0, MU, KT, deltaT, new LinkedList<>());
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
