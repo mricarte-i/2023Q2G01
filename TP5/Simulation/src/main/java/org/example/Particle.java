@@ -131,7 +131,7 @@ public class Particle {
     checkNextStepContactRightBase(baseY, rightBoundX);
   }
 
-  public void checkNextStepContactLeftBase(double baseY, double vertexX) {
+  private void checkNextStepContactLeftBase(double baseY, double vertexX) {
     double nextX = this.xIntegrator.getNextPosition();
     double nextY = this.yIntegrator.getNextPosition();
 
@@ -142,7 +142,7 @@ public class Particle {
     }
   }
 
-  public void checkNextStepContactRightBase(double baseY, double vertexX) {
+  private void checkNextStepContactRightBase(double baseY, double vertexX) {
     double nextX = this.xIntegrator.getNextPosition();
     double nextY = this.yIntegrator.getNextPosition();
 
