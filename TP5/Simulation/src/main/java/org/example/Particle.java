@@ -420,22 +420,22 @@ public class Particle {
 
   private List<Double> nextLeftBaseMemory = new LinkedList<>();
 
-  private double[] calculateNextTangentialForceLeftBase(double normalForce, double wallY, double MU, double KT) {
+  private double[] calculateNextTangentialForceLeftBase(double normalForce, double wallY, double wallVy, double MU, double KT) {
     double x = xIntegrator.getNextPosition();
     double y = yIntegrator.getNextPosition();
     double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
 
-    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, 0, MU, KT, deltaT, nextLeftBaseMemory);
+    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, wallVy, MU, KT, deltaT, nextLeftBaseMemory);
   }
 
   private List<Double> nextRightBaseMemory = new LinkedList<>();
 
-  private double[] calculateNextTangentialForceRightBase(double normalForce, double wallY, double MU, double KT) {
+  private double[] calculateNextTangentialForceRightBase(double normalForce, double wallY, double wallVy, double MU, double KT) {
     double x = xIntegrator.getNextPosition();
     double y = yIntegrator.getNextPosition();
     double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
 
-    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, 0, MU, KT, deltaT, nextRightBaseMemory);
+    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, wallVy, MU, KT, deltaT, nextRightBaseMemory);
   }
 
   private List<Double> nextLeftWallMemory = new LinkedList<>();
@@ -472,6 +472,28 @@ public class Particle {
     }
 
     return calculateTangentialForce(normalForce, x, y, radius, v, oX, oY, p.getRadius(), oV, MU, KT, deltaT, nextParticlesContact.get(p.id));
+  }
+
+  private double[] calculateNextTangentialForceObstacle(double normalForce, double obsX, double obsY, double obsVY, double MU, double KT, List<Double> forceMemory) {
+    double x = xIntegrator.getNextPosition();
+    double y = yIntegrator.getNextPosition();
+    double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
+
+    double[] obsV = {0, obsVY};
+
+    return calculateTangentialForceObstacle(normalForce, x, y, radius, v, obsX, obsY, obsV, MU, KT, deltaT, forceMemory);
+  }
+
+  private List<Double> nextRightVertexMemory = new LinkedList<>();
+
+  private double[] calculateNextTangentialForceRightVertex(double normalForce, double obsX, double obsY, double obsVY, double MU, double KT) {
+    return calculateNextTangentialForceObstacle(normalForce, obsX, obsY, obsVY, MU, KT, nextRightVertexMemory);
+  }
+
+  private List<Double> nextLeftVertexMemory = new LinkedList<>();
+
+  private double[] calculateNextTangentialForceLeftVertex(double normalForce, double obsX, double obsY, double obsVY, double MU, double KT) {
+    return calculateNextTangentialForceObstacle(normalForce, obsX, obsY, obsVY, MU, KT, nextLeftVertexMemory);
   }
 
   private double[] calculatePrevTangentialForce(double normalForce, Particle p, double MU, double KT) {
@@ -537,6 +559,25 @@ public class Particle {
     double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
 
     return calculateTangentialForceVerticalWall(normalForce, x, y, radius, v, wallX, 0, MU, KT, deltaT, new LinkedList<>());
+  }
+
+  private double[] calculatePrevTangentialForceObstacle(double normalForce, double obsX, double obsY, double obsVY, double MU, double KT, List<Double> forceMemory) {
+    double x = xIntegrator.getPreviousPosition();
+    double y = yIntegrator.getPreviousPosition();
+    double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
+
+    double[] obsV = {0, obsVY};
+
+    return calculateTangentialForceObstacle(normalForce, x, y, radius, v, obsX, obsY, obsV, MU, KT, deltaT, forceMemory);
+  }
+
+  private double[] calculatePrevTangentialForceRightVertex(double normalForce, double obsX, double obsY, double obsVY, double MU, double KT) {
+    return calculatePrevTangentialForceObstacle(normalForce, obsX, obsY, obsVY, MU, KT, new LinkedList<>());
+  }
+
+
+  private double[] calculatePrevTangentialForceLeftVertex(double normalForce, double obsX, double obsY, double obsVY, double MU, double KT) {
+    return calculatePrevTangentialForceObstacle(normalForce, obsX, obsY, obsVY, MU, KT, new LinkedList<>());
   }
 
   @Override
