@@ -689,35 +689,76 @@ public class Particle {
   }
 
   private double[] calculatePrevNormalForce(Particle p) {
+    double x = xIntegrator.getPreviousPosition();
+    double y = yIntegrator.getPreviousPosition();
+    double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
 
+    double oX = p.xIntegrator.getPreviousPosition();
+    double oY = p.yIntegrator.getPreviousPosition();
+    double[] oV = {p.xIntegrator.getPreviousVelocity(), p.yIntegrator.getPreviousVelocity()};
+
+    return calculateNormalForce(x, y, v, oX, oY, oV);
   }
 
   private double[] calculatePrevNormalForceVerticalWall(double wallX) {
+    double x = xIntegrator.getPreviousPosition();
+    double y = yIntegrator.getPreviousPosition();
+    double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
 
+    return calculateNormalForceVerticalWall(x, y, v, wallX);
   }
 
   private double[] calculatePrevNormalForceHorizontalWall(double wallY) {
+    double x = xIntegrator.getPreviousPosition();
+    double y = yIntegrator.getPreviousPosition();
+    double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
 
+    return calculateNormalForceHorizontalWall(x, y, v, wallY);
   }
 
   private double[] calculatePrevNormalForceObstacle(double obstacleX, double obstacleY) {
+    double x = xIntegrator.getPreviousPosition();
+    double y = yIntegrator.getPreviousPosition();
+    double[] v = {xIntegrator.getPreviousVelocity(), yIntegrator.getPreviousVelocity()};
 
+    return calculateNormalForceObstacle(x, y, v, obstacleX, obstacleY);
   }
 
   private double[] calculateNextNormalForce(Particle p) {
+    double x = xIntegrator.getNextPosition();
+    double y = yIntegrator.getNextPosition();
+    double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
+
+    double oX = p.xIntegrator.getNextPosition();
+    double oY = p.yIntegrator.getNextPosition();
+    double[] oV = {p.xIntegrator.getPredictedVelocity(), p.yIntegrator.getPredictedVelocity()};
+
+    return calculateNormalForce(x, y, v, oX, oY, oV);
 
   }
 
   private double[] calculateNextNormalForceVerticalWall(double wallX) {
+    double x = xIntegrator.getNextPosition();
+    double y = yIntegrator.getNextPosition();
+    double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
 
+    return calculateNormalForceVerticalWall(x, y, v, wallX);
   }
 
   private double[] calculateNextNormalForceHorizontalWall(double wallY) {
+    double x = xIntegrator.getNextPosition();
+    double y = yIntegrator.getNextPosition();
+    double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
 
+    return calculateNormalForceHorizontalWall(x, y, v, wallY);
   }
 
   private double[] calculateNextNormalForceObstacle(double obstacleX, double obstacleY) {
+    double x = xIntegrator.getNextPosition();
+    double y = yIntegrator.getNextPosition();
+    double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
 
+    return calculateNormalForceObstacle(x, y, v, obstacleX, obstacleY);
   }
 
   private double proyectX(double normalForce, double tangencialForce, double[] normalVersor) {
