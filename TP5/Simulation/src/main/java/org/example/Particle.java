@@ -206,15 +206,34 @@ public class Particle {
     }
   }
 
-  public void checkPrevStepContactBase(double baseY) {
+  public void checkPrevStepContactBase(double baseY, double leftBoundX, double rightBoundX) {
+    checkPrevStepContactLeftBase(baseY, leftBoundX);
+    checkPrevStepContactRightBase(baseY, rightBoundX);
+  }
+
+  private void checkPrevStepContactLeftBase(double baseY, double vertexX) {
+    double prevX = this.xIntegrator.getPreviousPosition();
     double prevY = this.yIntegrator.getPreviousPosition();
 
-    if (checkContactHorizontalWall(prevY, radius, baseY)) {
-      prevBaseContact = true;
+    checkPrevStepContactLeftVertex(vertexX, baseY);
+
+    if (!nextLeftVertexContact && prevX <= vertexX && checkContactHorizontalWall(prevY, radius, baseY)) {
+      nextLeftBaseContact = true;
     }
   }
 
-  public void checkPrevStepContactLeftVertex(double leftVertexX, double leftVertexY) {
+  private void checkPrevStepContactRightBase(double baseY, double vertexX) {
+    double prevX = this.xIntegrator.getPreviousPosition();
+    double prevY = this.yIntegrator.getPreviousPosition();
+
+    checkPrevStepContactRightVertex(vertexX, baseY);
+
+    if (!prevRightVertexContact && prevX >= vertexX && checkContactHorizontalWall(prevY, radius, baseY)) {
+      prevRightBaseContact = true;
+    }
+  }
+
+  private void checkPrevStepContactLeftVertex(double leftVertexX, double leftVertexY) {
     double prevX = this.xIntegrator.getPreviousPosition();
     double prevY = this.yIntegrator.getPreviousPosition();
 
@@ -223,7 +242,7 @@ public class Particle {
     }
   }
 
-  public void checkPrevStepContactRightVertex(double rightVertexX, double rightVertexY) {
+  private void checkPrevStepContactRightVertex(double rightVertexX, double rightVertexY) {
     double prevX = this.xIntegrator.getPreviousPosition();
     double prevY = this.yIntegrator.getPreviousPosition();
 
