@@ -21,10 +21,10 @@ public class Particle {
   private final HashMap<Integer, List<Double>> prevParticlesContact;
 
   private boolean prevLeftWallContact, prevRightWallContact, prevTopWallContact;
-  private boolean prevLeftVertexContact, prevBaseContact, prevRightVertexContact;
+  private boolean prevLeftVertexContact, prevRightVertexContact;
   private boolean prevLeftBaseContact, prevRightBaseContact;
   private boolean nextLeftWallContact, nextRightWallContact, nextTopWallContact;
-  private boolean nextLeftVertexContact, nextBaseContact, nextRightVertexContact;
+  private boolean nextLeftVertexContact, nextRightVertexContact;
   private boolean nextLeftBaseContact, nextRightBaseContact;
 
   private static final int K = 250;
@@ -332,7 +332,6 @@ public class Particle {
     nextTopWallContact     = false;
 
     nextLeftVertexContact  = false;
-    nextBaseContact        = false;
     nextRightVertexContact = false;
   }
 
