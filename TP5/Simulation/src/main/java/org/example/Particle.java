@@ -15,8 +15,10 @@ public class Particle {
 
   private boolean prevLeftWallContact, prevRightWallContact, prevTopWallContact;
   private boolean prevLeftVertexContact, prevBaseContact, prevRightVertexContact;
+  private boolean prevLeftBaseContact, prevRightBaseContact;
   private boolean nextLeftWallContact, nextRightWallContact, nextTopWallContact;
   private boolean nextLeftVertexContact, nextBaseContact, nextRightVertexContact;
+  private boolean nextLeftBaseContact, nextRightBaseContact;
 
   private static final int K = 250;
   private static final double GAMMA = 2.50;
@@ -60,8 +62,10 @@ public class Particle {
     prevTopWallContact     = false;
 
     prevLeftVertexContact  = false;
-    prevBaseContact        = false;
     prevRightVertexContact = false;
+
+    prevLeftBaseContact    = false;
+    prevRightBaseContact   = false;
   }
 
   private static boolean checkContactParticle(double x, double y, double r, double otherX, double otherY, double otherR) {
