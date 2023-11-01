@@ -100,11 +100,11 @@ public class ParticleSystem implements SimulationSystem {
             for (Particle pj: this.particles) {
                 pi.checkNextStepContact(pj);
             }
-            // 2 - check for vertex collisions
-            pi.checkNextStepContactLeftVertex(lvx, baseY);
-            pi.checkNextStepContactRightVertex(rvx, baseY);
+            // 2 - check for vertex collisions (now are not needed)
+            //pi.checkNextStepContactLeftVertex(lvx, baseY);
+            //pi.checkNextStepContactRightVertex(rvx, baseY);
             // 3 - check for base collisions
-            pi.checkNextStepContactBase(baseY);
+            pi.checkNextStepContactBase(baseY, lvx, rvx);
             // 4 - check for wall collisions
             pi.checkNextStepContactLeftWall(lwx);
             pi.checkNextStepContactRightWall(rwx);
