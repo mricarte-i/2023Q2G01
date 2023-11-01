@@ -273,6 +273,11 @@ public class Particle {
 
     xIntegrator.evaluateForce((nextX, predVx) -> 0);
     yIntegrator.evaluateForce((nextY, predVy) -> 0);
+  }
+
+  public void advanceStep() {
+    xIntegrator.advanceStep();
+    yIntegrator.advanceStep();
 
     prevLeftWallContact    = nextLeftWallContact;
     prevRightWallContact   = nextRightWallContact;
@@ -285,11 +290,6 @@ public class Particle {
     prevRightBaseContact   = nextRightBaseContact;
 
     nextContactsIds.clear();
-  }
-
-  public void advanceStep() {
-    xIntegrator.advanceStep();
-    yIntegrator.advanceStep();
 
     prevContacts.clear();
     prevContacts.addAll(nextContacts);
