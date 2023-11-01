@@ -13,6 +13,7 @@ public class ParticleSystem implements SimulationSystem {
     private double GRAVITY = 0.098; //en la consulta dijieron usar 9.8 cm/s^2 para la gravedad
     private Random random;
     private double baseY = 0;
+    private double baseVelY = 0;
     private double W, L, D;
 
     public ParticleSystem() {
@@ -40,6 +41,11 @@ public class ParticleSystem implements SimulationSystem {
         baseY = paramsParser.getA()*Math.sin(paramsParser.getAngularVelocity()*time);
     }
 
+    private void calculateBaseVelocity(double time) {
+        double w = paramsParser.getAngularVelocity();
+        baseVelY = paramsParser.getA()*w*Math.sin(w*time);
+    }
+
     private void advanceParticles() {
         for(Particle p: this.particles){
             p.advanceStep();
@@ -48,7 +54,8 @@ public class ParticleSystem implements SimulationSystem {
 
     private void evaluateParticleForces() {
         for(Particle p: this.particles){
-            p.evaluateNextForces();
+            p.evaluateNextForces(L, 0, W, baseY, (W - D)/2, (W + D)/2, baseVelY, GRAVITY,
+                    paramsParser.getMu(), paramsParser.getKt());
         }
     }
 
@@ -107,7 +114,8 @@ public class ParticleSystem implements SimulationSystem {
             // 1 - check for particle-particle interactions
             //TODO use CELL INDEX NEIGHBORS instead of looping over everything
             for (Particle pj: this.particles) {
-                pi.checkNextStepContact(pj);
+                if (!pi.equals(pj))
+                    pi.checkNextStepContact(pj);
             }
             // 2 - check for vertex collisions (now are not needed)
             //pi.checkNextStepContactLeftVertex(lvx, baseY);
@@ -134,6 +142,7 @@ public class ParticleSystem implements SimulationSystem {
 
         while(time < TF) {
             advanceBase(time);
+            calculateBaseVelocity(time);
             //TODO cell index
             //calculateNextNeighbors();
             checkExitedParticles(time);
