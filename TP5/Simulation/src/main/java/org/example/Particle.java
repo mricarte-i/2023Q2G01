@@ -313,8 +313,7 @@ public class Particle {
   }
 
   private static double calculateTangentialForceObstacle(double normalForce, double x, double y, double r, double[] v,
-                                                         double obsX, double obsY, double MU, double KT, double deltaT, List<Double> forceMemory) {
-    double[] obsV = {0, 0};
+                                                         double obsX, double obsY, double[] obsV, double MU, double KT, double deltaT, List<Double> forceMemory) {
     return calculateTangentialForce(normalForce, x, y, r, v, obsX, obsY, 0, obsV, MU, KT, deltaT, forceMemory);
   }
 
