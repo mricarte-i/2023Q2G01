@@ -641,12 +641,12 @@ public class Particle {
     //dot product of relativeVelocity on normal direction
     double dotProduct = relativeVelocity[0] * normalVersor[0] + relativeVelocity[1] * normalVersor[1];
     //magnitude of normal
-    double magN = Math.sqrt(normalVersor[0] * normalVersor[0] + normalVersor[1] * normalVersor[1]);
+    double magN = Math.abs(dotProduct);
     //magnitude of the projection of relativeVelocity on normal direction
     double relativeSpeed = dotProduct / magN;
 
 
-    double overlap = 2 * radius - Math.abs(Math.sqrt(x*x + y*y) - Math.sqrt(otherX*otherX + otherY*otherY));
+    double overlap = 2 * radius - Math.sqrt(Math.pow(x - otherX, 2)+ Math.pow(y - otherY, 2));
 
     if (overlap < 0)
       return new double[]{0, normalVersor[0], normalVersor[1]};
@@ -660,7 +660,7 @@ public class Particle {
     //dot product of relativeVelocity on normal direction
     double dotProduct = relativeVelocity[0] * normalVersor[0] + relativeVelocity[1] * normalVersor[1];
     //magnitude of normal
-    double magN = Math.sqrt(normalVersor[0] * normalVersor[0] + normalVersor[1] * normalVersor[1]);
+    double magN = Math.abs(dotProduct);
     //magnitude of the projection of relativeVelocity on normal direction
     double relativeSpeed = dotProduct / magN;
 
@@ -679,7 +679,7 @@ public class Particle {
     //dot product of relativeVelocity on normal direction
     double dotProduct = relativeVelocity[0] * normalVersor[0] + relativeVelocity[1] * normalVersor[1];
     //magnitude of normal
-    double magN = Math.sqrt(normalVersor[0] * normalVersor[0] + normalVersor[1] * normalVersor[1]);
+    double magN = Math.abs(dotProduct);
     //magnitude of the projection of relativeVelocity on normal direction
     double relativeSpeed = dotProduct / magN;
 

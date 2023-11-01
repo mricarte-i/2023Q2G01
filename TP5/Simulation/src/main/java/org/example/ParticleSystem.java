@@ -11,7 +11,7 @@ public class ParticleSystem implements SimulationSystem {
     private List<Particle> particles;
     private Writer writer;
     private double TF = 30;
-    public static final double GRAVITY = 9.8; //en la consulta dijieron usar 9.8 cm/s^2 para la gravedad
+    public static final double GRAVITY = 0.98; //en la consulta dijieron usar 9.8 cm/s^2 para la gravedad
     private Random random;
     private double baseY = 0;
     private double baseVelY = 0;
