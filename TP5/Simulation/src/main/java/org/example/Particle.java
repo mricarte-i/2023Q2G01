@@ -41,7 +41,7 @@ public class Particle {
   private Particle(int id, double radius, double mass, double gravity, double x, double y, double dT, double vx, double vy) {
     this.id = id;
     this.xIntegrator = new BeemanIntegrator(dT, x, vx, mass, (pos, vel) -> 0);
-    this.yIntegrator = new BeemanIntegrator(dT, y, vy, mass, (pos, vel) -> mass * gravity);
+    this.yIntegrator = new BeemanIntegrator(dT, y, vy, mass, (pos, vel) -> -mass * gravity);
     this.radius = radius;
     this.mass = mass;
     this.deltaT = dT;
@@ -65,7 +65,7 @@ public class Particle {
 
   public void initialize(double gravity) {
     xIntegrator.initPrevForce((prevX, prevVx) -> 0);
-    yIntegrator.initPrevForce((prevY, prevVy) -> mass * gravity);
+    yIntegrator.initPrevForce((prevY, prevVy) -> -mass * gravity);
 
     prevContacts.clear();
 
@@ -835,7 +835,7 @@ public class Particle {
 
   private double calculatePrevYForce(double topWallY, double leftWallX, double rightWallX, double baseY, double leftVertexX, double rightVertexX, double baseVelY,
                                      double gravity, double MU, double KT) {
-    double yForce = mass * gravity;
+    double yForce = -mass * gravity;
     for (Particle p : prevContacts){
       double[] resN = calculatePrevNormalForce(p);
       double[] resT = calculatePrevTangentialForce(resN[0], p, MU, KT);
@@ -933,7 +933,7 @@ public class Particle {
 
   private double calculateNextYForce(double topWallY, double leftWallX, double rightWallX, double baseY, double leftVertexX, double rightVertexX, double baseVelY,
                                      double gravity, double MU, double KT) {
-    double yForce = mass * gravity;
+    double yForce = -mass * gravity;
     for (Particle p : nextContacts){
       double[] resN = calculateNextNormalForce(p);
       double[] resT = calculateNextTangentialForce(resN[0], p, MU, KT);
@@ -984,10 +984,33 @@ public class Particle {
     return yIntegrator.getPosition() < lowerBound - L / 10.0;
   }
 
-  public void reinsert(double newX, double newY) {
+  public void reinsert(double newX, double newY, double gravity) {
     xIntegrator.reinsert(newX, 0, (x, vx) -> 0 );
-    xIntegrator.reinsert(newY, 0, (y, vy) -> 0 );
+    yIntegrator.reinsert(newY, 0, (y, vy) -> -mass*gravity);
     hasExited = false;
+
+    prevContacts.clear();
+
+    prevLeftWallContact    = false;
+    prevRightWallContact   = false;
+    prevTopWallContact     = false;
+
+    prevLeftVertexContact  = false;
+    prevRightVertexContact = false;
+
+    prevLeftBaseContact    = false;
+    prevRightBaseContact   = false;
+
+    prevParticlesContact.clear();
+    nextParticlesContact.clear();
+
+    nextLeftBaseMemory.clear();
+    nextRightBaseMemory.clear();
+    nextLeftVertexMemory.clear();
+    nextRightVertexMemory.clear();
+    nextLeftWallMemory.clear();
+    nextRightWallMemory.clear();
+    nextTopWallMemory.clear();
   }
 }
 

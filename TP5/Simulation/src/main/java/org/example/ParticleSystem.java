@@ -2,6 +2,7 @@ package org.example;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -9,8 +10,8 @@ public class ParticleSystem implements SimulationSystem {
     private ParamsParser paramsParser;
     private List<Particle> particles;
     private Writer writer;
-    private double TF = 1000;
-    public static final double GRAVITY = 0.098; //en la consulta dijieron usar 9.8 cm/s^2 para la gravedad
+    private double TF = 30;
+    public static final double GRAVITY = 9.8; //en la consulta dijieron usar 9.8 cm/s^2 para la gravedad
     private Random random;
     private double baseY = 0;
     private double baseVelY = 0;
@@ -75,7 +76,7 @@ public class ParticleSystem implements SimulationSystem {
                     double dy = y - other.getPositionY();
                     double minDist = r + other.getRadius();
 
-                    if((dx*dx) + (dy*dy) <= (minDist*minDist)){
+                    if(Math.sqrt((dx*dx) + (dy*dy)) <= (minDist*minDist)){
                         overlaps = true;
                         break; //overlapped with another particle, retry
                     }
@@ -83,16 +84,26 @@ public class ParticleSystem implements SimulationSystem {
             }
         } while(overlaps);
 
-        p.reinsert(x, y);
+        p.reinsert(x, y, GRAVITY);
     }
+
+    List<Particle> justReinserted = new ArrayList<>();
 
     private void reinsertParticles() {
         double lowerBound = paramsParser.getLowerOutOfBoundsPosition();
         for(Particle p : this.particles){
             if(p.needsReinsertion(lowerBound)) {
                 reinsertParticle(p);
+                justReinserted.add(p);
             }
         }
+    }
+
+    private void initReinserted() {
+        for (Particle p : this.justReinserted) {
+            p.initialize(GRAVITY);
+        }
+        justReinserted.clear();
     }
 
     private void checkExitedParticles(double time) {
@@ -132,8 +143,10 @@ public class ParticleSystem implements SimulationSystem {
         this.particles = paramsParser.getParticles();
         this.writer.writeStatic(paramsParser.getStaticFile(), paramsParser.getL(), paramsParser.getW(), paramsParser.getD(), paramsParser.getAngularVelocity(), particles);
 
-        double simStep = Math.pow(10, -paramsParser.getStateWritingDeltaTimeExp()); //deltaT should be 3
+        double simStep = Math.pow(10, -paramsParser.getIntegrationDeltaTimeExp()); //deltaT should be 3
+        double writeStep = Math.pow(10, -paramsParser.getStateWritingDeltaTimeExp());
         double time = 0;
+        double writeTime = 0;
         int iter = 0;
 
         this.writer.writeState(time, this.particles);
@@ -150,11 +163,16 @@ public class ParticleSystem implements SimulationSystem {
             evaluateParticleForces();
             advanceParticles();
             reinsertParticles();
+            initReinserted();
 
             iter++;
             time = iter*simStep;
+            writeTime += simStep;
 
-            this.writer.writeState(time, particles);
+            if (writeTime >= writeStep) {
+                this.writer.writeState(time, particles);
+                writeTime = 0;
+            }
         }
 
         this.writer.close();
