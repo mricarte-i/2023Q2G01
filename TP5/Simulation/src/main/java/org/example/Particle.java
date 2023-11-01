@@ -284,7 +284,8 @@ public class Particle {
     this.hasExited = hasExited;
   }
 
-  public void evaluateNextForces() {
+  public void evaluateNextForces(double topWallY, double leftWallX, double rightWallX, double baseY, double leftVertexX, double rightVertexX, double baseVelY,
+                                 double gravity, double MU, double KT) {
     for (Particle particle : prevContacts) {
       if (!nextContactsIds.contains(particle.id)) {
         nextParticlesContact.remove(particle.id);
@@ -298,8 +299,11 @@ public class Particle {
     if(!nextRightWallContact) nextRightWallMemory.clear();
     if(!nextTopWallContact) nextTopWallMemory.clear();
 
-    xIntegrator.evaluateForce((nextX, predVx) -> 0);
-    yIntegrator.evaluateForce((nextY, predVy) -> 0);
+    double xForce = calculateNextXForce(topWallY, leftWallX, rightWallX, baseY, leftVertexX, rightVertexX, baseVelY, gravity, MU, KT);
+    double yForce = calculateNextYForce(topWallY, leftWallX, rightWallX, baseY, leftVertexX, rightVertexX, baseVelY, gravity, MU, KT);
+
+    xIntegrator.evaluateForce((nextX, predVx) -> xForce);
+    yIntegrator.evaluateForce((nextY, predVy) -> yForce);
   }
 
   public void advanceStep() {
