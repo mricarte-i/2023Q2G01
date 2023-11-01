@@ -18,7 +18,6 @@ public class Particle {
   private Set<Integer> nextContactsIds;
 
   private final HashMap<Integer, List<Double>> nextParticlesContact;
-  private final HashMap<Integer, List<Double>> prevParticlesContact;
 
   private boolean prevLeftWallContact, prevRightWallContact, prevTopWallContact;
   private boolean prevLeftVertexContact, prevRightVertexContact;
@@ -46,7 +45,6 @@ public class Particle {
     this.mass = mass;
     this.deltaT = dT;
     this.nextParticlesContact = new HashMap<>();
-    this.prevParticlesContact = new HashMap<>();
     this.hasExited = false;
   }
 
@@ -79,7 +77,6 @@ public class Particle {
     prevLeftBaseContact    = false;
     prevRightBaseContact   = false;
 
-    prevParticlesContact.clear();
     nextParticlesContact.clear();
   }
 
@@ -988,6 +985,8 @@ public class Particle {
     yIntegrator.reinsert(newY, 0, (y, vy) -> -mass*gravity);
     hasExited = false;
 
+    nextContactsIds.clear();
+
     prevContacts.clear();
 
     prevLeftWallContact    = false;
@@ -1000,7 +999,6 @@ public class Particle {
     prevLeftBaseContact    = false;
     prevRightBaseContact   = false;
 
-    prevParticlesContact.clear();
     nextParticlesContact.clear();
 
     nextLeftBaseMemory.clear();
