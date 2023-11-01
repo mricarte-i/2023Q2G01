@@ -615,19 +615,11 @@ public class Particle {
     return Integer.hashCode(id);
   }
 
-  public double getPosition() {
-    throw new NotImplementedException();
-  }
-
   public double getPositionX() {
     return this.xIntegrator.getPosition();
   }
   public double getPositionY() {
     return this.yIntegrator.getPosition();
-  }
-
-  public double getVelocity() {
-    throw new NotImplementedException();
   }
 
   public double getVelocityX() {
