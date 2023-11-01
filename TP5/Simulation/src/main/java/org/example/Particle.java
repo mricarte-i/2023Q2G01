@@ -292,7 +292,7 @@ public class Particle {
       return -KT * s / relVtMag;
   }
 
-  private static double calculateTangentialForce(double normalForce, double x, double y, double r, double[] v, double oX, double oY, double oR, double[] oV,
+  private static double[] calculateTangentialForce(double normalForce, double x, double y, double r, double[] v, double oX, double oY, double oR, double[] oV,
                                                  double MU, double KT, double deltaT, List<Double> forceMemory) {
     double[] tangentialVersor = calculateTangentialVersor(x,y,oX,oY);
     double[] relV = {v[0]-oV[0], v[1]-oV[1]};
@@ -311,24 +311,34 @@ public class Particle {
     //WORKAROUND: dijieron en clase que si t1_2 suponia problemas, podia usarse t_3
     //double t3 = calculateT3(r, oR, x, oX, y, oY, relVt, KT);
 
-    return Math.min(t1_1, t1_2);// t3);
+    return new double[]{Math.min(t1_1, t1_2), tangentialVersor[0], tangentialVersor[1]};// t3);
   }
 
-  private static double calculateTangentialForceObstacle(double normalForce, double x, double y, double r, double[] v,
+  private static double[] calculateTangentialForceObstacle(double normalForce, double x, double y, double r, double[] v,
                                                          double obsX, double obsY, double[] obsV, double MU, double KT, double deltaT, List<Double> forceMemory) {
     return calculateTangentialForce(normalForce, x, y, r, v, obsX, obsY, 0, obsV, MU, KT, deltaT, forceMemory);
   }
 
-  private static double calculateTangentialForceHorizontalWall(double normalForce, double x, double y, double r, double[] v,
+  private static double[] calculateTangentialForceHorizontalWall(double normalForce, double x, double y, double r, double[] v,
                                                                double wallY, double wallVy, double MU, double KT, double deltaT, List<Double> forceMemory) {
     double[] obsV = {0, wallVy};
     return calculateTangentialForce(normalForce, x, y, r, v, x, wallY, 0, obsV, MU, KT, deltaT, forceMemory);
   }
 
-  private static double calculateTangentialForceVerticalWall(double normalForce, double x, double y, double r, double[] v,
+  private static double[] calculateTangentialForceVerticalWall(double normalForce, double x, double y, double r, double[] v,
                                                                double wallX, double wallVx, double MU, double KT, double deltaT, List<Double> forceMemory) {
     double[] obsV = {wallVx, 0};
     return calculateTangentialForce(normalForce, x, y, r, v, wallX, y, 0, obsV, MU, KT, deltaT, forceMemory);
+  }
+
+  private List<Double> nextTopWallMemory = new LinkedList<>();
+
+  private double[] calculateNextTangentialForceTopWall(double normalForce, double wallY, double MU, double KT) {
+    double x = xIntegrator.getNextPosition();
+    double y = yIntegrator.getNextPosition();
+    double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
+
+    return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, 0, MU, KT, deltaT, nextTopWallMemory);
   }
 
   @Override
