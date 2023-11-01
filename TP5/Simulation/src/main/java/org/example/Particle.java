@@ -328,6 +328,9 @@ public class Particle {
     nextRightWallContact   = false;
     nextTopWallContact     = false;
 
+    nextLeftBaseContact    = false;
+    nextRightBaseContact   = false;
+
     nextLeftVertexContact  = false;
     nextRightVertexContact = false;
   }
