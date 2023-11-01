@@ -4,6 +4,7 @@ import org.example.integrators.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Particle {
   private final int id;
@@ -13,6 +14,9 @@ public class Particle {
   private final double mass, radius;
   private List<Particle> prevContacts, nextContacts;
   private Set<Integer> nextContactsIds;
+
+  private HashMap<Integer, List<Double>> nextParticlesContact;
+  private HashMap<Integer, List<Double>> prevParticlesContact;
 
   private boolean prevLeftWallContact, prevRightWallContact, prevTopWallContact;
   private boolean prevLeftVertexContact, prevBaseContact, prevRightVertexContact;
@@ -39,6 +43,8 @@ public class Particle {
     this.radius = radius;
     this.mass = mass;
     this.deltaT = dT;
+    this.nextParticlesContact = new HashMap<>();
+    this.prevParticlesContact = new HashMap<>();
   }
 
   public Particle(int id, double radius, double mass, double x, double y, double dT, double vx, double vy, Integer totalParticles) {
@@ -69,6 +75,9 @@ public class Particle {
 
     prevLeftBaseContact    = false;
     prevRightBaseContact   = false;
+
+    prevParticlesContact.clear();
+    nextParticlesContact.clear();
   }
 
   private static boolean checkContactParticle(double x, double y, double r, double otherX, double otherY, double otherR) {
@@ -267,7 +276,7 @@ public class Particle {
   public void evaluateNextForces() {
     for (Particle particle : prevContacts) {
       if (!nextContactsIds.contains(particle.id)) {
-        // TODO: clear memory forces for id
+        nextParticlesContact.remove(particle.id);
       }
     }
 
@@ -407,6 +416,22 @@ public class Particle {
     double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
 
     return calculateTangentialForceHorizontalWall(normalForce, x, y, radius, v, wallY, 0, MU, KT, deltaT, nextTopWallMemory);
+  }
+
+  private double[] calculateNextTangentialForce(double normalForce, Particle p, double MU, double KT) {
+    double x = xIntegrator.getNextPosition();
+    double y = yIntegrator.getNextPosition();
+    double[] v = {xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
+
+    double oX = p.xIntegrator.getNextPosition();
+    double oY = p.yIntegrator.getNextPosition();
+    double[] oV = {p.xIntegrator.getPredictedVelocity(), yIntegrator.getPredictedVelocity()};
+
+    if(!this.nextParticlesContact.containsKey(p.id)){
+      this.nextParticlesContact.put(p.id, new LinkedList<>());
+    }
+
+    return calculateTangentialForce(normalForce, x, y, radius, v, oX, oY, p.getRadius(), oV, MU, KT, deltaT, nextParticlesContact.get(p.id));
   }
 
   @Override
