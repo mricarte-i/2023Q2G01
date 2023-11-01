@@ -17,8 +17,8 @@ public class Particle {
   private List<Particle> prevContacts, nextContacts;
   private Set<Integer> nextContactsIds;
 
-  private HashMap<Integer, List<Double>> nextParticlesContact;
-  private HashMap<Integer, List<Double>> prevParticlesContact;
+  private final HashMap<Integer, List<Double>> nextParticlesContact;
+  private final HashMap<Integer, List<Double>> prevParticlesContact;
 
   private boolean prevLeftWallContact, prevRightWallContact, prevTopWallContact;
   private boolean prevLeftVertexContact, prevBaseContact, prevRightVertexContact;
@@ -502,13 +502,13 @@ public class Particle {
     return calculateTangentialForceObstacle(normalForce, x, y, radius, v, obsX, obsY, obsV, MU, KT, deltaT, forceMemory);
   }
 
-  private List<Double> nextRightVertexMemory = new LinkedList<>();
+  private final List<Double> nextRightVertexMemory = new LinkedList<>();
 
   private double[] calculateNextTangentialForceRightVertex(double normalForce, double obsX, double obsY, double obsVY, double MU, double KT) {
     return calculateNextTangentialForceObstacle(normalForce, obsX, obsY, obsVY, MU, KT, nextRightVertexMemory);
   }
 
-  private List<Double> nextLeftVertexMemory = new LinkedList<>();
+  private final List<Double> nextLeftVertexMemory = new LinkedList<>();
 
   private double[] calculateNextTangentialForceLeftVertex(double normalForce, double obsX, double obsY, double obsVY, double MU, double KT) {
     return calculateNextTangentialForceObstacle(normalForce, obsX, obsY, obsVY, MU, KT, nextLeftVertexMemory);
