@@ -128,7 +128,7 @@ def plot_exiting_particles_vs_t(plt, timestamps, t_est, color, label, perform_re
     plt.plot(timestamps, accumulated_values, color=color, label=label)
 
     if perform_regression:
-        
+
         Q, errs = plot_regression(timestamps, accumulated_values, t_est, color)
 
         return Q, errs
@@ -174,11 +174,12 @@ def plot_q_vs_w(q: list[float], q_errors: list[float], w: list[int], save_to: st
     # plt.legend()
 
     # TODO: quitar si vamos a hacer todos los puntos de distintos colores
-    plt.errorbar(w, q, yerr=q_errors, fmt='o')
+    #plt.errorbar(w, q, yerr=q_errors, fmt='o')
+    plt.plot(w, q, marker="o", linestyle="")
 
-    plt.xlabel('w')
-    plt.ylabel('Q')
-    plt.title('Caudal en función de omega')
+    plt.xlabel('Vibración del silo')
+    plt.ylabel('Caudal')
+    #plt.title('Caudal en función de omega')
 
     plt.savefig(save_to, bbox_inches='tight', dpi=1200, facecolor='white')
     #plt.show()

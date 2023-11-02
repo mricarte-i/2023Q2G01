@@ -60,7 +60,7 @@ def perform_regression(X : np.ndarray, Ks : np.ndarray, f : Callable[[Any, Any],
         f_k_vec = np.vectorize(f_k)
         F       = f_k_vec(X)
 
-        E = F - Y
+        #E = np.apply_along_axis(lambda x : abs(x), 0, Y - F)
         err     = square_error(Y, F)
         K_errs.append(err)
 
@@ -68,7 +68,7 @@ def perform_regression(X : np.ndarray, Ks : np.ndarray, f : Callable[[Any, Any],
             best_k_idx = i
             min_err    = err
             min_F      = F
-            min_E      = E
+            min_E      = mean_square_error(Y, F)
     
     return min_F, RegressionData(best_k_idx, Ks, K_errs), min_E
 
