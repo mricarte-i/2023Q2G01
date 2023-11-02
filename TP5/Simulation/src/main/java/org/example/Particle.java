@@ -147,21 +147,20 @@ public class Particle {
     double nextX = this.xIntegrator.getNextPosition();
     double nextY = this.yIntegrator.getNextPosition();
 
-    checkNextStepContactLeftVertex(vertexX, baseY);
-
-    if (!nextLeftVertexContact && nextX <= vertexX && checkContactHorizontalWall(nextY, radius, baseY)) {
+    if (nextX <= vertexX && checkContactHorizontalWall(nextY, radius, baseY)) {
       nextLeftBaseContact = true;
+    } else {
+      checkNextStepContactLeftVertex(vertexX, baseY);
     }
   }
 
   private void checkNextStepContactRightBase(double baseY, double vertexX) {
     double nextX = this.xIntegrator.getNextPosition();
     double nextY = this.yIntegrator.getNextPosition();
-
-    checkNextStepContactRightVertex(vertexX, baseY);
-
-    if (!nextRightVertexContact && nextX >= vertexX && checkContactHorizontalWall(nextY, radius, baseY)) {
+    if (nextX >= vertexX && checkContactHorizontalWall(nextY, radius, baseY)) {
       nextRightBaseContact = true;
+    } else {
+      checkNextStepContactRightVertex(vertexX, baseY);
     }
   }
 
@@ -227,10 +226,10 @@ public class Particle {
     double prevX = this.xIntegrator.getPreviousPosition();
     double prevY = this.yIntegrator.getPreviousPosition();
 
-    checkPrevStepContactLeftVertex(vertexX, baseY);
-
-    if (!nextLeftVertexContact && prevX <= vertexX && checkContactHorizontalWall(prevY, radius, baseY)) {
+    if (prevX <= vertexX && checkContactHorizontalWall(prevY, radius, baseY)) {
       nextLeftBaseContact = true;
+    } else {
+      checkPrevStepContactLeftVertex(vertexX, baseY);
     }
   }
 
@@ -238,10 +237,10 @@ public class Particle {
     double prevX = this.xIntegrator.getPreviousPosition();
     double prevY = this.yIntegrator.getPreviousPosition();
 
-    checkPrevStepContactRightVertex(vertexX, baseY);
-
-    if (!prevRightVertexContact && prevX >= vertexX && checkContactHorizontalWall(prevY, radius, baseY)) {
+    if (prevX >= vertexX && checkContactHorizontalWall(prevY, radius, baseY)) {
       prevRightBaseContact = true;
+    } else {
+      checkPrevStepContactRightVertex(vertexX, baseY);
     }
   }
 
@@ -366,9 +365,9 @@ public class Particle {
   }
 
   private static double calculateT1_2(double relVt, double deltaT, double KT, List<Double> forceMemory) {
-    double relVtMag = Math.abs(relVt);
+    //double relVtMag = Math.abs(relVt);
 
-    double currS = deltaT * relVtMag;
+    double currS = deltaT * relVt;
     forceMemory.add(currS);
 
     double sumS = 0;
@@ -380,8 +379,6 @@ public class Particle {
   }
 
   private static double calculateT3(double r, double oR, double x, double oX, double y, double oY, double relVt, double KT){
-    double relVtMag = Math.abs(relVt);
-
     double[] relativePos = {x-oX, y-oY};
     double s = r + oR - Math.sqrt(Math.pow(relativePos[0], 2) + Math.pow(relativePos[1], 2));
 
@@ -396,6 +393,7 @@ public class Particle {
     //dot product of v_rel on t
     double relVt = relV[0] * tangentialVersor[0] + relV[1] * tangentialVersor[1];
     double relVn = relV[0] * tangentialVersor[1] - relV[1] * tangentialVersor[0];
+    double mag = Math.sqrt(Math.pow(relV[0], 2) + Math.pow(relV[1], 2));
 
     double t1_1 = calculateT1_1(relVt, normalForce, MU);
 
@@ -403,7 +401,7 @@ public class Particle {
     //sumRelativeVelocities needs a way to add up these velocities throughout the duration of the overlap
     //that value cannot be shared between all instances
     //double t1_2 = -KT * sumRelativeVelocities(DT*v_rel_t);
-    //double t1_2 = calculateT1_2(relVn, deltaT, KT, forceMemory);
+    //double t1_2 = calculateT1_2(relVt, deltaT, KT, forceMemory);
 
     //WORKAROUND: dijieron en clase que si t1_2 suponia problemas, podia usarse t_3
     double t3 = calculateT3(r, oR, x, oX, y, oY, relVt, KT);
@@ -645,7 +643,7 @@ public class Particle {
     //magnitude of normal
     double magN = Math.abs(dotProduct);
     //magnitude of the projection of relativeVelocity on normal direction
-    double relativeSpeed = magN;
+    double relativeSpeed = dotProduct;
 
 
     double overlap = (r + otherR) - Math.sqrt(Math.pow(x - otherX, 2)+ Math.pow(y - otherY, 2));

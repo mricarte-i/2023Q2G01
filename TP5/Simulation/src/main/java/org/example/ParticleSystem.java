@@ -10,8 +10,8 @@ public class ParticleSystem implements SimulationSystem {
     private ParamsParser paramsParser;
     private List<Particle> particles;
     private Writer writer;
-    private double TF = 100;
-    public static final double GRAVITY = 9.8; //en la consulta dijieron usar 9.8 cm/s^2 para la gravedad
+    private double TF = 500;
+    public static final double GRAVITY = 5; //en la consulta dijieron usar 9.8 cm/s^2 para la gravedad
     private Random random;
     private double baseY = 0;
     private double baseVelY = 0;
@@ -44,7 +44,7 @@ public class ParticleSystem implements SimulationSystem {
 
     private void calculateBaseVelocity(double time) {
         double w = paramsParser.getAngularVelocity();
-        baseVelY = paramsParser.getA()*w*Math.sin(w*time);
+        baseVelY = paramsParser.getA()*w*Math.cos(w*time);
     }
 
     private void advanceParticles() {
