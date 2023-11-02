@@ -10,7 +10,7 @@ public class ParticleSystem implements SimulationSystem {
     private ParamsParser paramsParser;
     private List<Particle> particles;
     private Writer writer;
-    private double TF = 30;
+    private double TF = 100;
     public static final double GRAVITY = 9.8; //en la consulta dijieron usar 9.8 cm/s^2 para la gravedad
     private Random random;
     private double baseY = 0;
@@ -152,13 +152,15 @@ public class ParticleSystem implements SimulationSystem {
         this.writer.writeState(time, this.particles);
 
         initParticles();
+        advanceBase(time);
+        calculateBaseVelocity(time);
 
         while(time < TF) {
-            advanceBase(time);
-            calculateBaseVelocity(time);
+            checkExitedParticles(time);
+            advanceBase(time+simStep);
+            calculateBaseVelocity(time+simStep);
             //TODO cell index
             //calculateNextNeighbors();
-            checkExitedParticles(time);
             checkNextContacts();
             evaluateParticleForces();
             advanceParticles();

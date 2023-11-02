@@ -21,7 +21,7 @@ public class ParamsParser {
     private final static double DEFAULT_ANGULAR_VEL = 5;
     private final static double AMPLITUDE = 0.15; // in cm
     private final static double K_N = 250; // in dina/cm
-    private final static double GAMMA = 0.7;
+    private final static double GAMMA = 2.5;
     private final static double MU = 0.7;
 
     private final static int DEFAULT_PARTICLE_COUNT = 200;
