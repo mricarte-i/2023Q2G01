@@ -28,7 +28,7 @@ def add_particles(xyz_file : str) -> None:
 
     particle_data = particles_pipeline.compute()
 
-    particle_data.particles_.vis.shape = ParticlesVis.Shape.Circle
+    particle_data.particles_.vis.shape = ParticlesVis.Shape.Sphere
     particle_data.cell_.vis.enabled = False
 
     particle_types = particles_pipeline.source.data.particles_.particle_types_
