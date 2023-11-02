@@ -11,6 +11,14 @@ def run_plots():
     plot_q_vs_t(timestamps, t_est)
     # ...
 
+def get_first_timestap_after_idx(time: float, timestamps: list[float]) -> int:
+    i = 0
+    for timestamp in timestamps:
+        if timestamp >= time:
+            break
+        i = i + 1
+    return i
+
 def get_caudal(timestamps: list[float], t_est: float):
     accumulated_values = list(range(1, len(timestamps) + 1))
 
@@ -50,7 +58,7 @@ def get_timestamps(fileName):
     return timestamps
 
 
-def plot_exiting_particles_vs_t_for_multiple_ws(timestamps: list[list[float]], t_ests: list[float], ws: list[int], colors: list[str], save_to: str):
+def plot_exiting_particles_vs_t_for_multiple_ws(timestamps: list[list[float]], t_ests: list[float], ws: list[int], colors: list[str], save_to: str, perform_regression=False):
     # TODO: unhardcode
     #timestamps_w_5 = [0.1, 0.2, 0.3, 0.5, 0.6, 0.7, 0.71, 0.745, 0.77, 0.779, 0.8, 0.81, 0.84]
     #t_est_w_5 = 0.7
@@ -60,9 +68,8 @@ def plot_exiting_particles_vs_t_for_multiple_ws(timestamps: list[list[float]], t
     # t_est_w_5 = 22 # TODO: set correct value
     # ...
 
-    plt.xlabel('t')
-    plt.ylabel('n')
-    plt.title('Descarga en función del tiempo')
+    plt.xlabel('Tiempo (s)')
+    plt.ylabel('Número de partículas descargadas')
 
     #plot_exiting_particles_vs_t(plt, timestamps_w_5, t_est_w_5, 'red', 'w = 5')
 
@@ -73,19 +80,62 @@ def plot_exiting_particles_vs_t_for_multiple_ws(timestamps: list[list[float]], t
 
     #plot_exiting_particles_vs_t(plt, timestamps_w_10, t_est_w_10, 'blue', 'w = 10')
 
+    caudales = dict()
+
     for i in range(len(ws)):
-        plot_exiting_particles_vs_t(plt, timestamps[i], t_ests[i], colors[i], 'w = ' + str(ws[i]))
+        if perform_regression:
+            Q, errs = plot_exiting_particles_vs_t(plt, timestamps[i], t_ests[i], colors[i], 'w = ' + str(ws[i]), perform_regression=True)
+            caudales[Q] = errs
+        else:
+            plot_exiting_particles_vs_t(plt, timestamps[i], t_ests[i], colors[i], 'w = ' + str(ws[i]), perform_regression=False)
 
     plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
     plt.savefig(save_to, bbox_inches='tight', dpi=1200, facecolor='white')
+    return caudales
     #plt.show()
 
+from min_sqrs import min_sqrs, perform_regression
+
+def plot_regression(timestamps: list[float], accumulated_values: list[float], t_est: float, color: str) -> tuple[int, np.ndarray]:
+    t_est_idx = get_first_timestap_after_idx(t_est, timestamps)
+
+    X = np.array(timestamps[t_est_idx:])-timestamps[t_est_idx]
+    Y = np.array(accumulated_values[t_est_idx:])-accumulated_values[t_est_idx]
+    F = [lambda x : x]
+
+    k = min_sqrs(X, F, Y)
+    k = k.item()
+
+    Y = Y + accumulated_values[t_est_idx]
+    k = round(k, 3)
+
+    k_int = (0, k*2)
+    K_s = np.arange(k_int[0], k_int[1] + 0.001, step=0.001)
+    min_f, reg_data, min_E = perform_regression(X, K_s, lambda x, c : c*x + Y[0], Y)
+
+    print(k, reg_data.Ks[reg_data.best_k_idx])
+
+    O = np.apply_along_axis(lambda x : k*x + Y[0], 0, X)
+
+    plt.plot(X+timestamps[t_est_idx], O, linestyle="--", color=color, label="Q = {}".format(k))
+
+    return k, min_E
 
 # timestamps = [...], t_est = x
-def plot_exiting_particles_vs_t(plt, timestamps, t_est, color, label):
+def plot_exiting_particles_vs_t(plt, timestamps, t_est, color, label, perform_regression=False):
     accumulated_values = list(range(1, len(timestamps) + 1))
 
     plt.plot(timestamps, accumulated_values, color=color, label=label)
+
+    if perform_regression:
+        
+        Q, errs = plot_regression(timestamps, accumulated_values, t_est, color)
+
+        return Q, errs
+    
+    return None
+    """
+    LO CAMBIE POR REGRESION
 
     i = 0
     for timestamp in timestamps:
@@ -102,6 +152,7 @@ def plot_exiting_particles_vs_t(plt, timestamps, t_est, color, label):
     slope = np.polyfit(x, y, 1)
     slope_poly = np.poly1d(slope)
     plt.plot(timestamps_from_stationary, slope_poly(timestamps_from_stationary), color=color, alpha=0.5, linestyle='dashed', label='Aprox. lineal para ' + label)
+    """
 
 
 # timestamps = [...], t_est = x
