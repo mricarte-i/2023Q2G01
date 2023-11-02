@@ -10,7 +10,7 @@ public class ParticleSystem implements SimulationSystem {
     private ParamsParser paramsParser;
     private List<Particle> particles;
     private Writer writer;
-    private double TF = 500;
+    private double TF = 1000;
     public static final double GRAVITY = 5; //en la consulta dijieron usar 9.8 cm/s^2 para la gravedad
     private Random random;
     private double baseY = 0;
@@ -19,7 +19,7 @@ public class ParticleSystem implements SimulationSystem {
 
     public ParticleSystem() {
         this.paramsParser = ParamsParser.getInstance();
-        this.writer = new Writer(paramsParser.getDynamicFile(), "exitingParticles.txt");
+        this.writer = new Writer(paramsParser.getDynamicFile(), paramsParser.getExitsFile());
         //set up writer and paramsparser
         random = paramsParser.getRandom();
         W = paramsParser.getW();

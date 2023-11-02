@@ -50,6 +50,7 @@ public class ParamsParser {
 
     private final String staticFile;
     private final String dynamicFile;
+    private final String exitsFile;
 
     private final Random random;
 
@@ -114,6 +115,9 @@ public class ParamsParser {
     public String getDynamicFile() {
         return dynamicFile;
     }
+    public String getExitsFile() {
+        return exitsFile;
+    }
     public Random getRandom() {
         return random;
     }
@@ -123,7 +127,7 @@ public class ParamsParser {
                          Double reinjectionUpperBound, Double reinjectionLowerBound,
                          Double w, Double A, Double Kn, Double Kt, Double gamma, Double mu,
                          Integer N, Integer n, Integer k,
-                         String staticFile, String dynamicFile, Random random) {
+                         String staticFile, String dynamicFile, String exitsFile, Random random) {
         this.simulationSystem = simulationSystem;
         this.particles  = particles;
 
@@ -153,6 +157,7 @@ public class ParamsParser {
 
         this.staticFile  = staticFile;
         this.dynamicFile = dynamicFile;
+        this.exitsFile = exitsFile;
         this.random = random;
     }
 
@@ -180,6 +185,13 @@ public class ParamsParser {
                     scope = ScopeType.INHERIT,
                     required = true)
             private String dynamicFile;
+
+            @Option(names = { "-e", "--exits-file" },
+                    description = "Exits file path with timestamps for every time a particle has exited the container.",
+                    paramLabel = "[DYNAMIC_FILE]",
+                    scope = ScopeType.INHERIT,
+                    required = true)
+            private String exitsFile;
 
             @Option(names = { "-n", "--integration-step-scale" },
                     description = "Scale of the integration step (10^-n).",
@@ -250,6 +262,7 @@ public class ParamsParser {
 
                 String staticFile = this.granularSimParserMixin.staticFile;
                 String dynamicFile = this.granularSimParserMixin.dynamicFile;
+                String exitsFile = this.granularSimParserMixin.exitsFile;
 
                 Random rand = granularSimParserMixin.seed == null ? new Random() : new Random(granularSimParserMixin.seed);
 
@@ -262,7 +275,7 @@ public class ParamsParser {
                         reinjectionLowerBound,
                         w, A, Kn, Kt, gamma, mu,
                         N, n, k,
-                        staticFile, dynamicFile,
+                        staticFile, dynamicFile, exitsFile,
                         rand
                 );
             }
