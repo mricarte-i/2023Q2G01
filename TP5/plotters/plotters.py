@@ -80,18 +80,18 @@ def plot_exiting_particles_vs_t_for_multiple_ws(timestamps: list[list[float]], t
 
     #plot_exiting_particles_vs_t(plt, timestamps_w_10, t_est_w_10, 'blue', 'w = 10')
 
-    caudales = dict()
+    w_caudales = dict()
 
     for i in range(len(ws)):
         if perform_regression:
             Q, errs = plot_exiting_particles_vs_t(plt, timestamps[i], t_ests[i], colors[i], 'w = ' + str(ws[i]), perform_regression=True)
-            caudales[Q] = errs
+            w_caudales[ws[i]] = (Q, errs)
         else:
             plot_exiting_particles_vs_t(plt, timestamps[i], t_ests[i], colors[i], 'w = ' + str(ws[i]), perform_regression=False)
 
     plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
     plt.savefig(save_to, bbox_inches='tight', dpi=1200, facecolor='white')
-    return caudales
+    return w_caudales
     #plt.show()
 
 from min_sqrs import min_sqrs, perform_regression
