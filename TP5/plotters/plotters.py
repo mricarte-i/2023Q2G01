@@ -180,8 +180,8 @@ def plot_q_vs_w(q: list[float], q_errors: list[float], w: list[int], save_to: st
         plt.errorbar(w, q, yerr=q_errors, fmt='o')
     #plt.plot(w, q, marker="o", linestyle="")
 
-    plt.xlabel('Vibración del silo')
-    plt.ylabel('Caudal')
+    plt.xlabel('Vibración del silo (1/s)')
+    plt.ylabel('Caudal (1/s)')
     #plt.title('Caudal en función de omega')
 
     if ylim is not None:
