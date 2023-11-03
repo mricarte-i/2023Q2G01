@@ -211,8 +211,8 @@ def plot_q_vs_d(q: list[float], q_errors: list[float], D: list[int], w: int, sav
     else:
         plt.errorbar(D, q, yerr=q_errors, fmt='o')
 
-    plt.xlabel('Ancho de la apertura de salida')
-    plt.ylabel('Caudal')
+    plt.xlabel('Ancho de la apertura de salida (cm)')
+    plt.ylabel('Caudal (1/s)')
     #plt.title('Caudal en función de la longitud de la apertura para w = ' + str(w))
 
     plt.savefig(save_to, bbox_inches='tight', dpi=1200, facecolor='white')
