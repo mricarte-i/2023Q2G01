@@ -161,7 +161,7 @@ def plot_q_vs_t(timestamps, t_est):
 
 
 # q = [...], w = [5, 10, 15, 20, 30, 50]
-def plot_q_vs_w(q: list[float], q_errors: list[float], w: list[int], save_to: str, join_ponts: bool = False):
+def plot_q_vs_w(q: list[float], q_errors: list[float], w: list[int], save_to: str, join_ponts: bool = False, ylim : tuple[float, float] = None):
     # TODO: unhardcode
     #w = [5, 10, 15, 20, 30, 50]
     #q = [20, 18, 16, 17, 19, 22]
@@ -183,6 +183,9 @@ def plot_q_vs_w(q: list[float], q_errors: list[float], w: list[int], save_to: st
     plt.xlabel('Vibración del silo')
     plt.ylabel('Caudal')
     #plt.title('Caudal en función de omega')
+
+    if ylim is not None:
+        plt.ylim(ylim)
 
     plt.savefig(save_to, bbox_inches='tight', dpi=1200, facecolor='white')
     #plt.show()
