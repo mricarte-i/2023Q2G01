@@ -63,11 +63,11 @@ public class ParticleSystem implements SimulationSystem {
     private void reinsertParticle(Particle p) {
         double x, y;
         double r = p.getRadius();
-        double heightRange = 30; //todo: assumes L = 70, y in [40,70]
+        double heightRange = paramsParser.getReinjectionUpperBound() - paramsParser.getReinjectionLowerBound();
         boolean overlaps = false;
         do {
             x = random.nextDouble() * (W - 2*r) + r;
-            y = random.nextDouble() * (heightRange - 2*r) + r + 40;
+            y = random.nextDouble() * (heightRange - 2*r) + r + paramsParser.getReinjectionLowerBound();
             overlaps = false;
 
             for(Particle other: particles) {
