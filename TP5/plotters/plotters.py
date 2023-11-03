@@ -132,7 +132,7 @@ def plot_exiting_particles_vs_t(plt, timestamps, t_est, color, label, perform_re
         Q, errs = plot_regression(timestamps, accumulated_values, t_est, color)
 
         return Q, errs
-    
+
     return None
     """
     LO CAMBIE POR REGRESION
@@ -192,7 +192,7 @@ def plot_q_vs_w(q: list[float], q_errors: list[float], w: list[int], save_to: st
 
 
 # q = [...], d = [4, 5, 6]
-def plot_q_vs_d(q: list[float], q_errors: list[float], D: list[int], w: int, save_to: str):
+def plot_q_vs_d(q: list[float], q_errors: list[float], D: list[int], w: int, save_to: str, join_points: bool = False):
     # TODO: unhardcode
     #D = [4, 5, 6]
     #q = [20, 18, 16]
@@ -205,11 +205,15 @@ def plot_q_vs_d(q: list[float], q_errors: list[float], D: list[int], w: int, sav
     # plt.legend()
 
     # TODO: quitar si vamos a hacer todos los puntos de distintos colores
-    plt.errorbar(D, q, yerr=q_errors, fmt='o')
+    #plt.errorbar(D, q, yerr=q_errors, fmt='o')
+    if join_points:
+        plt.errorbar(D, q, yerr=q_errors, fmt='o', linestyle="-")
+    else:
+        plt.errorbar(D, q, yerr=q_errors, fmt='o')
 
-    plt.xlabel('D')
-    plt.ylabel('Q')
-    plt.title('Caudal en función de la longitud de la apertura para w = ' + str(w))
+    plt.xlabel('Ancho de la apertura de salida')
+    plt.ylabel('Caudal')
+    #plt.title('Caudal en función de la longitud de la apertura para w = ' + str(w))
 
     plt.savefig(save_to, bbox_inches='tight', dpi=1200, facecolor='white')
     #plt.show()
