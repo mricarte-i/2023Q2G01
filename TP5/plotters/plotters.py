@@ -58,7 +58,8 @@ def get_timestamps(fileName):
     return timestamps
 
 
-def plot_exiting_particles_vs_t_for_multiple_ws(timestamps: list[list[float]], t_ests: list[float], ws: list[int], colors: list[str], save_to: str, perform_regression=False):
+def plot_exiting_particles_vs_t_for_multiple_ws(timestamps: list[list[float]], t_ests: list[float], ws: list[int], colors: list[str], save_to: str, perform_regression=False,
+                                                label_val: str = "ω", units_w: str = "1/s", units_reg: str = "1/s"):
     # TODO: unhardcode
     #timestamps_w_5 = [0.1, 0.2, 0.3, 0.5, 0.6, 0.7, 0.71, 0.745, 0.77, 0.779, 0.8, 0.81, 0.84]
     #t_est_w_5 = 0.7
@@ -84,10 +85,10 @@ def plot_exiting_particles_vs_t_for_multiple_ws(timestamps: list[list[float]], t
 
     for i in range(len(ws)):
         if perform_regression:
-            Q, errs = plot_exiting_particles_vs_t(plt, timestamps[i], t_ests[i], colors[i], 'w = ' + str(ws[i]), perform_regression=True)
+            Q, errs = plot_exiting_particles_vs_t(plt, timestamps[i], t_ests[i], colors[i], '{} = {} {}'.format(label_val, str(ws[i]), units_w), perform_regression=True, units_reg=units_reg)
             w_caudales[ws[i]] = (Q, errs)
         else:
-            plot_exiting_particles_vs_t(plt, timestamps[i], t_ests[i], colors[i], 'w = ' + str(ws[i]), perform_regression=False)
+            plot_exiting_particles_vs_t(plt, timestamps[i], t_ests[i], colors[i], '{} = {} {}'.format(label_val, str(ws[i]), units_w), perform_regression=False, units_reg=units_reg)
 
     plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
     plt.savefig(save_to, bbox_inches='tight', dpi=1200, facecolor='white')
@@ -96,7 +97,7 @@ def plot_exiting_particles_vs_t_for_multiple_ws(timestamps: list[list[float]], t
 
 from min_sqrs import min_sqrs, perform_regression
 
-def plot_regression(timestamps: list[float], accumulated_values: list[float], t_est: float, color: str) -> tuple[int, np.ndarray]:
+def plot_regression(timestamps: list[float], accumulated_values: list[float], t_est: float, color: str, units: str) -> tuple[int, np.ndarray]:
     t_est_idx = get_first_timestap_after_idx(t_est, timestamps)
 
     X = np.array(timestamps[t_est_idx:])-timestamps[t_est_idx]
@@ -117,19 +118,19 @@ def plot_regression(timestamps: list[float], accumulated_values: list[float], t_
 
     O = np.apply_along_axis(lambda x : k*x + Y[0], 0, X)
 
-    plt.plot(X+timestamps[t_est_idx], O, linestyle="--", color=color, label="Q = {}".format(k))
+    plt.plot(X+timestamps[t_est_idx], O, linestyle="--", color=color, label="Q = {} {}".format(k, units))
 
     return k, min_E
 
 # timestamps = [...], t_est = x
-def plot_exiting_particles_vs_t(plt, timestamps, t_est, color, label, perform_regression=False):
+def plot_exiting_particles_vs_t(plt, timestamps, t_est, color, label, perform_regression=False, units_reg=""):
     accumulated_values = list(range(1, len(timestamps) + 1))
 
     plt.plot(timestamps, accumulated_values, color=color, label=label)
 
     if perform_regression:
 
-        Q, errs = plot_regression(timestamps, accumulated_values, t_est, color)
+        Q, errs = plot_regression(timestamps, accumulated_values, t_est, color, units_reg)
 
         return Q, errs
 
@@ -175,12 +176,12 @@ def plot_q_vs_w(q: list[float], q_errors: list[float], w: list[int], save_to: st
 
     # TODO: quitar si vamos a hacer todos los puntos de distintos colores
     if join_ponts:
-        plt.errorbar(w, q, yerr=q_errors, fmt='o', linestyle="-")
+        plt.errorbar(w, q, yerr=q_errors, fmt='o', linestyle="-", capsize=5)
     else:
-        plt.errorbar(w, q, yerr=q_errors, fmt='o')
+        plt.errorbar(w, q, yerr=q_errors, fmt='o', capsize=5)
     #plt.plot(w, q, marker="o", linestyle="")
 
-    plt.xlabel('Vibración del silo (1/s)')
+    plt.xlabel('Frecuencia de Vibración del silo (1/s)')
     plt.ylabel('Caudal (1/s)')
     #plt.title('Caudal en función de omega')
 
@@ -207,11 +208,11 @@ def plot_q_vs_d(q: list[float], q_errors: list[float], D: list[int], w: int, sav
     # TODO: quitar si vamos a hacer todos los puntos de distintos colores
     #plt.errorbar(D, q, yerr=q_errors, fmt='o')
     if join_points:
-        plt.errorbar(D, q, yerr=q_errors, fmt='o', linestyle="-")
+        plt.errorbar(D, q, yerr=q_errors, fmt='o', linestyle="-", capsize=5)
     else:
-        plt.errorbar(D, q, yerr=q_errors, fmt='o')
+        plt.errorbar(D, q, yerr=q_errors, fmt='o', capsize=5)
 
-    plt.xlabel('Ancho de la apertura de salida (cm)')
+    plt.xlabel('Ancho de puerta (cm)')
     plt.ylabel('Caudal (1/s)')
     #plt.title('Caudal en función de la longitud de la apertura para w = ' + str(w))
 
